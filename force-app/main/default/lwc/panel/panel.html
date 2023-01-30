@@ -1,0 +1,21 @@
+<template>
+<div class="slds-panel slds-size_full slds-panel_docked
+		slds-panel_docked-right slds-panel_drawer slds-is-open"
+	aria-hidden="false"
+	id="panel-id">
+	<div class="slds-panel__header">
+		<h2 class="slds-panel__header-title
+				slds-text-heading_small slds-truncate"
+			title={title}>{title}</h2>
+		<div class="slds-panel__header-actions">
+			<lightning-button-icon icon-name="utility:close"
+				size="small"
+				variant="container"
+				onclick={handleCloseClick}></lightning-button-icon>
+		</div>
+	</div>
+	<div class="slds-panel__body">
+		<slot name="body"></slot>
+	</div>
+</div>
+</template>

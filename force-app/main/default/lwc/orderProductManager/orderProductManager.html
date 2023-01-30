@@ -1,0 +1,99 @@
+<!--
+@author Fernando Gomez
+@since 10/30.2022
+@versino 1.0
+-->
+<template>
+<div class="slds-box slds-box_small slds-theme_shade">
+	<lightning-layout>
+		<lightning-layout-item>
+			<div class="slds-media">
+				<div class="slds-media__figure">
+					<lightning-icon icon-name="standard:product"></lightning-icon>
+				</div>
+				<div class="slds-media__body">
+					<div class="slds-page-header__name">
+						<div class="slds-page-header__name-title">
+							<h1>
+								<span class="slds-page-header__title slds-truncate"
+									title="Products">{title}</span>
+								<lightning-formatted-rich-text
+									value={subtitle}></lightning-formatted-rich-text>
+							</h1>
+						</div>
+					</div>
+				</div>
+			</div>
+		</lightning-layout-item>
+		<lightning-layout-item alignment-bump="left"
+			padding="horizontal-large">
+			<div class="slds-text-title_caps slds-truncate"
+				title="Subtotal">
+				Subtotal
+			</div>
+			<div class="slds-truncate"></div>
+				<lightning-formatted-number 
+					format-style="currency"
+					currency-code="USD"
+					value={subtotal}
+					class="slds-text-heading_medium"></lightning-formatted-number>
+		</lightning-layout-item>
+		<lightning-layout-item padding="horizontal-large">
+			<div class="slds-text-title_caps slds-truncate"
+				title="Taxes">
+				Taxes (<lightning-formatted-number 
+					format-style="percent"
+					value={taxesPercent}></lightning-formatted-number>)
+			</div>
+			<div class="slds-truncate"></div>
+				<lightning-formatted-number 
+					format-style="currency"
+					currency-code="USD"
+					value={taxes}
+					class="slds-text-heading_medium"></lightning-formatted-number>
+		</lightning-layout-item>
+		<lightning-layout-item padding="horizontal-large">
+			<div class="slds-text-title_caps slds-truncate"
+				title="Discounts">
+				Discounts
+			</div>
+			<div class="slds-truncate"></div>
+				<lightning-formatted-number 
+					format-style="currency"
+					currency-code="USD"
+					value={discounts}
+					class="slds-text-heading_medium"></lightning-formatted-number>
+		</lightning-layout-item>
+		<lightning-layout-item padding="horizontal-large"
+			class="slds-border_left">
+			<div class="slds-text-title_caps slds-truncate"
+				title="Total">
+				Total
+			</div>
+			<div class="slds-truncate"></div>
+				<lightning-formatted-number 
+					format-style="currency"
+					currency-code="USD"
+					value={total}
+					class="slds-text-heading_large"></lightning-formatted-number>
+		</lightning-layout-item>
+	</lightning-layout>
+</div>
+<div class="products slds-scrollable_y">
+	<c-product-manager if:true={title}
+		title={title}
+		subtitle={subtitle}
+		details={details}
+		onproductschange={handleOnProductsChange}>
+	</c-product-manager>
+</div>
+<div class="c-footer slds-modal__footer">
+	<lightning-button label="Cancel"
+		class="slds-var-m-right_x-small"
+		onclick={handleCancelClick}></lightning-button>
+	<lightning-button variant="brand"
+		label="Save"
+		disabled={isSaveDisabled}
+		onclick={handleSaveClick}></lightning-button>
+</div>
+</template>

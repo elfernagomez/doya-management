@@ -1,0 +1,19 @@
+<!--
+@author Fernando Gomez
+@since 10/30.2022
+@versino 1.0
+-->
+<aura:component implements="force:lightningQuickActionWithoutHeader,force:hasRecordId">
+	<aura:html tag="style">
+		.slds-modal__container {
+			min-width: 80vw;
+			position: relative;
+		}
+		
+		.slds-modal__content {
+			position: relative;
+		}
+	</aura:html>
+	<c:orderProductManager recordId="{! v.recordId }"
+		oncancel="{! c.handleCancel }" />
+</aura:component>
