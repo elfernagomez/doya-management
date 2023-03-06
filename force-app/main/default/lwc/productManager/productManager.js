@@ -10,12 +10,13 @@ import { refreshApex } from '@salesforce/apex';
 export default class ProductManager extends LightningElement {
 	@api
 	get details() {
-		return _getDetails();
+		return this._getDetails();
 	}
 
 	set details(_details) {
-		this.products = [..._details?.products || []]
-		this.deletedIds = [..._details?.deletedIds || []]
+		let clone = JSON.parse(JSON.stringify(_details));
+		this.products = clone.products || [];
+		this.deletedIds = clone.deletedIds || [];
 	}
 
 	products = [];
@@ -162,7 +163,7 @@ export default class ProductManager extends LightningElement {
 			});
 		else
 			// if product was cleared, we need to clear the value in the item
-			this.editProduct(index, { selectedProduct2Id: null });
+			this.editProduct(index, { product2Id: null });
 	}
 
 	translateProduct(data) {
@@ -217,7 +218,12 @@ export default class ProductManager extends LightningElement {
 			isBusy: false,
 			isDeleting: false,
 			isDisabled: false,
-			totalPrice: 0
+			totalPrice: 0,
+			isDeleting: false,
+			isDisabled: false,
+			isValid: true,
+			errorMessage: null,
+			isNew: true
 		});
 	}
 
@@ -231,14 +237,19 @@ export default class ProductManager extends LightningElement {
 
 		// new products that have not been saved can be deleted
 		// without confirmation to save time...
-		if (this._isNew(product))
+		try {
+		if (product.isNew)
 			this.products.splice(index, 1);
 		// for existing products we need confirmation
 		else {
 			product.isDeleting = true;
 			product.isDisabled = true;
 		}
+		} catch (e) {
+			console.error(e);
+		}
 
+		console.log(JSON.stringify(product));
 		this._refreshReference();
 	}
 
@@ -294,15 +305,6 @@ export default class ProductManager extends LightningElement {
 			default:
 				return val;
 		}
-	}
-
-	/**
-	 * @param {*} product 
-	 * @returns true if the product has never been saved into the database.
-	 * Meaning it was just created interacting with this tool.
-	 */
-	_isNew(product) {
-		return product.uniqueId.startsWith("unsaved_");
 	}
 
 	_getDetails() {

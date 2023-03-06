@@ -4,7 +4,22 @@
 @versino 1.0
 -->
 <template>
-<div class="slds-box slds-box_small slds-theme_shade">
+<div class="anchor-all slds-scrollable_y slds-var-p-horizontal_small">
+	<c-product-manager lwc:if={isReady}
+		title={title}
+		subtitle={subtitle}
+		details={details}
+		onproductschange={handleOnProductsChange}>
+	</c-product-manager>
+
+	<template lwc:if={isLoading}>
+		<lightning-spinner variant="brand"
+			alternative-text="Loading..."></lightning-spinner>
+	</template>
+</div>
+
+<div class="anchor-top slds-box slds-box_small
+		slds-theme_shade slds-scrollable_x">
 	<lightning-layout>
 		<lightning-layout-item>
 			<div class="slds-media">
@@ -79,15 +94,7 @@
 		</lightning-layout-item>
 	</lightning-layout>
 </div>
-<div class="products slds-scrollable_y">
-	<c-product-manager if:true={title}
-		title={title}
-		subtitle={subtitle}
-		details={details}
-		onproductschange={handleOnProductsChange}>
-	</c-product-manager>
-</div>
-<div class="c-footer slds-modal__footer">
+<div class="anchor-bottom slds-modal__footer">
 	<lightning-button label="Cancel"
 		class="slds-var-m-right_x-small"
 		onclick={handleCancelClick}></lightning-button>
