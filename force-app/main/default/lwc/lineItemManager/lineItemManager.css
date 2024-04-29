@@ -1,0 +1,9 @@
+.switch-btn {
+	top: -1rem;
+	left: 50%;
+	color: var(--slds-c-button-text-color,
+		var(--sds-c-button-text-color,
+		var(--lwc-brandAccessible,
+		rgb(1, 118, 211))));
+	z-index: 1;
+;}

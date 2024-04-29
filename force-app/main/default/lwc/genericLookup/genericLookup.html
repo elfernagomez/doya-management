@@ -1,0 +1,143 @@
+<!--
+Custom Lookup componenent to be used in any custom form.
+@authro Fernando Gomez, SkyPlanner LLC
+@version 1.0
+-->
+<template>
+	<div class="slds-form-element">
+		<div lwc:if={record}
+			class={formElementClass}>
+			<label lwc:if={showLabel}
+				class="slds-form-element__label">{label}</label>
+			<div class="slds-form-element__control">
+				<div class="slds-combobox_container slds-has-selection">
+					<div aria-expanded="false"
+						aria-haspopup="listbox"
+						role="combobox"
+						class="slds-combobox
+							slds-dropdown-trigger
+							slds-dropdown-trigger_click">
+						<div role="none"
+							class="slds-combobox__form-element slds-input-has-icon
+								slds-input-has-icon_left-right">
+							<span class="slds-icon_container
+								slds-combobox__input-entity-icon"
+								style={style}>
+								<img lwc:if={someThemeIcon}
+									src={iconUrl}
+									class="slds-icon slds-icon_small" />
+								<lightning-icon
+									lwc:else icon-name={iconName}
+									size="small">
+								</lightning-icon>
+							</span>
+							<input type="text"
+								autocomplete="off"
+								role="textbox"
+								readonly="readonly"
+								value={record.label}
+								class="slds-input slds-combobox__input
+									slds-combobox__input-value" />
+							<button lwc:if={showCloseButon}
+								onclick={handleOnRemoveSelection}
+								title="Remove selected option"
+								class="slds-button slds-button_icon
+									slds-input__icon slds-input__icon_right">
+								<lightning-icon icon-name="utility:close"
+									size="x-small"
+									alternative-text="Remove Selection">
+								</lightning-icon>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div lwc:else
+			class="slds-combobox_container slds-var-m-bottom_small">
+			<div class="slds-combobox slds-dropdown-trigger
+					slds-dropdown-trigger_click slds-is-open"
+				aria-expanded="true"
+				aria-haspopup="listbox"
+				role="combobox">
+				<lightning-input 
+					name="enter-search"
+					label={label}
+					value={keywords}
+					variant={variant}
+					placeholder={placeholder}
+					onblur={handleOnBlur}
+					onchange={handleOnChange}
+					autocomplete="off"
+					type="search"
+					read-only={isReadOnly}
+					required={isRequired}
+					class="required-field
+						slds-combobox__input
+						slds-m-bottom_none"></lightning-input>
+	
+				<div lwc:if={showMenu}
+					class="slds-dropdown slds-dropdown_fluid
+						slds-dropdown_length-with-icon-7"
+					role="listbox">
+					<ul class="slds-listbox slds-listbox_vertical"
+						role="presentation">
+						<li role="presentation"
+							class="slds-listbox__item">
+							<div aria-selected="true"
+								id="option0"
+								class="slds-media slds-listbox__option
+									slds-listbox__option_entity
+									slds-listbox__option_term slds-has-focus"
+								role="option">
+								<span class="slds-media__figure
+										slds-listbox__option-icon">
+									<lightning-icon icon-name="utility:search"
+										size="x-small"></lightning-icon>
+								</span>
+								<span class="slds-media__body">{keywords}</span>
+							</div>
+						</li>
+						<li for:each={results}
+							for:item="it"
+							for:index="index"
+							key={it.Id}
+							onclick={handleOnSelect}
+							data-index={index}
+							role="presentation"
+							class="slds-listbox__item">
+							<div role="option"
+								class="slds-media slds-listbox__option
+									slds-listbox__option_entity
+									slds-listbox__option_has-meta">
+								<span class="slds-media__figure
+										slds-listbox__option-icon">
+									<span lwc:if={someThemeIcon}
+										class="slds-icon_container"
+										style={style}>
+										<img src={iconUrl}
+											class="slds-icon slds-icon_small" />
+									</span>
+									<lightning-icon lwc:else
+										icon-name={iconName}
+										size="small"></lightning-icon>
+								</span>
+								<span class="slds-media__body">
+									<span class="slds-listbox__option-text
+											slds-listbox__option-text_entity">
+										<span>{it.label}</span>
+									</span>
+									<span lwc:if={it.subLabel}
+										class="slds-listbox__option-meta
+											slds-listbox__option-meta_entity">
+										{it.subLabel}
+									</span>
+								</span>
+							</div>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>

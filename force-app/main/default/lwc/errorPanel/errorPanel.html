@@ -1,0 +1,20 @@
+<template>
+<div class="slds-box">
+	<div class="slds-media">
+		<div class="slds-media__figure">
+			<lightning-icon icon-name="utility:error"
+				size="small"
+				variant="error"></lightning-icon>
+		</div>
+		<div class="slds-media__body">
+			<p class="slds-text-heading_small
+					slds-text-color_error
+					slds-var-m-bottom_small">{errorTitle}</p>
+			<pre lwc:if={showErrorJson}
+				class="slds-box
+					slds-box_x-small
+					slds-theme_shade">{errorJson}</pre>
+		</div>
+	</div>
+</div>
+</template>

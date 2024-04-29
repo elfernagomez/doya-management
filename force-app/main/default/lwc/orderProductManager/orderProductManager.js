@@ -1,4 +1,5 @@
-import { LightningElement, api, wire } from 'lwc';
+import LwcBase from 'c/lwcBase';
+import { api, wire } from 'lwc';
 import { getRecord, getFieldValue } from 'lightning/uiRecordApi';
 import { getRelatedListRecords } from 'lightning/uiRelatedListApi';
 import { CloseActionScreenEvent } from 'lightning/actions';
@@ -14,7 +15,7 @@ import ACCOUNT_NAME_FIELD from '@salesforce/schema/Order.Account.Name';
  * @since 10/30.2022
  * @versino 1.0
  */
-export default class OrderProductManager extends LightningElement {
+export default class OrderProductManager extends LwcBase {
 	@api
 	recordId;
 
@@ -32,6 +33,7 @@ export default class OrderProductManager extends LightningElement {
 	total = 0;
 
 	isSaveDisabled = true;
+	isLoading = false;
 
 	@wire(getRecord, { 
 		recordId: "$recordId",

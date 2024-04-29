@@ -1,20 +1,22 @@
 <!--
-@author Fernando Gomez, SkyPlanner LLC
+@author Fernando Gomez
 @version 1.0
 -->
 <template>
-<template if:true={isOpen}>
+<template lwc:if={isOpen}>
 	<section role="dialog"
 		tabindex="-1" 
 		aria-labelledby="modal-heading-01" 
 		aria-modal="true"
 		aria-describedby="modal-content-id-1" 
-		class="slds-modal slds-fade-in-open">
-		<div class="slds-modal__container">
-			<header if:true={headerHidden}
+		class={modalClass}>
+		<div class="slds-modal__container slds-grid_align-center">
+			<header lwc:if={headerHidden}
 				class="slds-modal__header slds-modal__header_empty">
 				<!-- sldsValidatorIgnoreNextLine -->
-				<lightning-button-icon onclick={onCloseClick}
+				<lightning-button-icon
+					lwc:if={showCloseButton}
+					onclick={onCloseClick}
 					icon-name="utility:close"
 					alternative-text="Close"
 					title="Close"
@@ -24,10 +26,11 @@
 					class="slds-button slds-button_icon
 						slds-modal__close"></lightning-button-icon>
 			</header>
-			<header if:false={headerHidden}
+			<header lwc:else
 				class="slds-modal__header">
 				<!-- sldsValidatorIgnoreNextLine -->
-				<lightning-button-icon onclick={onCloseClick}
+				<lightning-button-icon lwc:if={showCloseButton}
+					onclick={onCloseClick}
 					icon-name="utility:close"
 					alternative-text="Close"
 					title="Close"
@@ -36,8 +39,7 @@
 					size="large"
 					class="slds-button slds-button_icon
 						slds-modal__close"></lightning-button-icon>
-				<h2 id="modal-heading-01"
-					class="slds-modal__title slds-hyphenate">
+				<h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">
 					<slot name="header"></slot>
 				</h2>
 			</header>

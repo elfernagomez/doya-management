@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+	<apiVersion>54.0</apiVersion>
+	<isExposed>true</isExposed>
+	<targets>
+		<target>lightning__AppPage</target>
+		<target>lightning__FlowScreen</target>
+		<target>lightning__HomePage</target>
+		<target>lightning__RecordPage</target>
+	</targets>
+	<targetConfigs>
+		<targetConfig targets="lightning__FlowScreen">
+			<property name="variant"
+				type="String"
+				label="Variant (info, info-inverse, success, warning, error)" />
+			<property name="message"
+				type="String"
+				label="Message" />
+			<property name="isIconHidden"
+				type="Boolean"
+				label="Is Icon Hidden?" />
+			<property name="customBackgroundColor"
+				type="String"
+				label="Custom Background Color" />
+		</targetConfig>
+		<targetConfig targets="lightning__AppPage,lightning__HomePage,lightning__RecordPage">
+			<property name="variant"
+				type="String"
+				label="Variant (info, info-inverse, success, warning, error)" />
+			<property name="message"
+				type="String"
+				label="Message" />
+			<property name="isIconHidden"
+				type="Boolean"
+				label="Is Icon Hidden?" />
+			<property name="customBackgroundColor"
+				type="String"
+				label="Custom Background Color" />
+			<supportedFormFactors>
+				<supportedFormFactor type="Large" /> 
+				<supportedFormFactor type="Small" />
+			</supportedFormFactors>
+		</targetConfig>
+	</targetConfigs>
+</LightningComponentBundle>

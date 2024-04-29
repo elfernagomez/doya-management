@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+	<labels>
+		<fullName>lineItemManager_addItemBtn</fullName>
+		<language>en_US</language>
+		<protected>false</protected>
+		<shortDescription>lineItemManager_addItemBtn</shortDescription>
+		<value>Add Item</value>
+	</labels>
+	<labels>
+		<fullName>lineItemManager_deleteItemBtn</fullName>
+		<language>en_US</language>
+		<protected>false</protected>
+		<shortDescription>lineItemManager_deleteItemBtn</shortDescription>
+		<value>Delete Item</value>
+	</labels>
+	<labels>
+		<fullName>lineItemManager_noItemsMsg</fullName>
+		<language>en_US</language>
+		<protected>false</protected>
+		<shortDescription>lineItemManager_noItemsMsg</shortDescription>
+		<value>No steps yet.</value>
+	</labels>
+	<labels>
+		<fullName>lineItemManager_procedureFieldLabel</fullName>
+		<language>en_US</language>
+		<protected>false</protected>
+		<shortDescription>lineItemManager_procedureFieldLabel</shortDescription>
+		<value>Procedure</value>
+	</labels>
+	<labels>
+		<fullName>lineItemManager_showItemsNotesBtn</fullName>
+		<language>en_US</language>
+		<protected>false</protected>
+		<shortDescription>lineItemManager_showItemsNotesBtn</shortDescription>
+		<value>Show Notes</value>
+	</labels>
+	<labels>
+		<fullName>lineItemManager_hideItemsNotesBtn</fullName>
+		<language>en_US</language>
+		<protected>false</protected>
+		<shortDescription>lineItemManager_hideItemsNotesBtn</shortDescription>
+		<value>Hide Notes</value>
+	</labels>
+	<labels>
+		<fullName>lineItemManager_notesFieldLabel</fullName>
+		<language>en_US</language>
+		<protected>false</protected>
+		<shortDescription>lineItemManager_notesFieldLabel</shortDescription>
+		<value>Notes</value>
+	</labels>
+	<labels>
+		<fullName>lineItemManager_orderItemBtn</fullName>
+		<language>en_US</language>
+		<protected>false</protected>
+		<shortDescription>lineItemManager_orderItemBtn</shortDescription>
+		<value>Switch Order</value>
+	</labels>
+</CustomLabels>

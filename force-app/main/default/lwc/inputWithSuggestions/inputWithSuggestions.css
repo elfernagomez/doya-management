@@ -1,0 +1,12 @@
+.slds-combobox_container .custom-dropdown {
+	padding: var(--lwc-spacingXxxSmall, 0.125rem) 0;
+	left: 0;
+	transform: none;
+}
+
+.custom-dropdown .custom-listbox__option_plain {
+	padding: var(--lwc-spacingXxxSmall, 0.125rem)
+		0
+		var(--lwc-spacingXxxSmall, 0.125rem)
+		var(--lwc-spacingSmall, 1rem);
+}

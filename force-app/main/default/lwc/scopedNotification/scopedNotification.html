@@ -1,0 +1,26 @@
+<!--
+Component implemeting Scoped Notification blue print
+on the lightning design system:
+https://www.lightningdesignsystem.com/components/scoped-notifications
+@author Fernando Gomez
+@version 1.0 6/24/2022
+-->
+<template>
+	<div role="status"
+		class={mainClass}
+		style={mainStyle}>
+		<div lwc:if={showIcon}
+			class="slds-media__figure">
+			<lightning-icon icon-name={icon}
+				alternative-text="information"
+				variant={iconVariant}
+				size="small"></lightning-icon>
+		</div>
+		<div class="slds-media__body">
+			<div lwc:if={message}
+				class="slds-text-heading_medium">{message}</div>
+			<!-- custom html used inside another component -->
+			<slot></slot>
+		</div>
+	</div>
+</template>

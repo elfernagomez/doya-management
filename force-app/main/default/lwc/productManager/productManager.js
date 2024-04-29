@@ -1,4 +1,5 @@
-import { LightningElement, api, wire } from 'lwc';
+import LwcBase from 'c/lwcBase';
+import { api, wire } from 'lwc';
 import { getRecord } from 'lightning/uiRecordApi';
 import { refreshApex } from '@salesforce/apex';
 
@@ -7,7 +8,7 @@ import { refreshApex } from '@salesforce/apex';
  * @since 10/30.2022
  * @versino 1.0
  */
-export default class ProductManager extends LightningElement {
+export default class ProductManager extends LwcBase {
 	@api
 	get details() {
 		return this._getDetails();
@@ -61,7 +62,7 @@ export default class ProductManager extends LightningElement {
 		let field = event.target.dataset.field;
 		let type = event.target.dataset.type;
 		let src = event.target.dataset.src;
-		let converted = this._convertToType(val, type);
+		let converted = this.convertToType(val, type);
 
 		switch (src) {
 			case "locals":
@@ -95,7 +96,7 @@ export default class ProductManager extends LightningElement {
 	 */
 	handleNewProductClick(event) {
 		this.newProductRequestIndex =
-			this._convertToType(event.target.dataset.index, "int");
+			this.convertToType(event.target.dataset.index, "int");
 		event.preventDefault();
 		this.openNewProductPanel();
 	}
@@ -105,7 +106,7 @@ export default class ProductManager extends LightningElement {
 	 * @param {*} event 
 	 */
 	handleDeleteProductClicked(event) {
-		let index = this._convertToType(event.target.dataset.index, "int");
+		let index = this.convertToType(event.target.dataset.index, "int");
 		event.preventDefault();
 		this.deleteProduct(index);
 	}
@@ -115,8 +116,8 @@ export default class ProductManager extends LightningElement {
 	 * @param {*} event 
 	 */
 	handleConfirmDeleteProductClicked(event) {
-		let index = this._convertToType(event.target.dataset.index, "int");
-		let value = this._convertToType(event.target.dataset.value, "bool");
+		let index = this.convertToType(event.target.dataset.index, "int");
+		let value = this.convertToType(event.target.dataset.value, "bool");
 		event.preventDefault();
 
 		// we delete if confirmed, cancel if canceled
@@ -216,8 +217,6 @@ export default class ProductManager extends LightningElement {
 			height: null,
 			deliveryType: null,
 			isBusy: false,
-			isDeleting: false,
-			isDisabled: false,
 			totalPrice: 0,
 			isDeleting: false,
 			isDisabled: false,
@@ -292,19 +291,6 @@ export default class ProductManager extends LightningElement {
 		this.dispatchEvent(new CustomEvent('productschange', {
 			detail: this._getDetails()
 		}));
-	}
-
-	_convertToType(val, type) {
-		switch (type) {
-			case "int":
-				return parseInt(val);
-			case "float":
-				return parseFloat(val);
-			case "bool":
-				return val?.toLowerCase() == "true";
-			default:
-				return val;
-		}
 	}
 
 	_getDetails() {
