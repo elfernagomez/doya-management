@@ -56,4 +56,18 @@
 		<shortDescription>lineItemManager_orderItemBtn</shortDescription>
 		<value>Switch Order</value>
 	</labels>
+	<labels>
+		<fullName>fieldMultiSelector_defaultTitle</fullName>
+		<language>en_US</language>
+		<protected>false</protected>
+		<shortDescription>fieldMultiSelector_defaultTitle</shortDescription>
+		<value>Fields</value>
+	</labels>
+	<labels>
+		<fullName>procedureExtraFieldsSelector_title</fullName>
+		<language>en_US</language>
+		<protected>false</protected>
+		<shortDescription>procedureExtraFieldsSelector_title</shortDescription>
+		<value>Procedure Settings</value>
+	</labels>
 </CustomLabels>

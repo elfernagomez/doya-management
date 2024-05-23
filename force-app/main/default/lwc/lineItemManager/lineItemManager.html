@@ -15,10 +15,7 @@
 		for:item="item"
 		for:index="index"
 		key={item.uniqueId}
-		class="slds-media 
-			slds-box
-			slds-box_x-small
-			slds-var-m-bottom_xx-small
+		class="slds-var-m-bottom_xx-small
 			slds-is-relative">
 		<button lwc:if={index}
 			title={labels.orderItemBtn}
@@ -36,99 +33,10 @@
 				<label>{labels.orderItemBt}</label>
 			</c-font-awesome-icon>
 		</button>
-		<div class="slds-media__figure">
-			<div>
-				<span class="slds-badge">{item.order}</span>
-			</div>
-			<!-- <div class="slds-var-m-top_xx-small">
-				<lightning-button-icon alternative-text={labels.orderItemBtn}
-					data-index={index}
-					variant="base"
-					icon-name="utility:drag_and_drop"
-					size="small">
-					<label>{labels.orderItemBtn}</label>
-				</lightning-button-icon>
-			</div> -->
-		</div>
-		<div class="slds-media__body">
-			<lightning-layout>
-				<lightning-layout-item>
-					<lightning-combobox name="procedureId"
-						label={labels.procedureFieldLabel}
-						value={item.procedureId}
-						options={procedureOptions}
-						data-index={index}
-						data-field="procedureId"
-						data-type="string"
-						data-src="item"
-						onchange={handleFlatFieldChange}
-						required
-						class="validate"></lightning-combobox>
-				</lightning-layout-item>
-				<lightning-layout-item lwc:if={item.showDetails}
-					class="slds-var-m-left_medium">
-					<lightning-record-picker lwc:if={item.isDetailsMachine}
-						label="Machine"
-						object-api-name="Asset"
-						placeholder="Search Machines..."
-						filter={item.detailsFilter}
-						value={item.detailsValue}
-						data-index={index}
-						data-field="Machine__c"
-						onchange={handleRecordFieldChange}
-						required
-						class="validate"></lightning-record-picker>
-					<lightning-record-edit-form lwc:else
-						object-api-name="WorkOrderLineItem">
-						<lightning-input-field
-							field-name={item.detailsField}
-							value={item.detailsValue}
-							data-index={index}
-							data-field={item.detailsField}
-							onchange={handleRecordFieldChange}
-							required
-							class="validate"></lightning-input-field>
-					</lightning-record-edit-form>
-				</lightning-layout-item>
-			</lightning-layout>
-			<lightning-layout>
-				<lightning-layout-item lwc:if={item.showNotes}
-					size="12">
-					<lightning-textarea name="notes"
-						label={labels.notesFieldLabel}
-						value={item.notes}
-						data-index={index}
-						data-field="notes"
-						data-type="string"
-						data-src="item"
-						onchange={handleFlatFieldChange}
-						class="custom-input validate"></lightning-textarea>
-					<lightning-button label={labels.hideItemsNotesBtn}
-						data-index={index}
-						variant="base"
-						icon-name="utility:chevronup"
-						icon-position="right"
-						onclick={handleHideNotesClick}></lightning-button>
-				</lightning-layout-item>
-				<lightning-layout-item lwc:else
-					class="slds-col">
-					<lightning-button label={labels.showItemsNotesBtn}
-						data-index={index}
-						variant="base"
-						icon-name="utility:chevrondown"
-						icon-position="right"
-						onclick={handleShowNotesClick}></lightning-button>
-				</lightning-layout-item>
-			</lightning-layout>
-		</div>
-		<div class="slds-media__figure slds-media__figure_reverse">
-			<lightning-button-icon alternative-text={labels.deleteItemBtn}
-				data-index={index}
-				icon-name="utility:delete"
-				variant="bare">
-				<label>{labels.deleteItemBtn}</label>
-			</lightning-button-icon>
-		</div>
+		<c-line-item-manager-step item={item}
+			preview-procedure-options={procedureOptions}
+			variant="edit"
+			data-index={index}></c-line-item-manager-step>
 	</div>
 	</template>
 	<template lwc:else>

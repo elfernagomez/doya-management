@@ -1,0 +1,203 @@
+<template>
+<lightning-card title={title}>
+<lightning-radio-group slot="actions"
+	variant="label-hidden"
+	options={modeOptions}
+	value={_mode}
+	type="button"
+	onchange={handleOnModeChange}></lightning-radio-group>
+<div lwc:if={isView}
+	class="slds-var-p-horizontal_medium slds-is-relative">
+	<div lwc:if={hasFields}>
+		<div for:each={fields}
+			for:item="field"
+			for:index="index"
+			key={field.order}
+			class="slds-media 
+				slds-box
+				slds-box_x-small
+				slds-var-m-bottom_xx-small
+				slds-is-relative">
+			<div class="slds-media__figure">
+				<div><span class="slds-badge">{field.order}</span></div>
+			</div>
+			<div class="slds-media__body">
+				<div role="list"
+					class="slds-form">
+					<div class="slds-form__row">
+						<div role="listitem"
+							class="slds-form__item"
+							style="min-width: 0;">
+							<div class="slds-form-element
+									slds-form-element_edit
+									slds-form-element_readonly
+									slds-form-element_horizontal
+									slds-hint-parent">
+								<span title="Field"
+									class="slds-form-element__label">Field</span>
+								<div class="slds-form-element__control">
+									<div class="slds-form-element__static">
+										{field.fieldTitle}
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="slds-form__row">
+						<div role="listitem"
+							class="slds-form__item"
+							style="min-width: 0;">
+							<div class="slds-form-element
+									slds-form-element_edit
+									slds-form-element_readonly
+									slds-form-element_horizontal
+									slds-hint-parent">
+								<span title="Field"
+									class="slds-form-element__label">Label</span>
+								<div class="slds-form-element__control">
+									<div class="slds-form-element__static">
+										{field.fieldLabel}
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="slds-form__row">
+						<div role="listitem"
+							class="slds-form__item"
+							style="min-width: 0;">
+							<div class="slds-form-element
+									slds-form-element_edit
+									slds-form-element_readonly
+									slds-form-element_horizontal
+									slds-hint-parent">
+								<span title="Field"
+									class="slds-form-element__label">Required?</span>
+								<div class="slds-form-element__control">
+									<div class="slds-form-element__static">
+										<b lwc:if={field.isRequired}
+											class="slds-text-color_error">Yes</b>
+										<b lwc:else>No</b>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div lwc:if={isEdit}
+	class="slds-var-p-horizontal_medium slds-is-relative">
+	<div lwc:if={isError}>
+		<c-error-panel error-title={errorTitle}
+			error-object={errorObject}></c-error-panel>
+	</div>
+	<div lwc:if={hasFields}>
+		<div for:each={fields}
+			for:item="field"
+			for:index="index"
+			key={field.order}
+			class="slds-media 
+				slds-box
+				slds-box_x-small
+				slds-var-m-bottom_xx-small
+				slds-is-relative">
+			<button lwc:if={index}
+				title="Reorder"
+				data-index={index}
+				onclick={handleOnSwitchFieldsOrderClick}
+				class="switch-btn
+					slds-button
+					slds-button_icon
+					slds-button_icon-border-filled
+					slds-button_icon-small
+					slds-is-absolute">
+				<c-font-awesome-icon icon-name="solid:arrows-up-down"
+					size="x-small"
+					variant="inherit">
+					<label>Reorder</label>
+				</c-font-awesome-icon>
+			</button>
+			<div class="slds-media__figure">
+				<div><span class="slds-badge">{field.order}</span></div>
+			</div>
+			<div class="slds-media__body">
+				<p lwc:if={field.isError}
+					class="slds-text-color_error slds-var-m-bottom_xx-small">
+					{field.errorMsg}</p>
+				<lightning-combobox name="fieldApiName"
+					label="Field"
+					value={field.fieldApiName}
+					options={fieldOptions}
+					data-index={index}
+					data-field="fieldApiName"
+					data-type="string"
+					onchange={handleFieldChange}
+					class="validate slds-var-m-bottom_xx-small"
+					required></lightning-combobox>
+				<lightning-input name="fieldLabel"
+					label="Label (If Different)"
+					value={field.fieldLabel}
+					data-index={index}
+					data-field="fieldLabel"
+					data-type="string"
+					onchange={handleChange}
+					disabled={field.isLabelDisabled}
+					class="validate slds-var-m-bottom_medium"
+					required></lightning-input>
+				<lightning-input type="toggle"
+					label="Required?"
+					name="isRequired"
+					checked={field.isRequired}
+					data-index={index}
+					data-field="isRequired"
+					data-type="bool"
+					message-toggle-active="Yes"
+					message-toggle-inactive="No"
+					onchange={handleChange}
+					disabled={field.isRequiredDisabled}></lightning-input>
+			</div>
+			<div class="slds-media__figure slds-media__figure_reverse">
+				<!-- sldsValidatorIgnoreNextLine -->
+				<lightning-button-icon icon-name="utility:delete"
+					data-index={index}
+					variant="bare"
+					onclick={handleOnDeleteClick}></lightning-button-icon>
+			</div>
+		</div>
+	</div>
+	<div class="slds-var-m-top_medium">
+		<lightning-button label="Add Field"
+			icon-name="utility:add"
+			stretch="true"
+			onclick={handleAddFieldClick}></lightning-button>
+	</div>
+	<div class="slds-var-m-top_x-small">
+		<lightning-button label="Save"
+			icon-name="utility:save"
+			stretch="true"
+			variant="brand"
+			disabled={isSaveDisabled}
+			onclick={handleOnSaveClick}></lightning-button>
+	</div>
+	<lightning-layout lwc:if={showSaveSuccessMsg}
+		class="slds-gutters">
+		<lightning-layout-item
+			class="slds-media slds-box_x-small slds-var-m-top_x-small">
+			<div class="slds-media__figure">
+				<lightning-icon icon-name="utility:success"
+					size="x-small"
+					variant="success"></lightning-icon>
+			</div>
+			<div class="slds-media__body slds-text-color_success">
+				Saccessfully Saved!
+			</div>
+		</lightning-layout-item>
+	</lightning-layout>
+	<lightning-spinner lwc:if={isLoading}
+		variant="brand"></lightning-spinner>
+</div>
+</lightning-card>
+</template>

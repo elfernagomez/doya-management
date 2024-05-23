@@ -1,0 +1,61 @@
+<template>
+<lightning-card title={labels.title}>
+	<lightning-button icon-name="utility:preview"
+		variant="border-filled"
+		label="Peview"
+		slot="actions"
+		onclick={handleOnPreviewClick}></lightning-button>
+	<hr class="slds-var-m-vertical_xx-small" />
+	<lightning-layout multiple-rows="true">
+		<lightning-layout-item size="12"
+			medium-device-size="6">
+			<c-field-multi-selector record-id={recordId}
+				title="Administration Fields"
+				object-api-name={objectApiName}
+				source-object-api-name="WorkOrderLineItem"
+				result-field-api-name="AdminFieldsJson__c"></c-field-multi-selector>
+		</lightning-layout-item>
+		<lightning-layout-item size="12"
+			medium-device-size="6">
+			<c-field-multi-selector record-id={recordId}
+				title="Production Fields"
+				object-api-name={objectApiName}
+				source-object-api-name="WorkOrderLineItem"
+				result-field-api-name="ProductionFieldsJson__c"></c-field-multi-selector>
+		</lightning-layout-item>
+	</lightning-layout>
+</lightning-card>
+<c-modal size="large"
+	footer-hidden=true
+	class="previewModal">
+	<div slot="header">
+		<p>{procedureName}</p>
+		<p class="slds-text-heading_small">Line Item Preview</p>
+	</div>
+	<div slot="body"
+		class="slds-var-p-around_medium">
+		<div class="slds-grid
+				slds-grid_align-center">
+			<lightning-radio-group name="radioGroup"
+				alternative-text="Preview Mode"
+				options={previewModeOptions}
+				value={previewMode}
+				type="button"
+				variant="label-hidden"
+				onchange={handlePreviewModeChange}></lightning-radio-group>
+		</div>
+		<div lwc:if={previewItems}
+			class="slds-var-p-around_large">
+			<div for:each={previewItems}
+				for:item="item"
+				for:index="idnex"
+				key={item.uniqueId}
+				class="slds-var-m-bottom_xx-small">
+				<c-line-item-manager-step item={item}
+					procedure-options={previewProcedureOptions}
+					variant={previewMode}></c-line-item-manager-step>
+			</div>
+		</div>
+	</div>
+</c-modal>
+</template>

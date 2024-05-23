@@ -12,20 +12,28 @@ public with sharing class Procedure {
 	public String label { get; private set; }
 	
 	@AuraEnabled
-	public String detailsType { get; private set; }
-	
-	@AuraEnabled
-	public String detailsFieldApiName { get; private set; }
-	
-	@AuraEnabled
 	public String defaultNextId { get; private set; }
+	
+	@AuraEnabled
+	public Boolean isMachineInfoRequired { get; private set; }
+	
+	@AuraEnabled
+	public List<ProcedureFieldInfo> extraFields { get; private set; }
 
 	private Procedure(Procedure__c record) {
 		value = record.Id;
 		label = record.Name;
-		detailsType = record.Details_Type__c;
-		detailsFieldApiName = record.Details_Field_API_Name__c;
 		defaultNextId = record.DefaultNextProcedure__c;
+		isMachineInfoRequired = record.IsMachineInfoRequired__c;
+
+		try {
+			/* extraFields = (List<ProcedureFieldInfo>)JSON.deserialize(
+				record.ExtraFieldsJson__c, List<ProcedureFieldInfo>.class); */
+		} catch (JSONException ex) {
+			// we dn't want to block the program if it fails
+			extraFields = new List<ProcedureFieldInfo>();
+		}
+			
 	}
 
 	/**
@@ -39,9 +47,9 @@ public with sharing class Procedure {
 			result = new List<Procedure>();
 			for (Procedure__c p : [
 					SELECT Name,
-						Details_Type__c,
-						Details_Field_API_Name__c,
-						DefaultNextProcedure__c
+						DefaultNextProcedure__c,
+						IsMachineInfoRequired__c/* ,
+						ExtraFieldsJson__c */
 					FROM Procedure__c
 					ORDER BY Name
 					LIMIT 2000

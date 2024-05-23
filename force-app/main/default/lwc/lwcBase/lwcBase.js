@@ -147,6 +147,14 @@ export default class LwcBase extends LightningElement {
 	}
 
 	/**
+	 * @param {*} selector
+	 * @returns the components with the specified selector
+	 */
+	getAllComponents(selector) {
+		return this.template.querySelectorAll(selector);
+	}
+
+	/**
 	 * @param {*} str 
 	 * @returns 
 	 */

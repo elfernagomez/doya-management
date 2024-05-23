@@ -1,6 +1,6 @@
 import LwcBase from "c/lwcBase";
 import { track, api, wire } from "lwc";
-import { items } from "c/constants";
+import { lineItemManagerLabels } from "c/constants";
 import getAllProcedures from "@salesforce/apex/Procedure.getAll";
 
 const PROCEDURE_DETAIL_NOT_NEEDED = "No Details Needed";
@@ -34,7 +34,7 @@ export default class LineItemManager extends LwcBase {
 	@track
 	procedureOptions = [];
 
-	labels = items;
+	labels = lineItemManagerLabels;
 	locals = { };
 
 	isError = false;
@@ -79,11 +79,29 @@ export default class LineItemManager extends LwcBase {
 			event.target.dataset.index);
 	}
 
+	handleDetailsRecordFieldChange(event) {
+		let index = event.target.dataset.index;
+		this.items[index].detailsValue = event.detail.recordId;
+		this.handleRecordFieldChange(event);
+	}
+
 	handleRecordFieldChange(event) {
-		alert(event.target.value)
 		let field = event.target.dataset.field;
 		let index = event.target.dataset.index;
-		this.items[index].record[field] = event.target.value;
+		this.items[index].record[field] = event.detail.recordId;
+	}
+
+	/**
+	 * Triggered when Add button is clicke (both)
+	 * @param {*} event
+	 */
+	handleAddItemClick(event) {
+		this.addNewItem();
+	}
+
+	handleOnSwitchItemsOrderClick(event) {
+		let index = event.currentTarget.dataset.index;
+		this.moveItemUp(index);
 	}
 
 	/**
@@ -110,35 +128,6 @@ export default class LineItemManager extends LwcBase {
 
 				break;
 		}
-	}
-
-	/**
-	 * Triggered when Add button is clicke (both)
-	 * @param {*} event
-	 */
-	handleAddItemClick(event) {
-		this.addNewItem();
-	}
-
-	handleShowNotesClick(event) {
-		this.editItem(
-			event.target.dataset.index,
-			{
-				showNotes: true
-			});
-	}
-
-	handleHideNotesClick(event) {
-		this.editItem(
-			event.target.dataset.index,
-			{
-				showNotes: false
-			});
-	}
-
-	handleOnSwitchItemsOrderClick(event) {
-		let index = event.currentTarget.dataset.index;
-		this.moveItemUp(index);
 	}
 
 	addNewItem() {
@@ -182,6 +171,9 @@ export default class LineItemManager extends LwcBase {
 
 	applyProcedure(index) {
 		let item = this.items[index];
+		this.cleanProcedureDependencies(index);
+		item.record.Procedure__c = item.procedureId;
+
 		if (item.procedureId) {
 			let proc = this.procedureOptions.find(p => p.value == item.procedureId);
 			item.showDetails = proc.detailsType != PROCEDURE_DETAIL_NOT_NEEDED;
@@ -194,11 +186,6 @@ export default class LineItemManager extends LwcBase {
 					value: proc.label
 				}]
 			};
-		} else {
-			item.showDetails = false;
-			item.detailsField = null;
-			item.isDetailsMachine = false;
-			item.detailsFilter = null;
 		}
 	}
 
@@ -250,5 +237,25 @@ export default class LineItemManager extends LwcBase {
 		this.isError = true;
 		this.errorTitle = message;
 		this.errorObject = error;
+	}
+
+	cleanProcedureDependencies(index) {
+		let item = this.items[index];
+		item.showDetails = false;
+		item.detailsField = null;
+		item.isDetailsMachine = false;
+		item.detailsFilter = null;
+		item.record.Machine__c = null;
+		item.detailsValue = null;
+		
+		// we also need to clear the details
+		// record picker value since there will be a new filter
+		try {
+		let detailsField = this.getComponent(`.detailsField[data-index="${index}"]`);
+		if (detailsField && detailsField.clearSelection)
+			detailsField.clearSelection();
+		} catch (e) {
+			console.error(e)
+		}
 	}
 }

@@ -15,7 +15,12 @@ import NOTES_FIELD_LABEL
 import ORDER_ITEM_BTN
 	from "@salesforce/label/c.lineItemManager_orderItemBtn";
 
-export const items = {
+import FIELD_MULTI_SELECTOR_DEFAULT_TITLE
+	from "@salesforce/label/c.fieldMultiSelector_defaultTitle";
+import PROCEDURE_EXTRA_FIELDS_SELECTOR_TITLE
+	from "@salesforce/label/c.procedureExtraFieldsSelector_title";
+
+export const lineItemManagerLabels = {
 	noItemsMsg: NO_ITEMS_MSG,
 	addItemBtn: ADD_ITEM_BTN,
 	deleteItemBtn: DELETE_ITEM_BTN,
@@ -24,4 +29,12 @@ export const items = {
 	hideItemsNotesBtn: HIDE_ITEMS_NOTES_BTN,
 	notesFieldLabel: NOTES_FIELD_LABEL,
 	orderItemBtn: ORDER_ITEM_BTN
+};
+
+export const fieldMultiSelectorLabels = {
+	defaultTitle: FIELD_MULTI_SELECTOR_DEFAULT_TITLE
+};
+
+export const procedureConfigurationLabels = {
+	title: PROCEDURE_EXTRA_FIELDS_SELECTOR_TITLE
 };

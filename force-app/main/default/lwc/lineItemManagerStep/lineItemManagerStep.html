@@ -1,0 +1,258 @@
+<template>
+<div lwc:if={isAdmin}
+	class="slds-media
+		slds-media_small
+		slds-box
+		slds-p-around_none
+		slds-is-relative
+		slds-theme_shade">
+	<button lwc:if={index}
+		title={labels.orderItemBtn}
+		data-index={index}
+		onclick={handleOnSwitchItemsOrderClick}
+		class="switch-btn
+			slds-button
+			slds-button_icon
+			slds-button_icon-border-filled
+			slds-button_icon-small
+			slds-is-absolute">
+		<c-font-awesome-icon icon-name="solid:arrows-up-down"
+			size="x-small"
+			variant="inherit">
+			<label>{labels.orderItemBt}</label>
+		</c-font-awesome-icon>
+	</button>
+	<div class="slds-media__body">
+		<lightning-layout>
+			<lightning-layout-item aria-label="Procedure"
+				aria-describedby="popover-body-id"
+				role="dialog"
+				class="slds-popover slds-nubbin_right procedure-panel">
+				<div class="slds-popover__body
+						slds-var-p-left_x-small">
+					<div class="slds-media slds-media_small">
+						<div class="slds-media__figure">
+							<span class="slds-badge">{_item.order}</span>
+						</div>
+						<div class="slds-media__body">
+							<lightning-combobox name="procedureId"
+								label={labels.procedureFieldLabel}
+								value={_item.procedureId}
+								options={procedureOptions}
+								data-field="procedureId"
+								data-type="string"
+								data-src="item"
+								onchange={handleFlatFieldChange}
+								required
+							class="procedureField validate"></lightning-combobox>
+						</div>
+					</div>
+				</div>
+			</lightning-layout-item>
+			<lightning-layout-item lwc:if={_item.procedureId}
+				class="slds-var-p-around_x-small">
+				<lightning-layout multiple-rows="true">
+					<lightning-layout-item for:each={_item.fields}
+						for:item="field"
+						for:index="index"
+						key={field.order}
+						class="slds-var-m-right_small">
+						<lightning-record-edit-form
+							object-api-name={objectApiName}
+							class="slds-form-element">
+							<label class="slds-form-element__label"
+								for={field.fieldApiName}>
+								<abbr lwc:if={field.isRequired}
+									class="slds-required"
+									title="required">* </abbr>
+								{field.fieldLabel}</label>
+							<lightning-input-field variant="label-hidden"
+								field-name={field.fieldApiName}
+								data-field-name={field.fieldApiName}
+								required={field.isRequired}
+								onchange={handleDetailsRecordFieldChange}
+								class="validate"></lightning-input-field>
+						</lightning-record-edit-form>
+					</lightning-layout-item>
+				</lightning-layout>
+				<lightning-layout>
+					<lightning-layout-item lwc:if={_item.showNotes}
+						size="12">
+						<lightning-textarea name="notes"
+							label={labels.notesFieldLabel}
+							value={_item.notes}
+							data-field="notes"
+							data-type="string"
+							data-src="item"
+							onchange={handleFlatFieldChange}
+							class="custom-input validate"></lightning-textarea>
+						<lightning-button label={labels.hideItemsNotesBtn}
+							variant="base"
+							icon-name="utility:chevronup"
+							icon-position="right"
+							onclick={handleHideNotesClick}></lightning-button>
+					</lightning-layout-item>
+					<lightning-layout-item lwc:else
+						class="slds-col">
+						<lightning-button label={labels.showItemsNotesBtn}
+							variant="base"
+							icon-name="utility:chevrondown"
+							icon-position="right"
+							onclick={handleShowNotesClick}></lightning-button>
+					</lightning-layout-item>
+				</lightning-layout>
+			</lightning-layout-item>
+		</lightning-layout>
+	</div>
+	<div class="slds-media__figure
+			slds-media__figure_reverse
+			slds-var-p-top_x-small
+			slds-var-p-right_x-small">
+		<lightning-button-icon alternative-text={labels.deleteItemBtn}
+			icon-name="utility:delete"
+			variant="bare">
+			<label>{labels.deleteItemBtn}</label>
+		</lightning-button-icon>
+	</div>
+</div>
+<div lwc:if={isProd}
+	class="slds-box slds-box_xx-small slds-media slds-theme_shade">
+	<div class="slds-media__body">
+		<div class="slds-media">
+			<div class="slds-media__figure">
+				<div aria-label="Procedure"
+					aria-describedby="popover-body-id"
+					role="dialog"
+					class="slds-popover
+						slds-nubbin_right
+						procedure-panel">
+					<div class="slds-popover__body
+							slds-var-p-vertical_xx-small
+							slds-var-p-left_xxx-small
+							slds-var-p-right_small">
+						<div class="slds-media
+								slds-media_center">
+							<div class="slds-media__figure">
+								<span class="slds-badge">{_item.order}</span>
+							</div>
+							<div class="slds-media__body">
+								<b>{item.procedureName}</b>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="slds-media__body slds-var-p-left_xx-small">
+				<lightning-layout multiple-rows="true">
+					<lightning-layout-item for:each={_item.adminFields}
+						for:item="field"
+						for:index="index"
+						key={field.order}
+						class="slds-var-p-top_xx-small
+							slds-var-m-right_xx-small">
+						<div class="slds-media
+								slds-media_small
+								slds-box
+								slds-p-around_none
+								slds-scrollable_none">
+							<label class="slds-media__figure
+									slds-theme_default
+									slds-var-p-vertical_xx-small
+									slds-var-p-horizontal_x-small
+									slds-form-element__label">
+								{field.fieldLabel}
+							</label>
+							<div class="slds-media__body
+									slds-theme_shade
+									slds-var-p-vertical_xx-small
+									slds-var-p-horizontal_x-small">
+								<c-output-field field-name={field.fieldApiName}
+									record={_item.record}></c-output-field>
+							</div>
+						</div>
+					</lightning-layout-item>
+				</lightning-layout>
+				<lightning-layout multiple-rows="true">
+					<lightning-layout-item for:each={_item.prodFields}
+						for:item="field"
+						for:index="index"
+						key={field.order}
+						class="slds-var-p-top_xx-small
+							slds-var-m-right_xx-small">
+						<div class="slds-media
+								slds-media_small
+								slds-box
+								slds-p-around_none
+								slds-scrollable_none">
+							<label class="slds-media__figure
+									slds-theme_default
+									slds-var-p-vertical_xx-small
+									slds-var-p-horizontal_x-small
+									slds-form-element__label">
+								{field.fieldLabel}
+							</label>
+							<div class="slds-media__body
+									slds-theme_shade
+									slds-var-p-vertical_xx-small
+									slds-var-p-horizontal_x-small">
+								<c-output-field field-name={field.fieldApiName}
+									record={_item.record}></c-output-field>
+							</div>
+						</div>
+					</lightning-layout-item>
+				</lightning-layout>
+			</div>
+		</div>
+		<div lwc:if={_item.notes}
+			class="slds-border_top
+				slds-var-m-top_x-small
+				slds-var-p-left_x-small">
+			<div class="slds-media">
+				<div class="slds-media__figure">
+					<lightning-button lwc:if={_item.showNotes}
+						variant="base"
+						label={labels.notesFieldLabel}
+						icon-name="utility:chevronup"
+						icon-position="right"
+						onclick={handleHideNotesClick}></lightning-button>
+					<lightning-button lwc:else
+						variant="base"
+						label={labels.notesFieldLabel}
+						icon-name="utility:chevronright"
+						icon-position="right"
+						onclick={handleShowNotesClick}></lightning-button>
+				</div>
+				<div class="slds-media__body
+						slds-var-p-vertical_xx-small
+						slds-var-m-top_xxx-small">
+					<pre lwc:if={_item.showNotes}
+						class="slds-m-around_none"
+						style="font-family: inherit;
+							white-space: pre-wrap;">{_item.notes}</pre>
+					<p lwc:else
+						class="slds-truncate">{_item.notes}</p>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="slds-media__figure slds-media__figure_reverse">
+		<div lwc:if={_item.isPending}>
+			<lightning-icon icon-name="utility:clock"
+				size="small"
+				title="Pending"></lightning-icon>
+		</div>
+		<div lwc:if={_item.isNext}>
+			<lightning-button icon-name="utility:chevronright"
+				icon-position="right"
+				variant="border-filled"
+				label="Complete"></lightning-button>
+		</div>
+		<div lwc:if={_item.isComplete}>
+			<lightning-icon icon-name="utility:success"
+				variant="success"
+				size="small"
+				title="Completed"></lightning-icon>
+		</div>
+	</div>
+</div>
+</template>
