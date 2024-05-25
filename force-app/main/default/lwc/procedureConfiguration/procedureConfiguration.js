@@ -33,6 +33,13 @@ export default class ProcedureConfiguration extends LwcBase {
 		}];
 	}
 
+	get excludedFields() {
+		return [
+			"Procedure__c",
+			"Machine__c"
+		];
+	}
+
 	@wire(getRecord, {
 		recordId: "$recordId",
 		fields: [
@@ -41,8 +48,7 @@ export default class ProcedureConfiguration extends LwcBase {
 			"Procedure__c.AdminFieldsJson__c",
 			"Procedure__c.ProductionFieldsJson__c",
 			"Procedure__c.IsMachineInfoRequired__c",
-			"Procedure__c.MachineSkill__c",
-			"Procedure__c.OwnerId"
+			"Procedure__c.MachineSkill__c"
 		]
 	})
 	wiredCurrentRecord({ error, data }) {
@@ -64,10 +70,8 @@ export default class ProcedureConfiguration extends LwcBase {
 				isNew: true,
 				showNotes: false,
 				order: 1,
-				showDetails: false,
-				detailsField: null,
-				isDetailsMachine: false,
-				detailsFilter: false,
+				isMachineRequired: data.fields.IsMachineInfoRequired__c.value == true,
+				machineSkills: data.fields.MachineSkill__c.value?.split(";"),
 				// status flags
 				isPending: false,
 				isNext: false,

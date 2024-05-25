@@ -25,6 +25,9 @@ export default class FieldMultiSelector extends LwcBase {
 	title = fieldMultiSelectorLabels.defaultTitle;
 
 	@api
+	excludedFields = [];
+
+	@api
 	get mode() {
 		return this._mode;
 	};
@@ -69,10 +72,12 @@ export default class FieldMultiSelector extends LwcBase {
 	get modeOptions() {
 		return [{
 			label: "View",
-			value: "view"
+			value: "view",
+			iconName: "utility:view"
 		}, {
 			label: "Edit",
-			value: "edit"
+			value: "edit",
+			iconName: "utility:edit"
 		}];
 	}
 
@@ -82,11 +87,12 @@ export default class FieldMultiSelector extends LwcBase {
 	wiredWorkOrderLineItemInfo({ error, data}) {
 		if (data) {
 			this.objectInfo = data;
+			this.logAsStringPretty(this.excludedFields)
 			this.fieldOptions =
 				Object.keys(data.fields)
 					.filter(f =>
 						data.fields[f].updateable &&
-						data.fields[f].apiName != "Procedure__c"
+						this.excludedFields.indexOf(data.fields[f].apiName) == -1
 					)
 					.map(f => ({
 						label: this._getFieldTitle(

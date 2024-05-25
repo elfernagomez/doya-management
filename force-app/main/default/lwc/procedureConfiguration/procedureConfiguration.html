@@ -13,7 +13,8 @@
 				title="Administration Fields"
 				object-api-name={objectApiName}
 				source-object-api-name="WorkOrderLineItem"
-				result-field-api-name="AdminFieldsJson__c"></c-field-multi-selector>
+				result-field-api-name="AdminFieldsJson__c"
+				excluded-fields={excludedFields}></c-field-multi-selector>
 		</lightning-layout-item>
 		<lightning-layout-item size="12"
 			medium-device-size="6">
@@ -21,7 +22,8 @@
 				title="Production Fields"
 				object-api-name={objectApiName}
 				source-object-api-name="WorkOrderLineItem"
-				result-field-api-name="ProductionFieldsJson__c"></c-field-multi-selector>
+				result-field-api-name="ProductionFieldsJson__c"
+				excluded-fields={excludedFields}></c-field-multi-selector>
 		</lightning-layout-item>
 	</lightning-layout>
 </lightning-card>
