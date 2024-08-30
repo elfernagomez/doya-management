@@ -5,8 +5,16 @@
 -->
 <template>
 <lightning-card title={title}>
+<lightning-radio-group slot="actions"
+	name="modeRadioGroup"
+	alternative-text="Mode"
+	options={modeOptions}
+	value={mode}
+	type="button"
+	variant="label-hidden"
+	onchange={handleModeChange}></lightning-radio-group>
 <div class="slds-var-p-horizontal_small">
-	<div lwc:if={isError}>
+	<div lwc:if={hasError}>
 		<c-error-panel error-title={errorTitle}
 			error-object={errorObject}></c-error-panel>
 	</div>
@@ -17,26 +25,31 @@
 		key={item.uniqueId}
 		class="slds-var-m-bottom_xx-small
 			slds-is-relative">
-		<button lwc:if={index}
-			title={labels.orderItemBtn}
-			data-index={index}
-			onclick={handleOnSwitchItemsOrderClick}
-			class="switch-btn
-				slds-button
-				slds-button_icon
-				slds-button_icon-border-filled
-				slds-button_icon-small
-				slds-is-absolute">
-			<c-font-awesome-icon icon-name="solid:arrows-up-down"
-				size="x-small"
-				variant="inherit">
-				<label>{labels.orderItemBt}</label>
-			</c-font-awesome-icon>
-		</button>
+		<template lwc:if={isAdmin}>
+			<button lwc:if={index}
+				title={labels.orderItemBtn}
+				data-index={index}
+				onclick={handleSwitchItemsOrderClick}
+				class="switch-btn
+					slds-button
+					slds-button_icon
+					slds-button_icon-border-filled
+					slds-button_icon-small
+					slds-is-absolute">
+				<c-font-awesome-icon icon-name="solid:arrows-up-down"
+					size="x-small"
+					variant="inherit">
+					<label>{labels.orderItemBt}</label>
+				</c-font-awesome-icon>
+			</button>
+		</template>
 		<c-line-item-manager-step item={item}
 			preview-procedure-options={procedureOptions}
-			variant="edit"
-			data-index={index}></c-line-item-manager-step>
+			mode={mode}
+			data-index={index}
+			procedure-options={procedureOptions}
+			onitemchange={handleItemChange}
+			onitemdelete={handleItemDelete}></c-line-item-manager-step>
 	</div>
 	</template>
 	<template lwc:else>
@@ -44,7 +57,8 @@
 			image-size=""
 			message={labels.noItemsMsg}></c-illustration>
 	</template>
-	<div class="slds-var-m-top_medium">
+	<div lwc:if={isAdmin}
+		class="slds-var-m-top_medium">
 		<lightning-button label={labels.addItemBtn}
 			icon-name="utility:add"
 			stretch="true"

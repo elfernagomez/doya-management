@@ -2,13 +2,14 @@ import LwcBase from "c/lwcBase";
 import { track, api, wire } from "lwc";
 import { lineItemManagerLabels } from "c/constants";
 import getAllProcedures from "@salesforce/apex/Procedure.getAll";
-
-const PROCEDURE_DETAIL_NOT_NEEDED = "No Details Needed";
+import { getRecords } from 'lightning/uiRecordApi';
+import { getProcedureFromRecord, getFieldNames } from "c/procedureConfiguration";
+import { createNewItem, applyProcedureOption } from "c/lineItemManagerStep";
 
 /**
  * @author Fernando Gomez
  * @since 3/28/2023
- * @versino 1.0
+ * @version 1.0
  */
 export default class LineItemManager extends LwcBase {
 	@api
@@ -19,11 +20,27 @@ export default class LineItemManager extends LwcBase {
 	set details(_details) {
 		let clone = JSON.parse(JSON.stringify(_details));
 		this.items = clone.items || [];
-		this.deletedIds = clone.deletedIds || [];
+		this.parentRecordId = clone.parentRecordId;
 	}
 
 	@api
 	title = 'Items';
+
+	/**
+	 * Add the specified changes to the item in the internal list.
+	 * The item is found by uniqueId. Set skiEvent to false if
+	 * the event sent when an item is updated is still necessary
+	 * @param {*} id
+	 * @param {*} changes
+	 * @param {*} skipEvent
+	 */
+	@api
+	updateItem(id, changes, skipEvent = true) {
+		let index = this.items.findIndex(i => i.uniqueId == id);
+		if (index != -1)
+			// skip the event
+			this.editItem(index, changes, skipEvent);
+	}
 
 	@track
 	items = [];
@@ -34,175 +51,118 @@ export default class LineItemManager extends LwcBase {
 	@track
 	procedureOptions = [];
 
+	@track
+	wiredProcedureParameter;
+
+	parentRecordId;
 	labels = lineItemManagerLabels;
 	locals = { };
-
-	isError = false;
-	errorTitle;
-	errorObject;
+	mode = "prod";
 
 	get hasItems() {
 		return this.items != null && this.items.length > 0;
 	}
 
+	get modeOptions() {
+		return [{
+			label: "Admin",
+			value: "admin"
+		}, {
+			label: "Production",
+			value: "prod"
+		}];
+	}
+
+	get isAdmin() {
+		return this.mode == "admin";
+	}
+
 	@wire(getAllProcedures)
 	wiredProcedureOptions({ data, error }) {
-		if (data)
-			this.procedureOptions = data;
-		else if (error)
+		if (data) {
+			this.wiredProcedureParameter = data.map(id => ({
+				recordIds: [id],
+				fields: getFieldNames()
+			}));
+		} else if (error)
 			this.addError("Error retrieving available Procedures", error);
 	}
 
-	/**
-	 * Triggered when inputs are changed
-	 * @param {*} event 
-	 */
-	handleLookupFieldChange(event) {
-		this.processFieldChange(
-			event.detail.recordId,
-			event.target.dataset.field,
-			event.target.dataset.type,
-			event.target.dataset.src,
-			event.target.dataset.index);
+	@wire(getRecords, {
+		records: "$wiredProcedureParameter"
+	})
+	wiredRecords({ error, data }) {
+		if (data) {
+			this.procedureOptions = data.results.map(
+				result => getProcedureFromRecord(result.result));
+		} else if (error) {
+			console.log("error: ", error);
+		}
 	}
 
-	/**
-	 * Triggered when inputs are changed
-	 * @param {*} event 
-	 */
-	handleFlatFieldChange(event) {
-		this.processFieldChange(
-			event.target.value,
-			event.target.dataset.field,
-			event.target.dataset.type,
-			event.target.dataset.src,
-			event.target.dataset.index);
-	}
-
-	handleDetailsRecordFieldChange(event) {
-		let index = event.target.dataset.index;
-		this.items[index].detailsValue = event.detail.recordId;
-		this.handleRecordFieldChange(event);
-	}
-
-	handleRecordFieldChange(event) {
-		let field = event.target.dataset.field;
-		let index = event.target.dataset.index;
-		this.items[index].record[field] = event.detail.recordId;
+	handleModeChange(event) {
+		this.mode = event.target.value;
 	}
 
 	/**
 	 * Triggered when Add button is clicke (both)
 	 * @param {*} event
 	 */
-	handleAddItemClick(event) {
+	handleAddItemClick() {
 		this.addNewItem();
 	}
 
-	handleOnSwitchItemsOrderClick(event) {
-		let index = event.currentTarget.dataset.index;
+	handleSwitchItemsOrderClick(event) {
+		let index = parseInt(event.currentTarget.dataset.index);
 		this.moveItemUp(index);
 	}
 
-	/**
-	 * Process changes on inputs
-	 * @param {*} val
-	 * @param {*} field
-	 * @param {*} type
-	 * @param {*} src
-	 * @param {*} index
-	 */
-	processFieldChange(val, field, type, src, index) {
-		let converted = this.convertToType(val, type);
-		switch (src) {
-			case "locals":
-				this.locals[field] = converted;
-				break;
-			case "item":
-				let item = {};
-				item[field] = converted;
-				this.editItem(index, item);
+	handleItemChange(event) {
+		let index = parseInt(event.target.dataset.index);
+		this.editItem(index, event.detail.item);
+	}
 
-				if (field == "procedureId")
-					this.applyProcedure(index);
-
-				break;
-		}
+	handleItemDelete(event) {
+		let index = parseInt(event.target.dataset.index);
+		this.deleteItem(index);
 	}
 
 	addNewItem() {
-		let nextProceId = this.getNextProcedureId();
-		this.addItem({
-			uniqueId: `unsaved_${this.items.length + 1}`,
-			isEditing: true,
-			isBusy: false,
-			isDeleting: false,
-			isDisabled: false,
-			isValid: true,
-			errorMessage: null,
-			isNew: true,
-			showNotes: false,
-			order: this.items.length + 1,
-			showDetails: false,
-			detailsField: null,
-			isDetailsMachine: false,
-			detailsFilter: false,
-			// step work information
-			procedureId: nextProceId,
-			// actual salesforce record
-			record: {
-				Procedure__c: nextProceId
-			}
-		});
-
-		// apply the procedure since one might have been applied
-		if (nextProceId)
-			this.applyProcedure(this.items.length - 1);
+		this.addItem(
+			createNewItem(
+				this.items.length + 1,
+				this.getNextProcedureId()));
 	}
 
 	addItem(item) {
 		this.items.push(item);
+		this.customEvent("itemcreate", { item });
 	}
 
-	editItem(index, item) {
+	editItem(index, changes, skipEvent = false) {
 		let existent = this.items[index];
-		this.items[index] = { ...existent, ...item };
+		let item = (this.items[index] = { ...existent, ...changes });
+		if (!skipEvent)
+			this.customEvent("itemchange", { item });
 	}
 
-	applyProcedure(index) {
+	deleteItem(index) {
 		let item = this.items[index];
-		this.cleanProcedureDependencies(index);
-		item.record.Procedure__c = item.procedureId;
-
-		if (item.procedureId) {
-			let proc = this.procedureOptions.find(p => p.value == item.procedureId);
-			item.showDetails = proc.detailsType != PROCEDURE_DETAIL_NOT_NEEDED;
-			item.detailsField = proc.detailsFieldApiName;
-			item.isDetailsMachine = item.detailsField == 'Machine__c';
-			item.detailsFilter = {
-				criteria: [{
-					fieldPath: "Skills__c",
-					operator: "includes",
-					value: proc.label
-				}]
-			};
-		}
-	}
-
-	reportItemsChange() {
-		this.dispatchEvent(new CustomEvent('itemschange', {
-			detail: this.getDetails()
-		}));
-	}
-
-	adjustItemsOrder() {
-		this.items.forEach((item, index) => item.order = index + 1);
+		this.items.splice(index, 1);
+		this.customEvent("itemdelete", { item });
+		setTimeout(() => {
+			// the order field of the next item must be adjusted...
+			let item = this.items[index];
+			// the next now will ne in the same place as the deleted one
+			if (item)
+				this.editItem(index, { order: index + 1 });
+		}, 1000);
 	}
 
 	getDetails() {
 		return {
-			items: this.items,
-			deletedIds: this.deletedIds
+			parentRecordId: this.parentRecordId,
+			items: this.items
 		};
 	}
 
@@ -225,37 +185,13 @@ export default class LineItemManager extends LwcBase {
 			this.items[index - 1] = item;
 			this.items[index] = previousItem;
 			// we have to fix the order number
-			// but we can't ddo it now since it
+			// but we can't do it now since it
 			// will be confusing to the user...
 			// we wait a bit
-			setTimeout(() => this.adjustItemsOrder(), 1000);
-		}
-	}
-
-	addError(message, error) {
-		console.error(error);
-		this.isError = true;
-		this.errorTitle = message;
-		this.errorObject = error;
-	}
-
-	cleanProcedureDependencies(index) {
-		let item = this.items[index];
-		item.showDetails = false;
-		item.detailsField = null;
-		item.isDetailsMachine = false;
-		item.detailsFilter = null;
-		item.record.Machine__c = null;
-		item.detailsValue = null;
-		
-		// we also need to clear the details
-		// record picker value since there will be a new filter
-		try {
-		let detailsField = this.getComponent(`.detailsField[data-index="${index}"]`);
-		if (detailsField && detailsField.clearSelection)
-			detailsField.clearSelection();
-		} catch (e) {
-			console.error(e)
+			setTimeout(() => {
+				this.editItem(index - 1, { order: index });
+				this.editItem(index, { order: index + 1 });
+			}, 1000);
 		}
 	}
 }

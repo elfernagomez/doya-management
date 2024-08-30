@@ -17,6 +17,9 @@ import ORDER_ITEM_BTN
 
 import FIELD_MULTI_SELECTOR_DEFAULT_TITLE
 	from "@salesforce/label/c.fieldMultiSelector_defaultTitle";
+import FIELD_MULTI_SELECTOR_ALLOW_EDIT_HELP_TEXT
+	from "@salesforce/label/c.fieldMultiSelector_allowEditHelp";
+
 import PROCEDURE_EXTRA_FIELDS_SELECTOR_TITLE
 	from "@salesforce/label/c.procedureExtraFieldsSelector_title";
 
@@ -32,7 +35,8 @@ export const lineItemManagerLabels = {
 };
 
 export const fieldMultiSelectorLabels = {
-	defaultTitle: FIELD_MULTI_SELECTOR_DEFAULT_TITLE
+	defaultTitle: FIELD_MULTI_SELECTOR_DEFAULT_TITLE,
+	allowEditHelp: FIELD_MULTI_SELECTOR_ALLOW_EDIT_HELP_TEXT
 };
 
 export const procedureConfigurationLabels = {

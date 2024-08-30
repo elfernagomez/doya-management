@@ -1,0 +1,11 @@
+.number-container {
+	width: 3rem;
+}
+
+.number-input {
+	text-align: center !important;
+	--lwc-heightInput: 3rem;
+	--lwc-spacingMedium: 0;
+	--lwc-spacingSmall: 0;
+	--lwc-fontSize3: 2rem;
+}

@@ -10,28 +10,51 @@ public with sharing class Procedure {
 
 	@AuraEnabled
 	public String label { get; private set; }
+
+	@AuraEnabled
+	public String colorCode { get; private set; }
 	
 	@AuraEnabled
 	public String defaultNextId { get; private set; }
 	
 	@AuraEnabled
 	public Boolean isMachineInfoRequired { get; private set; }
+
+	@AuraEnabled
+	public List<String> machineSkills { get; private set; }
 	
 	@AuraEnabled
-	public List<ProcedureFieldInfo> extraFields { get; private set; }
+	public List<ProcedureFieldInfo> adminFields { get; private set; }
+
+	@AuraEnabled
+	public List<ProcedureFieldInfo> productionFields { get; private set; }
 
 	private Procedure(Procedure__c record) {
 		value = record.Id;
 		label = record.Name;
+		colorCode = record.ColorCssCode__c ?? '#ffffff';
 		defaultNextId = record.DefaultNextProcedure__c;
 		isMachineInfoRequired = record.IsMachineInfoRequired__c;
+		machineSkills =
+			String.isNotBlank(record.MachineSkills__c) ?
+			record.MachineSkills__c.split(';') :
+			new List<String>();
 
 		try {
-			/* extraFields = (List<ProcedureFieldInfo>)JSON.deserialize(
-				record.ExtraFieldsJson__c, List<ProcedureFieldInfo>.class); */
-		} catch (JSONException ex) {
+			adminFields = (List<ProcedureFieldInfo>)JSON.deserialize(
+				record.AdminFieldsJson__c ?? '[]', List<ProcedureFieldInfo>.class);
+		} catch (Exception ex) {
 			// we dn't want to block the program if it fails
-			extraFields = new List<ProcedureFieldInfo>();
+			adminFields = new List<ProcedureFieldInfo>();
+		}
+
+		try {
+			productionFields = (List<ProcedureFieldInfo>)JSON.deserialize(
+				record.ProductionFieldsJson__c ?? '[]',
+				List<ProcedureFieldInfo>.class);
+		} catch (Exception ex) {
+			// we dn't want to block the program if it fails
+			productionFields = new List<ProcedureFieldInfo>();
 		}
 			
 	}
@@ -41,20 +64,17 @@ public with sharing class Procedure {
 	 * @return List<Procedure>
 	 */
 	@AuraEnabled(cacheable=true)
-	public static List<Procedure> getAll() {
-		List<Procedure> result;
+	public static List<Id> getAll() {
+		List<Id> result;
 		try {
-			result = new List<Procedure>();
+			result = new List<Id>();
 			for (Procedure__c p : [
-					SELECT Name,
-						DefaultNextProcedure__c,
-						IsMachineInfoRequired__c/* ,
-						ExtraFieldsJson__c */
+					SELECT Id
 					FROM Procedure__c
 					ORDER BY Name
 					LIMIT 2000
 				])
-				result.add(new Procedure(p));
+				result.add(p.Id);
 
 			return result;
 		} catch (Exception e) {

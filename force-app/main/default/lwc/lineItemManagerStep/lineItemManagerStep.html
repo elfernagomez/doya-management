@@ -1,11 +1,9 @@
 <template>
-<div lwc:if={isAdmin}
-	class="slds-media
-		slds-media_small
-		slds-box
+<div class="slds-box
 		slds-p-around_none
-		slds-is-relative
 		slds-theme_shade">
+<div lwc:if={isAdmin}
+	class="slds-media slds-is-relative">
 	<button lwc:if={index}
 		title={labels.orderItemBtn}
 		data-index={index}
@@ -27,7 +25,8 @@
 			<lightning-layout-item aria-label="Procedure"
 				aria-describedby="popover-body-id"
 				role="dialog"
-				class="slds-popover slds-nubbin_right procedure-panel">
+				class="slds-popover slds-nubbin_right procedure-panel admin"
+				style={_item.procedureStyle}>
 				<div class="slds-popover__body
 						slds-var-p-left_x-small">
 					<div class="slds-media slds-media_small">
@@ -38,50 +37,58 @@
 							<lightning-combobox name="procedureId"
 								label={labels.procedureFieldLabel}
 								value={_item.procedureId}
-								options={procedureOptions}
-								data-field="procedureId"
-								data-type="string"
-								data-src="item"
-								onchange={handleFlatFieldChange}
+								options={_procedureOptions}
+								onchange={handleProcedureFieldChange}
 								required
-							class="procedureField validate"></lightning-combobox>
+								class="procedureField validate"></lightning-combobox>
+							<div lwc:if={_item.procedureId}
+								class="slds-text-align_right">
+								<lightning-button label="Edit Procedure"
+									icon-name="utility:new_window"
+									icon-position="right"
+									onclick={handleEditProcedureClick}
+									variant="base"></lightning-button>
+							</div>
 						</div>
 					</div>
 				</div>
 			</lightning-layout-item>
 			<lightning-layout-item lwc:if={_item.procedureId}
+				flexibility="grow"
 				class="slds-var-p-around_x-small">
 				<lightning-layout multiple-rows="true">
-					<lightning-layout-item for:each={_item.fields}
+					<lightning-layout-item lwc:if={item.isMachineNeeded}
+						class="slds-var-m-left_small">
+						<lightning-record-picker 
+							label="Machine"
+							object-api-name="Asset"
+							placeholder="Search Machines..."
+							filter={_item.machineFilter}
+							value={_item.machineId}
+							data-field="machineId"
+							onchange={handleLookupFieldChange}
+							required
+							class="validate"></lightning-record-picker>
+					</lightning-layout-item>
+					<lightning-layout-item for:each={_item.productionFields}
 						for:item="field"
 						for:index="index"
 						key={field.order}
-						class="slds-var-m-right_small">
-						<lightning-record-edit-form
-							object-api-name={objectApiName}
-							class="slds-form-element">
-							<label class="slds-form-element__label"
-								for={field.fieldApiName}>
-								<abbr lwc:if={field.isRequired}
-									class="slds-required"
-									title="required">* </abbr>
-								{field.fieldLabel}</label>
-							<lightning-input-field variant="label-hidden"
-								field-name={field.fieldApiName}
-								data-field-name={field.fieldApiName}
-								required={field.isRequired}
-								onchange={handleDetailsRecordFieldChange}
-								class="validate"></lightning-input-field>
-						</lightning-record-edit-form>
+						class="slds-var-m-left_small">
+						<c-production-field field={field}
+							record={_item.record}
+							mode="edit"
+							onchange={handleRecordFieldChange}></c-production-field>
 					</lightning-layout-item>
 				</lightning-layout>
 				<lightning-layout>
-					<lightning-layout-item lwc:if={_item.showNotes}
-						size="12">
-						<lightning-textarea name="notes"
-							label={labels.notesFieldLabel}
-							value={_item.notes}
-							data-field="notes"
+					<lightning-layout-item lwc:if={_item.showAdminNotes}
+						size="12"
+						class="slds-var-p-left_small">
+						<lightning-textarea name="adminNotes"
+							label="Admin Notes"
+							value={_item.adminNotes}
+							data-field="adminNotes"
 							data-type="string"
 							data-src="item"
 							onchange={handleFlatFieldChange}
@@ -90,15 +97,15 @@
 							variant="base"
 							icon-name="utility:chevronup"
 							icon-position="right"
-							onclick={handleHideNotesClick}></lightning-button>
+							onclick={handleHideAdminNotesClick}></lightning-button>
 					</lightning-layout-item>
 					<lightning-layout-item lwc:else
-						class="slds-col">
+						class="slds-var-p-left_small">
 						<lightning-button label={labels.showItemsNotesBtn}
 							variant="base"
 							icon-name="utility:chevrondown"
 							icon-position="right"
-							onclick={handleShowNotesClick}></lightning-button>
+							onclick={handleShowAdminNotesClick}></lightning-button>
 					</lightning-layout-item>
 				</lightning-layout>
 			</lightning-layout-item>
@@ -108,151 +115,250 @@
 			slds-media__figure_reverse
 			slds-var-p-top_x-small
 			slds-var-p-right_x-small">
-		<lightning-button-icon alternative-text={labels.deleteItemBtn}
+		<div lwc:if={_item.isDeleting}
+			class="delete-panel
+				slds-panel
+				slds-panel_docked
+				slds-panel_docked-right
+				slds-is-open
+				slds-is-absolute">
+			<div class="slds-panel__body">
+				<lightning-layout>
+					<lightning-layout-item
+						class="slds-var-m-right_small">
+						<p>Are you sure?</p>
+					</lightning-layout-item>
+					<lightning-layout-item
+						class="slds-border_left slds-var-p-left_small">
+						<div class="slds-var-m-bottom_xxx-small">
+							<lightning-button label="Yes, Delete"
+								variant="destructive"
+								onclick={handleConfirmDeleteClick}></lightning-button>
+						</div>
+						<div class="slds-var-m-bottom_xxx-small">
+							<lightning-button label="No, Cancel"
+								variant="brand-outline"
+								onclick={handleCancelDeleteClick}></lightning-button>
+						</div>
+					</lightning-layout-item>
+				</lightning-layout>
+			</div>
+		</div>
+		<lightning-button-icon lwc:else
+			alternative-text={labels.deleteItemBtn}
 			icon-name="utility:delete"
-			variant="bare">
+			variant="border-filled"
+			size="x-small"
+			onclick={handleDeleteClick}>
 			<label>{labels.deleteItemBtn}</label>
 		</lightning-button-icon>
 	</div>
 </div>
-<div lwc:if={isProd}
-	class="slds-box slds-box_xx-small slds-media slds-theme_shade">
-	<div class="slds-media__body">
-		<div class="slds-media">
-			<div class="slds-media__figure">
-				<div aria-label="Procedure"
-					aria-describedby="popover-body-id"
-					role="dialog"
-					class="slds-popover
-						slds-nubbin_right
-						procedure-panel">
-					<div class="slds-popover__body
-							slds-var-p-vertical_xx-small
-							slds-var-p-left_xxx-small
-							slds-var-p-right_small">
-						<div class="slds-media
-								slds-media_center">
-							<div class="slds-media__figure">
-								<span class="slds-badge">{_item.order}</span>
-							</div>
-							<div class="slds-media__body">
-								<b>{item.procedureName}</b>
-							</div>
+<lightning-layout lwc:if={isProd}
+	class="slds-grid_vertical-stretch slds-is-relative">
+	<lightning-layout-item  flexibility="grow"
+		class="slds-border_right">
+		<lightning-layout>
+			<lightning-layout-item aria-label="Procedure"
+				aria-describedby="popover-body-id"
+				role="dialog"
+				class="slds-popover slds-nubbin_right procedure-panel production"
+				style={_item.procedureStyle}>
+				<div class="slds-popover__body
+						slds-var-p-left_x-small">
+					<div class="slds-media slds-media_center">
+						<div class="slds-media__figure">
+							<span class="slds-badge">{_item.order}</span>
+						</div>
+						<div class="slds-media__body">
+							<b>{item.procedureName}</b>
 						</div>
 					</div>
 				</div>
-			</div>
-			<div class="slds-media__body slds-var-p-left_xx-small">
+			</lightning-layout-item>
+			<lightning-layout-item flexibility="grow"
+				class="slds-var-p-left_x-small slds-var-p-vertical_xxx-small">
 				<lightning-layout multiple-rows="true">
-					<lightning-layout-item for:each={_item.adminFields}
+					<lightning-layout-item lwc:if={_item.isMachineNeeded}
+						class="slds-var-p-horizontal_xx-small slds-border_right">
+						<c-production-field field={machineField}
+							record={_item.record}
+							mode="view"
+							is-edit-allowed-override={_item.isInProgress}
+							></c-production-field>
+					</lightning-layout-item>
+					<lightning-layout-item for:each={_item.productionFields}
 						for:item="field"
 						for:index="index"
 						key={field.order}
-						class="slds-var-p-top_xx-small
-							slds-var-m-right_xx-small">
-						<div class="slds-media
-								slds-media_small
-								slds-box
-								slds-p-around_none
-								slds-scrollable_none">
-							<label class="slds-media__figure
-									slds-theme_default
-									slds-var-p-vertical_xx-small
-									slds-var-p-horizontal_x-small
-									slds-form-element__label">
-								{field.fieldLabel}
-							</label>
-							<div class="slds-media__body
-									slds-theme_shade
-									slds-var-p-vertical_xx-small
-									slds-var-p-horizontal_x-small">
-								<c-output-field field-name={field.fieldApiName}
-									record={_item.record}></c-output-field>
-							</div>
-						</div>
+						class="slds-var-p-horizontal_small slds-border_right">
+						<c-production-field field={field}
+							record={_item.record}
+							mode="view"
+							is-edit-allowed-override={_item.isInProgress}
+							></c-production-field>
 					</lightning-layout-item>
 				</lightning-layout>
-				<lightning-layout multiple-rows="true">
-					<lightning-layout-item for:each={_item.prodFields}
-						for:item="field"
-						for:index="index"
-						key={field.order}
-						class="slds-var-p-top_xx-small
-							slds-var-m-right_xx-small">
-						<div class="slds-media
-								slds-media_small
-								slds-box
-								slds-p-around_none
-								slds-scrollable_none">
-							<label class="slds-media__figure
-									slds-theme_default
-									slds-var-p-vertical_xx-small
-									slds-var-p-horizontal_x-small
-									slds-form-element__label">
-								{field.fieldLabel}
-							</label>
-							<div class="slds-media__body
-									slds-theme_shade
-									slds-var-p-vertical_xx-small
-									slds-var-p-horizontal_x-small">
-								<c-output-field field-name={field.fieldApiName}
-									record={_item.record}></c-output-field>
-							</div>
-						</div>
-					</lightning-layout-item>
-				</lightning-layout>
-			</div>
-		</div>
-		<div lwc:if={_item.notes}
-			class="slds-border_top
-				slds-var-m-top_x-small
-				slds-var-p-left_x-small">
+			</lightning-layout-item>
+		</lightning-layout>
+		<div lwc:if={_item.adminNotes}
+			class="slds-border_top slds-var-p-left_x-small">
 			<div class="slds-media">
 				<div class="slds-media__figure">
-					<lightning-button lwc:if={_item.showNotes}
+					<lightning-button lwc:if={_item.showAdminNotes}
 						variant="base"
-						label={labels.notesFieldLabel}
-						icon-name="utility:chevronup"
+						label="Admin Notes"
+						icon-name="utility:chevrondown"
 						icon-position="right"
-						onclick={handleHideNotesClick}></lightning-button>
+						onclick={handleHideAdminNotesClick}></lightning-button>
 					<lightning-button lwc:else
 						variant="base"
-						label={labels.notesFieldLabel}
+						label="Admin Notes"
 						icon-name="utility:chevronright"
 						icon-position="right"
-						onclick={handleShowNotesClick}></lightning-button>
+						onclick={handleShowAdminNotesClick}></lightning-button>
 				</div>
 				<div class="slds-media__body
 						slds-var-p-vertical_xx-small
 						slds-var-m-top_xxx-small">
-					<pre lwc:if={_item.showNotes}
+					<pre lwc:if={_item.showAdminNotes}
 						class="slds-m-around_none"
 						style="font-family: inherit;
-							white-space: pre-wrap;">{_item.notes}</pre>
+							white-space: pre-wrap;">{_item.adminNotes}</pre>
 					<p lwc:else
-						class="slds-truncate">{_item.notes}</p>
+						class="slds-truncate">{_item.adminNotes}</p>
 				</div>
 			</div>
 		</div>
-	</div>
-	<div class="slds-media__figure slds-media__figure_reverse">
-		<div lwc:if={_item.isPending}>
-			<lightning-icon icon-name="utility:clock"
-				size="small"
-				title="Pending"></lightning-icon>
+		<div class="slds-border_top slds-var-p-left_x-small">
+			<div class="slds-media">
+				<div class="slds-media__figure">
+					<lightning-button lwc:if={_item.showProductionNotes}
+						variant="base"
+						label="Prod Notes"
+						icon-name="utility:chevrondown"
+						icon-position="right"
+						onclick={handleHideProductionNotesClick}></lightning-button>
+					<lightning-button lwc:else
+						variant="base"
+						label="Prod Notes"
+						icon-name="utility:chevronright"
+						icon-position="right"
+						onclick={handleShowProductionNotesClick}></lightning-button>
+				</div>
+				<div class="slds-media__body
+						slds-var-p-vertical_xx-small
+						slds-var-m-top_xxx-small">
+					<lightning-textarea lwc:if={_item.showProductionNotes}
+						name="productionNotes"
+						label="Prod Notes"
+						variant="label-hidden"
+						value={_item.productionNotes}
+						data-field="productionNotes"
+						data-type="string"
+						data-src="item"
+						onchange={handleFlatFieldChange}
+						class="custom-input validate"></lightning-textarea>
+					<p lwc:else
+						class="slds-truncate">{_item.productionNotes}</p>
+				</div>
+			</div>
 		</div>
-		<div lwc:if={_item.isNext}>
-			<lightning-button icon-name="utility:chevronright"
-				icon-position="right"
-				variant="border-filled"
-				label="Complete"></lightning-button>
+	</lightning-layout-item>
+	<lightning-layout-item
+		class="slds-is-relative
+			status-panel
+			slds-theme_default">
+		<div lwc:if={_item.isPending}
+			class="status-panel-item
+				slds-var-p-around_x-small">
+			<p class="slds-text-align_center">
+				<lightning-badge label="Pending"
+					icon-name="utility:clock"></lightning-badge>
+			</p>
+			<div class="slds-var-m-top_xx-small">
+				<lightning-button icon-name="utility:play"
+					icon-position="right"
+					variant="border-filled"
+					label="Start"
+					stretch="true"></lightning-button>
+			</div>
 		</div>
-		<div lwc:if={_item.isComplete}>
-			<lightning-icon icon-name="utility:success"
-				variant="success"
-				size="small"
-				title="Completed"></lightning-icon>
+		<div lwc:if={_item.isInProgress}
+			class="status-panel-item
+				slds-var-p-around_x-small">
+			<p class="slds-text-align_center">
+				<c-badge>
+					<c-font-awesome-icon slot="iconLeft"
+						icon-name="solid:screwdriver-wrench"
+						variant="warning"
+						size="x-small"></c-font-awesome-icon>
+					<span slot="body">In Progress</span>
+				</c-badge>
+			</p>
+			<p lwc:if={_item.startedOn}
+				class="slds-text-align_center slds-text-body_small">
+				Started&nbsp;
+				<lightning-formatted-date-time
+					value={_item.startedOn}
+					weekday="short"
+					month="short"
+					day="numeric"
+					hour="numeric"
+					minute="2-digit"></lightning-formatted-date-time>
+			</p>
+			<p lwc:if={_item.startedBy}
+				class="slds-text-align_center slds-text-body_small">
+				By&nbsp;
+				<c-staff-output-field
+					record-id={_item.startedBy}></c-staff-output-field>
+			</p>
+			<div class="slds-var-m-top_xx-small">
+				<lightning-button icon-name="utility:check"
+					icon-position="right"
+					variant="border-filled"
+					label="Complete"
+					stretch="true"
+					onclick={handleOnCompleteClick}></lightning-button>
+			</div>
 		</div>
-	</div>
+		<div lwc:if={_item.isComplete}
+			class="status-panel-item
+				slds-var-p-around_x-small">
+			<p class="slds-text-align_center">
+				<c-badge>
+					<lightning-icon slot="iconLeft"
+						icon-name="utility:success"
+						variant="success"
+						size="x-small"></lightning-icon>
+					<span slot="body">Complete</span>
+				</c-badge>
+			</p>
+			<p lwc:if={_item.completedOn}
+				class="slds-text-align_center slds-text-body_small">
+				On&nbsp;
+				<lightning-formatted-date-time
+					value={_item.completedOn}
+					weekday="short"
+					month="short"
+					day="numeric"
+					hour="numeric"
+					minute="2-digit"></lightning-formatted-date-time>
+			</p>
+			<p lwc:if={_item.completedBy}
+				class="slds-text-align_center slds-text-body_small">
+				By&nbsp;
+				<c-staff-output-field
+					record-id={_item.completedBy}></c-staff-output-field>
+			</p>
+		</div>
+	</lightning-layout-item>
+</lightning-layout>
+<div lwc:if={_item.hasError}
+	class="slds-var-p-horizontal_small slds-var-p-vertical_xx-small">
+	<c-error-panel error-title={_item.errorMessage}
+		error-object={_item.errorObject}
+		variant="compact"></c-error-panel>
+</div>
 </div>
 </template>

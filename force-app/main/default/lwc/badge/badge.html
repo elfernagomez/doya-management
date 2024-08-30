@@ -1,0 +1,10 @@
+<template>
+<span class="slds-badge">
+	<span lwc:if={isIconStart}
+		class="slds-badge__icon slds-badge__icon_left">
+		<slot name="iconLeft"></slot>
+	</span><slot name="body"></slot></span><span lwc:if={isIconEnd}
+		class="slds-badge__icon slds-badge__icon_right">
+		<slot name="iconRight"></slot>
+	</span>
+</template>

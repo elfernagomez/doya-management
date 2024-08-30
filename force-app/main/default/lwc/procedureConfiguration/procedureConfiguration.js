@@ -1,19 +1,81 @@
 import LwcBase from "c/lwcBase";
 import { api, wire } from "lwc";
-import { getRecord } from 'lightning/uiRecordApi';
 import { procedureConfigurationLabels } from "c/constants";
+import {
+	getRecord,
+	getFieldValue,
+	updateRecord,
+	notifyRecordUpdateAvailable
+} from 'lightning/uiRecordApi';
+import { createNewItem } from "c/lineItemManagerStep";
+
+import PROCEDURE_OBJECT
+	from '@salesforce/schema/Procedure__c';
+
+import NAME_FIELD from
+	"@salesforce/schema/Procedure__c.Name";
+import COLOR_CSS_CODE_FIELD from
+	"@salesforce/schema/Procedure__c.ColorCssCode__c";
+import DEFAULT_NEXT_FIELD from
+	"@salesforce/schema/Procedure__c.DefaultNextProcedure__c";
+import IS_MACHINE_REQUIRED_FIELD from
+	"@salesforce/schema/Procedure__c.IsMachineInfoRequired__c";
+import MACHINE_SKILLS_FIELD from
+	"@salesforce/schema/Procedure__c.MachineSkills__c";
+import PRODUCTION_FIELDS_JSON_FIELD from
+	"@salesforce/schema/Procedure__c.ProductionFieldsJson__c";
+
+export function getFieldNames() {
+	return [
+		`${PROCEDURE_OBJECT.objectApiName}.${NAME_FIELD.fieldApiName}`,
+		`${PROCEDURE_OBJECT.objectApiName}.${COLOR_CSS_CODE_FIELD.fieldApiName}`,
+		`${PROCEDURE_OBJECT.objectApiName}.${DEFAULT_NEXT_FIELD.fieldApiName}`,
+		`${PROCEDURE_OBJECT.objectApiName}.${IS_MACHINE_REQUIRED_FIELD.fieldApiName}`,
+		`${PROCEDURE_OBJECT.objectApiName}.${MACHINE_SKILLS_FIELD.fieldApiName}`,
+		`${PROCEDURE_OBJECT.objectApiName}.${PRODUCTION_FIELDS_JSON_FIELD.fieldApiName}`
+	];
+}
+
+export function getProcedureFromRecord(record) {
+	return {
+		value: record.id,
+		label:
+			getFieldValue(record, NAME_FIELD),
+		colorCode:
+			getFieldValue(record, COLOR_CSS_CODE_FIELD) || "#ffffff",
+		defaultNextId:
+			getFieldValue(record, DEFAULT_NEXT_FIELD),
+		isMachineInfoRequired:
+			getFieldValue(record, IS_MACHINE_REQUIRED_FIELD),
+		machineSkills:
+			getFieldValue(record, MACHINE_SKILLS_FIELD)?.split(";") || null,
+		productionFields:
+			JSON.parse(getFieldValue(record, PRODUCTION_FIELDS_JSON_FIELD) || "[]"),
+	};
+}
 
 export default class ProcedureConfiguration extends LwcBase {
 	@api
 	recordId;
 
-	objectApiName = "Procedure__c";
+	objectApiName = PROCEDURE_OBJECT.objectApiName;
 	labels = procedureConfigurationLabels;
 
 	previewMode = "view";
 	isReady = false;
 	previewItems = null;
+
 	procedureName;
+	colorCode = "#ffffff";
+	fieldsMode = "view";
+
+	get isFieldsInViewMode() {
+		return this.fieldsMode == "view";
+	}
+
+	get isFieldsInEditMode() {
+		return this.fieldsMode == "edit";
+	}
 
 	get previewProcedureOptions() {
 		return [{
@@ -21,7 +83,6 @@ export default class ProcedureConfiguration extends LwcBase {
 			value: this.recordId
 		}];
 	}
-
 
 	get previewModeOptions() {
 		return [{
@@ -43,82 +104,37 @@ export default class ProcedureConfiguration extends LwcBase {
 	@wire(getRecord, {
 		recordId: "$recordId",
 		fields: [
-			"Procedure__c.Id",
-			"Procedure__c.Name",
-			"Procedure__c.AdminFieldsJson__c",
-			"Procedure__c.ProductionFieldsJson__c",
-			"Procedure__c.IsMachineInfoRequired__c",
-			"Procedure__c.MachineSkill__c"
+			NAME_FIELD,
+			COLOR_CSS_CODE_FIELD,
+			DEFAULT_NEXT_FIELD,
+			IS_MACHINE_REQUIRED_FIELD,
+			MACHINE_SKILLS_FIELD,
+			PRODUCTION_FIELDS_JSON_FIELD
 		]
 	})
 	wiredCurrentRecord({ error, data }) {
 		if (data) {
-			this.procedureName = data.fields.Name.value;
-			let adminFields = JSON.parse(
-				data.fields.AdminFieldsJson__c.value || "[]");
-			let prodFields = JSON.parse(
-				data.fields.ProductionFieldsJson__c.value || "[]");
-
-			let template = {
-				uniqueId: `unsaved_$1`,
-				isEditing: false,
-				isBusy: false,
-				isDeleting: false,
-				isDisabled: false,
-				isValid: true,
-				errorMessage: null,
-				isNew: true,
-				showNotes: false,
-				order: 1,
-				isMachineRequired: data.fields.IsMachineInfoRequired__c.value == true,
-				machineSkills: data.fields.MachineSkill__c.value?.split(";"),
-				// status flags
-				isPending: false,
-				isNext: false,
-				isComplete: false,
-				// step work information
-				procedureId: this.recordId,
-				procedureName: data.fields.Name.value,
-				notes: [
-					"Sed ut perspiciatis unde omnis iste natus error sit voluptatem",
-					"Nemo enim ipsam voluptatem quia voluptas sit aspernatur",
-					"Ut enim ad minima veniam, quis nostrum exercitationem ullam"
-				].join("\n"),
-				// actual salesforce record
-				record: {
-					Procedure__c: {
-						value: this.recordId,
-						displayValue: data.fields.Name.value
-					},
-					...[
-						...adminFields,
-						...prodFields
-					].reduce(
-						(obj, f) => {
-							obj[f.fieldApiName] = {
-								value: null,
-								displayValue: `Test ${f.fieldLabel}`
-							};
-							return obj
-						},
-						{})
-				},
-				adminFields,
-				prodFields
-			};
+			let proc = getProcedureFromRecord(data);
+			this.procedureName = proc.label;
+			this.colorCode = proc.colorCode;
+			let template = createNewItem(1, this.recordId, [proc]);
 
 			this.previewItems = [{
 				...template,
 				isPending: true
 			}, {
 				...template,
+				order: 2,
 				isNext: true,
 				notes: null
 			}, {
 				...template,
+				order: 3,
 				isComplete: true,
 				notes: "Shorter notes this time."
 			}];
+		} else if (error) {
+			console.error(error);
 		}
 	}
 
@@ -128,5 +144,37 @@ export default class ProcedureConfiguration extends LwcBase {
 
 	handlePreviewModeChange(event) {
 		this.previewMode = event.detail.value;
+	}
+
+	handleColorChange(event) {
+		let color = event.target.value;
+		this.save("ColorCssCode__c", color);
+	}
+
+	handleOnEditFieldsClick() {
+		this.fieldsMode = "edit";
+	}
+
+	handleOnCancelFieldsClick() {
+		this.fieldsMode = "view";
+	}
+
+	handleOnFieldsSave() {
+		this.fieldsMode = "view";
+	}
+
+	save(fieldApiName, value) {
+		let record = {};
+		record["Id"] = this.recordId;
+		record[fieldApiName] = value;
+
+		updateRecord({
+			fields: record
+		})
+		.then(() => notifyRecordUpdateAvailable([{recordId: this.recordId}]))
+		.catch((error) => {
+			console.error(error);
+			// this.addError("There was a problem while Saving", error);
+		});
 	}
 }

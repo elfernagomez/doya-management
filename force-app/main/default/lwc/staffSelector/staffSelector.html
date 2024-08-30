@@ -1,0 +1,29 @@
+<template>
+	<lightning-modal-header label="Enter PIN"></lightning-modal-header>
+	<lightning-modal-body>
+		<lightning-layout horizontal-align="center"
+			class="slds-gutters_xx-small slds-var-m-bottom_large">
+			<lightning-layout-item>
+				<lightning-record-picker
+					label="Staff Member"
+					variant="label-hidden"
+					placeholder="Search Staff..."
+					object-api-name="Staff__c"></lightning-record-picker>
+			</lightning-layout-item>
+		</lightning-layout>
+		<lightning-layout horizontal-align="center"
+			class="slds-gutters_xx-small">
+			<lightning-layout-item for:each={numbers}
+				for:index="index"
+				for:item="n"
+				key={n.key}
+				class="slds-col number-container">
+				<lightning-input type="password"
+					max-length="1"
+					variant="label-hidden"
+					class="number-input"></lightning-input>
+			</lightning-layout-item>
+		</lightning-layout>
+		<hr />
+	</lightning-modal-body>
+</template>

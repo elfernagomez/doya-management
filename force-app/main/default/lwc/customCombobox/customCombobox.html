@@ -1,0 +1,106 @@
+<template>
+<div lwc:if={hasValue}
+	class="slds-form-element">
+		<label class="slds-form-element__label"
+			for="combobox-id-17"
+			id="combobox-label-id-139">
+			<abbr lwc:if={isRequired}
+				class="slds-required"
+				title="required">* </abbr>
+			{label}</label>
+	<div class="slds-form-element__control">
+		<div class="slds-combobox_container slds-has-selection">
+			<div class="slds-combobox
+					slds-dropdown-trigger
+					slds-dropdown-trigger_click">
+				<div role="none"
+					class="slds-combobox__form-element
+						slds-input-has-icon
+						slds-input-has-icon_right">
+					<div role="combobox"
+						tabindex="0"
+						class="slds-input_faux
+							slds-combobox__input
+							slds-combobox__input-value"
+						aria-labelledby="combobox-label-id-139	
+							combobox-id-17-selected-value"
+						id="combobox-id-17-selected-value"
+						aria-expanded="false"
+						aria-haspopup="listbox">
+						<span class="slds-truncate">{_value}</span>
+					</div>
+					<!-- sldsValidatorIgnoreNextLine -->
+					<button title="Clear"
+						onclick={handleOnClearClick}
+						class="slds-button slds-button_icon
+							slds-input__icon
+							slds-input__icon_right">
+						<lightning-icon icon-name="utility:clear"
+							size="xx-small"></lightning-icon>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div lwc:else
+	class="slds-is-relative">
+	<lightning-input type="search"
+		label={label}
+		value={editingValue}
+		required={isRequired}
+		onkeydown={handleOnKeydown}
+		onchange={handleOnChange}
+		onfocus={handleOnFocus}
+		onblur={handleOnBlur}></lightning-input>
+
+	<div lwc:if={showDropdown}
+		role="listbox"
+		aria-label="Otiopns]"
+		tabindex="0"
+		aria-busy="false"
+		class="slds-dropdown
+			slds-dropdown_length-5
+			slds-dropdown_fluid">
+		<ul role="presentation"
+			class="slds-listbox slds-listbox_vertical">
+			<li lwc:if={editingValue}
+				role="presentation"
+				onclick={handleOnCurrentEditingValueClick}
+				class="slds-listbox__item">
+				<div role="option"
+					class="slds-media
+						slds-listbox__option
+						slds-listbox__option_plain
+						slds-media_small">
+					<span class="slds-media__figure slds-listbox__option-icon"></span>
+					<span class="slds-media__body">
+						<span class="slds-truncate"
+							title={editingValue}>{editingValue}</span>
+					</span>
+				</div>
+			</li>
+			<li for:each={options}
+				for:item="option"
+				for:index="index"
+				key={option.value}
+				role="presentation"
+				data-index={index}
+				onclick={handleOnOptionClick}
+				class="slds-listbox__item">
+				<div role="option"
+					class="slds-media
+						slds-listbox__option
+						slds-listbox__option_plain
+						slds-media_small">
+					<span class="slds-media__figure slds-listbox__option-icon"></span>
+					<span class="slds-media__body">
+						<span class="slds-truncate"
+							title={option.label}>{option.label}</span>
+					</span>
+				</div>
+			</li>
+		</ul>
+	</div>
+</div>
+</template>

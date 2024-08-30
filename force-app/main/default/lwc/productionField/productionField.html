@@ -1,0 +1,62 @@
+<template>
+<div lwc:if={showEdit}
+	class={editModeContainerClass}>
+	<div lwc:if={field.isText}>
+		<lightning-combobox lwc:if={field.isOptionRestricted}
+			label={field.fieldLabel}
+			value={value}
+			required={field.isRequired}
+			read-only={isReadonly}
+			options={options}
+			onchange={handleRecordFieldChange}></lightning-combobox>
+		<c-custom-combobox lwc:else
+			label={field.fieldLabel}
+			value={value}
+			required={field.isRequired}
+			options={options}
+			onchange={handleRecordFieldChange}></c-custom-combobox>
+	</div>
+	<lightning-record-edit-form lwc:else
+		record-id={recordId}
+		object-api-name={objectApiName}
+		class="slds-form-element">
+		<label class="slds-form-element__label"
+			for={field.fieldApiName}>
+			<abbr lwc:if={field.isRequired}
+				class="slds-required"
+				title="required">* </abbr>
+			{field.fieldLabel}</label>
+		<lightning-input-field variant="label-hidden"
+			field-name={field.fieldApiName}
+			value={value}
+			required={field.isRequired}
+			onchange={handleRecordFieldChange}
+			class="validate"></lightning-input-field>
+	</lightning-record-edit-form>
+	<!-- sldsValidatorIgnoreNextLine -->
+	<lightning-button-icon lwc:if={showCloseEditButton}
+		icon-name="utility:close"
+		variant="bare"
+		title="Close"
+		onclick={handleOnCloseEditClick}
+		class="slds-is-absolute slds-var-m-bottom_xx-small"
+		style="bottom:0;right:0;"></lightning-button-icon>
+</div>
+<div lwc:else
+	class={viewModeContainerClass}>
+	<lightning-record-view-form 
+		record-id={recordId}
+		object-api-name={objectApiName}>
+		<lightning-output-field field-name={field.fieldApiName}
+			label={field.fieldLabel}></lightning-output-field>
+	</lightning-record-view-form>
+	<!-- sldsValidatorIgnoreNextLine -->
+	<lightning-button-icon lwc:if={isEditAllowed}
+		icon-name="utility:edit"
+		variant="bare"
+		title="Edit"
+		onclick={handleOnEditClick}
+		class="slds-is-absolute slds-var-m-bottom_xx-small"
+		style="bottom:0;right:0;"></lightning-button-icon>
+</div>
+</template>

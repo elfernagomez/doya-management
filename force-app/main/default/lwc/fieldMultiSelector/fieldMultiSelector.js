@@ -84,10 +84,9 @@ export default class FieldMultiSelector extends LwcBase {
 	@wire(getObjectInfo, {
 		objectApiName: "$sourceObjectApiName"
 	})
-	wiredWorkOrderLineItemInfo({ error, data}) {
+	wiredObjectInfo({ error, data}) {
 		if (data) {
 			this.objectInfo = data;
-			this.logAsStringPretty(this.excludedFields)
 			this.fieldOptions =
 				Object.keys(data.fields)
 					.filter(f =>
@@ -130,7 +129,13 @@ export default class FieldMultiSelector extends LwcBase {
 			fieldTitle: null,
 			isRequired: true,
 			isLabelDisabled: true,
-			isRequiredDisabled: true
+			isRequiredDisabled: true,
+			isEditionAllowed: true,
+			isEditionAllowedDisabled: false,
+			isText: false,
+			isFromOptions: false,
+			isOptionRestricted: false,
+			options: []
 		});
 		this.isSaveDisabled = false;
 	}
@@ -143,18 +148,33 @@ export default class FieldMultiSelector extends LwcBase {
 		field.fieldTitle = this._getFieldTitle(info.label, info.apiName);
 		field.isLabelDisabled = false;
 		field.isRequiredDisabled = info.required;
-
-		if (info.required)
-			field.isRequired = true;
-		
+		field.isRequired = info.required == true;
+		field.isText = info.dataType == "String";
+		field.isFromOptions = false;
+		field.options = [];
 		this.isSaveDisabled = false;
 	}
 
 	handleChange(event) {
 		let field = this.fields[event.target.dataset.index];
-		field[event.target.dataset.field] = this.convertToType(
-			event.target.value, event.target.dataset.type);
+		field[event.target.dataset.field] = 
+			event.target.type == "checkbox" ?
+				event.target.checked :
+				this.convertToType(
+					event.target.value,
+					event.target.dataset.type);
 		this.isSaveDisabled = false;
+		// this.logAsStringPretty(field.options);
+	}
+
+	handleFieldOptionsChange(event) {
+		let field = this.fields[event.target.dataset.index];
+		field.options = event.detail.value;
+		this.isSaveDisabled = false;
+	}
+
+	handleOnCancelClick() {
+		this.mode = "view";
 	}
 
 	handleOnDeleteClick(event) {
@@ -214,9 +234,12 @@ export default class FieldMultiSelector extends LwcBase {
 			this.isLoading = false;
 			this.showSaveSuccessMsg = true;
 			this.isSaveDisabled = true;
-			this._mode = "view";
 			notifyRecordUpdateAvailable([{recordId: this.recordId}]);
 			setTimeout(() => this.isSaveDisabled = false, 2000);
+			this.customEvent("save", {
+				recordId: this.recordId,
+				record: record
+			});
 		})
 		.catch((error) => {
 			console.error(error);

@@ -1,3 +1,8 @@
+.header {
+	overflow: auto;
+	white-space: normal;
+}
+
 .switch-btn {
 	top: -1rem;
 	left: 50%;

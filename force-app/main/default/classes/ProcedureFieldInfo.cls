@@ -6,8 +6,29 @@
  */
 public inherited sharing class ProcedureFieldInfo {
 	@AuraEnabled
-	public String fiedApiName { get; set; }
+	public Integer order { get; set; }
+	
+	@AuraEnabled
+	public String fieldLabel { get; set; }
+	
+	@AuraEnabled
+	public String fieldApiName { get; set; }
+	
+	@AuraEnabled
+	public String fieldTitle { get; set; }
 	
 	@AuraEnabled
 	public Boolean isRequired { get; set; }
+
+	/*
+	{
+		"order":1,
+		"fieldLabel":"Duration",
+		"fieldApiName":"Duration",
+		"fieldTitle":"Duration (Duration)",
+		"isRequired":true,
+		"isLabelDisabled":false,
+		"isRequiredDisabled":false
+	}
+	*/
 }

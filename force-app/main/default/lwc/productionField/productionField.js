@@ -1,0 +1,95 @@
+import LwcBase from "c/lwcBase";
+import { api } from "lwc";
+
+export default class ProductionField extends LwcBase {
+	@api
+	field;
+
+	@api
+	mode = "edit"; // view, edit
+
+	@api
+	get record() {
+		return this._record;
+	};
+
+	set record(v) {
+		this._record = { ...v };
+	}
+
+	@api
+	objectApiName = "ProductionOrderLineItem__c";
+
+	@api
+	isReadonly = false;
+
+	@api
+	isEditAllowedOverride = null;
+
+	_record = {};
+	isEditing = false;
+
+	get showEdit() {
+		return this.mode == "edit" ||
+			this.field.isEditionAllowed && this.isEditing;
+	}
+
+	get recordId() {
+		return this.record?.Id || null;
+	}
+
+	get value() {
+		return this.record[this.field.fieldApiName];
+	}
+
+	get options() {
+		return (this.field.options || [])
+			.map(o => ({
+				label: o,
+				value: o
+			}));
+	}
+
+	get isEditAllowed() {
+		return this.field.isEditionAllowed &&
+			(this.isEditAllowedOverride == null || this.isEditAllowedOverride == true);
+	}
+
+	get viewModeContainerClass() {
+		return this.field.isEditionAllowed ?
+			"slds-is-relative slds-var-p-right_medium" :
+			""
+	}
+
+	get editModeContainerClass() {
+		return this.showCloseEditButton ?
+			"slds-is-relative slds-var-p-right_medium" :
+			""
+	}
+
+	get showCloseEditButton() {
+		return this.mode == "view" && this.isEditing;
+	}
+
+	handleRecordFieldChange(event) {
+		event.stopPropagation();
+		this.setValue(event.detail.value, true);
+	}
+
+	handleOnEditClick() {
+		this.isEditing = true;
+	}
+
+	handleOnCloseEditClick() {
+		this.isEditing = false;
+	}
+
+	setValue(v, doNotify) {
+		this._record[this.field.fieldApiName] = v;
+		if (doNotify)
+			this.customEvent("change", {
+				field: this.field,
+				record: this._record
+			});
+	}
+}

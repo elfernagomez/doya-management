@@ -1,13 +1,12 @@
 <template>
-<lightning-card title={title}>
-<lightning-radio-group slot="actions"
+<!-- <lightning-radio-group slot="actions"
 	variant="label-hidden"
 	options={modeOptions}
 	value={_mode}
 	type="button"
-	onchange={handleOnModeChange}></lightning-radio-group>
+	onchange={handleOnModeChange}></lightning-radio-group> -->
 <div lwc:if={isView}
-	class="slds-var-p-horizontal_medium slds-is-relative">
+	class="slds-is-relative">
 	<div lwc:if={hasFields}>
 		<div for:each={fields}
 			for:item="field"
@@ -29,7 +28,6 @@
 							class="slds-form__item"
 							style="min-width: 0;">
 							<div class="slds-form-element
-									slds-form-element_edit
 									slds-form-element_readonly
 									slds-form-element_horizontal
 									slds-hint-parent">
@@ -48,7 +46,6 @@
 							class="slds-form__item"
 							style="min-width: 0;">
 							<div class="slds-form-element
-									slds-form-element_edit
 									slds-form-element_readonly
 									slds-form-element_horizontal
 									slds-hint-parent">
@@ -67,7 +64,6 @@
 							class="slds-form__item"
 							style="min-width: 0;">
 							<div class="slds-form-element
-									slds-form-element_edit
 									slds-form-element_readonly
 									slds-form-element_horizontal
 									slds-hint-parent">
@@ -76,20 +72,113 @@
 								<div class="slds-form-element__control">
 									<div class="slds-form-element__static">
 										<b lwc:if={field.isRequired}
-											class="slds-text-color_error">Yes</b>
+											class="slds-text-color_success">Yes</b>
 										<b lwc:else>No</b>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
+					<div class="slds-form__row">
+						<div role="listitem"
+							class="slds-form__item"
+							style="min-width: 0;">
+							<div class="slds-form-element
+									slds-form-element_readonly
+									slds-form-element_horizontal
+									slds-hint-parent">
+								<span title="Field"
+									class="slds-form-element__label">Allow Edit?</span>
+								<div class="slds-form-element__control">
+									<div class="slds-form-element__static">
+										<b lwc:if={field.isEditionAllowed}
+											class="slds-text-color_success">Yes</b>
+										<b lwc:else>No</b>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- support for text fields -->
+					<template lwc:if={field.isText}>
+						<div class="slds-form__row">
+							<div role="listitem"
+								class="slds-form__item"
+								style="min-width: 0;">
+								<div class="slds-form-element
+										slds-form-element_readonly
+										slds-form-element_horizontal
+										slds-hint-parent">
+									<span title="Field"
+										class="slds-form-element__label">
+										Choose from options?
+									</span>
+									<div class="slds-form-element__control">
+										<div class="slds-form-element__static">
+											<b lwc:if={field.isFromOptions}
+												class="slds-text-color_success">Yes</b>
+											<b lwc:else>No</b>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div lwc:if={field.isFromOptions}
+							class="slds-form__row">
+							<div role="listitem"
+								class="slds-form__item"
+								style="min-width: 0;">
+								<div class="slds-form-element
+										slds-form-element_readonly
+										slds-form-element_horizontal
+										slds-hint-parent">
+									<span title="Field"
+										class="slds-form-element__label">
+										Restrict to options?
+									</span>
+									<div class="slds-form-element__control">
+										<div class="slds-form-element__static">
+											<b lwc:if={field.isOptionRestricted}
+												class="slds-text-color_success">Yes</b>
+											<b lwc:else>No</b>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div lwc:if={field.isFromOptions}
+							class="slds-form__row">
+							<div role="listitem"
+								class="slds-form__item"
+								style="min-width: 0;">
+								<div class="slds-form-element
+										slds-form-element_readonly
+										slds-form-element_horizontal
+										slds-hint-parent">
+									<span title="Field"
+										class="slds-form-element__label">
+										Options
+									</span>
+									<div class="slds-form-element__control">
+										<div class="slds-form-element__static">
+											<c-input-list value={field.options}
+												mode="view"></c-input-list>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</template>
 				</div>
 			</div>
 		</div>
 	</div>
+	<div lwc:else>
+		<p class="slds-text-color_inverse-weak">No fields.</p>
+	</div>
 </div>
 <div lwc:if={isEdit}
-	class="slds-var-p-horizontal_medium slds-is-relative">
+	class="slds-is-relative">
 	<div lwc:if={isError}>
 		<c-error-panel error-title={errorTitle}
 			error-object={errorObject}></c-error-panel>
@@ -137,27 +226,68 @@
 					onchange={handleFieldChange}
 					class="validate slds-var-m-bottom_xx-small"
 					required></lightning-combobox>
-				<lightning-input name="fieldLabel"
-					label="Label (If Different)"
-					value={field.fieldLabel}
-					data-index={index}
-					data-field="fieldLabel"
-					data-type="string"
-					onchange={handleChange}
-					disabled={field.isLabelDisabled}
-					class="validate slds-var-m-bottom_medium"
-					required></lightning-input>
-				<lightning-input type="toggle"
-					label="Required?"
-					name="isRequired"
-					checked={field.isRequired}
-					data-index={index}
-					data-field="isRequired"
-					data-type="bool"
-					message-toggle-active="Yes"
-					message-toggle-inactive="No"
-					onchange={handleChange}
-					disabled={field.isRequiredDisabled}></lightning-input>
+				<template lwc:if={field.fieldApiName}>
+					<lightning-input name="fieldLabel"
+						label="Label (If Different)"
+						value={field.fieldLabel}
+						data-index={index}
+						data-field="fieldLabel"
+						data-type="string"
+						onchange={handleChange}
+						disabled={field.isLabelDisabled}
+						class="validate slds-var-m-bottom_medium"
+						required></lightning-input>
+					<lightning-input type="checkbox"
+						label="Required?"
+						name="isRequired"
+						checked={field.isRequired}
+						data-index={index}
+						data-field="isRequired"
+						data-type="bool"
+						onchange={handleChange}
+						disabled={field.isRequiredDisabled}
+						class="validate slds-var-m-bottom_medium"></lightning-input>
+					<lightning-input type="checkbox"
+						label="Allow Edition?"
+						field-level-help={labels.allowEditHelp}
+						data-field="isEditionAllowed"
+						checked={field.isEditionAllowed}
+						data-index={index}
+						data-type="bool"
+						onchange={handleChange}
+						disabled={field.isEditionAllowedDisabled}
+						class="validate slds-var-m-bottom_medium"></lightning-input>
+					<!-- support for text fields -->
+					<template lwc:if={field.isText}>
+						<lightning-input type="checkbox"
+							label="Choose from options?"
+							name="isFromOptions"
+							checked={field.isFromOptions}
+							data-index={index}
+							data-field="isFromOptions"
+							data-type="bool"
+							onchange={handleChange}
+							class="validate slds-var-m-bottom_medium"></lightning-input>
+						<lightning-input type="checkbox"
+							label="Restrict to options?"
+							name="isOptionRestricted"
+							checked={field.isOptionRestricted}
+							data-index={index}
+							data-field="isOptionRestricted"
+							data-type="bool"
+							onchange={handleChange}
+							class="validate slds-var-m-bottom_medium"></lightning-input>
+						<div lwc:if={field.isFromOptions}
+							class="slds-var-m-bottom_medium">
+							<c-input-list is-required=true
+								label="Options"
+								value={field.options}
+								data-index={index}
+								onchange={handleFieldOptionsChange}
+								class="validate"></c-input-list>
+						</div>
+					</template>
+				</template>
 			</div>
 			<div class="slds-media__figure slds-media__figure_reverse">
 				<!-- sldsValidatorIgnoreNextLine -->
@@ -199,5 +329,4 @@
 	<lightning-spinner lwc:if={isLoading}
 		variant="brand"></lightning-spinner>
 </div>
-</lightning-card>
 </template>

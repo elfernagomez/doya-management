@@ -1,0 +1,127 @@
+<template>
+<div lwc:if={isView}
+	class="">
+	<ul lwc:if={items.length}
+		class="item-container slds-scrollable_y">
+		<li for:each={items}
+			for:item="item"
+			for:index="index"
+			key={item}
+			class="slds-item
+				slds-media
+				slds-media_small">
+			<div class="slds-media__figure">
+				<!-- sldsValidatorIgnoreNextLine -->
+				<lightning-icon label={item}
+					icon-name="utility:picklist_type"
+					size="xx-small"></lightning-icon>
+			</div>
+			<div class="slds-media__body">
+				<p class="item-text slds-scrollable_none">{item}</p>
+			</div>
+		</li>
+	</ul>	
+	<p lwc:else
+		class="slds-var-p-horizontal_small
+			slds-text-color_inverse-weak">No items.</p>
+</div>
+<div lwc:if={isEdit}
+	class="slds-box slds-box_small">
+	<lightning-layout class="slds-var-m-bottom_xx-small">
+		<lightning-layout-item flexibility="grow">
+			<label class="slds-form-element__label">
+				<abbr lwc:if={isRequired}
+					class="slds-required"
+					title="required">*</abbr>{label}</label>
+		</lightning-layout-item>
+		<lightning-layout-item>
+			<lightning-button-group>
+				<lightning-button-icon-stateful
+					for:each={orderingTypeOptions}
+					for:item="option"
+					for:index="index"
+					key={option.value}
+					size="small"
+					icon-name={option.iconName}
+					selected={option.isSelected}
+					data-value={option.value}
+					onclick={handleSortOptionClick}
+					alternative-text={option.label}></lightning-button-icon-stateful>
+			</lightning-button-group>
+		</lightning-layout-item>
+	</lightning-layout>
+	<ul data-dragging={isDragging}
+		class="item-container
+			slds-has-dividers_bottom
+			slds-var-m-bottom_small
+			slds-scrollable_y">
+		<li for:each={items}
+			for:item="item"
+			for:index="index"
+			key={item}
+			data-index={index}
+			draggable={isDraggingAllowed}
+			ondragstart={handleOnDragStart}
+			ondragend={handleOnDragEnd}
+			class="slds-is-relative
+				slds-item
+				slds-media
+				slds-media_small
+				slds-media_center
+				slds-var-p-vertical_xx-small">
+			<div lwc:if={isDraggingAllowed}
+				class="slds-media__figure slds-var-p-left_xxx-small">
+				<!-- sldsValidatorIgnoreNextLine -->
+				<lightning-button-icon icon-name="utility:drag_and_drop"
+					variant="bare"
+					label="Order"
+					data-index={index}
+					onmousedown={handleOnHandlerMouseDown}
+					onmouseup={handleOnHandlerMouseUp}></lightning-button-icon>
+			</div>
+			<div class="slds-media__body">
+				<p class="slds-scrollable_none item-text">{item}</p>
+			</div>
+			<div class="slds-media__figure slds-media__figure_reverse">
+				<!-- sldsValidatorIgnoreNextLine -->
+				<lightning-button-icon icon-name="utility:delete"
+					variant="bare"
+					label="Delete Value"
+					data-index={index}
+					onclick={handleOnDeleteItemClick}></lightning-button-icon>
+			</div>
+			<div data-index={index}
+				data-position="before"
+				ondragover={handleOnDragOver}
+				ondragleave={handleOnDragLeave}
+				ondrop={handleOnDrop}
+				class="slds-is-absolute slds-size_2-of-2 drop-before"></div>
+			<div data-index={index}
+				data-position="after"
+				ondragover={handleOnDragOver}
+				ondragleave={handleOnDragLeave}
+				ondrop={handleOnDrop}
+				class="slds-is-absolute slds-size_2-of-2 drop-after"></div>
+		</li>
+	</ul>
+	<div class="slds-media">
+		<div class="slds-media__body">
+			<lightning-input name="newElement"
+				variant="label-hidden"
+				value={newValue}
+				maxlength="80"
+				onchange={handleOnNewValueChange}
+				onkeypress={handleOnNewValueKeyPress}
+				placeholder="Add item..."
+				class="newElementInput"></lightning-input>
+		</div>
+		<div class="slds-media__figure slds-media__figure_reverse">
+			<!-- sldsValidatorIgnoreNextLine -->
+			<lightning-button-icon icon-name="utility:add"
+				variant="neutral"
+				disabled={isAddBtnDisabled}
+				onclick={handleOnAddClick}></lightning-button-icon>
+		</div>
+	</div>
+</div>
+</template>

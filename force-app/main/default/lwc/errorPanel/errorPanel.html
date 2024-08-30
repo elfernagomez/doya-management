@@ -1,5 +1,6 @@
 <template>
-<div class="slds-box">
+<div lwc:if={isConfy}
+	class="slds-box slds-box_small">
 	<div class="slds-media">
 		<div class="slds-media__figure">
 			<lightning-icon icon-name="utility:error"
@@ -8,12 +9,66 @@
 		</div>
 		<div class="slds-media__body">
 			<p class="slds-text-heading_small
-					slds-text-color_error
-					slds-var-m-bottom_small">{errorTitle}</p>
-			<pre lwc:if={showErrorJson}
+					slds-text-color_error">{errorTitle}</p>
+			<div lwc:if={showErrorDetailsPanel}>
+				<div lwc:if={showDetails}>
+					<lightning-button label="Hide Details"
+						variant="base"
+						icon-name="utility:chevronup"
+						icon-position="right"
+						onclick={handleToggleDetails}></lightning-button>
+					<pre class="slds-box
+						slds-box_x-small
+						slds-theme_shade
+						slds-m-around_none">{errorJson}</pre>
+				</div>
+				<lightning-button lwc:else
+					label="Show Details"
+					variant="base"
+					icon-name="utility:chevrondown"
+					icon-position="right"
+					onclick={handleToggleDetails}></lightning-button>
+			</div>
+		</div>
+	</div>
+</div>
+<div lwc:if={isCompact}>
+	<div class="slds-media">
+		<div class="slds-media__figure">
+			<lightning-icon icon-name="utility:error"
+				size="xx-small"
+				variant="error"></lightning-icon>
+		</div>
+		<div class="slds-media__body">
+			<p class="slds-text-color_error">
+				{errorTitle}
+				<template lwc:if={showErrorDetailsPanel}>
+					&nbsp;&nbsp;
+					<a lwc:if={showDetails}
+						href="#"
+						onclick={handleToggleDetails}
+						class="slds-truncate">
+						Hide Details&nbsp;
+						<lightning-icon size="xx-small"
+							icon-name="utility:chevronup"
+							class="slds-current-color"></lightning-icon>
+					</a>
+					<a lwc:else
+						href="#"
+						onclick={handleToggleDetails}
+						class="slds-truncate">
+						Show Details&nbsp;
+						<lightning-icon size="xx-small"
+							icon-name="utility:chevrondown"
+							class="slds-current-color"></lightning-icon>
+					</a>
+				</template>
+			</p>
+			<pre lwc:if={showDetails}
 				class="slds-box
-					slds-box_x-small
-					slds-theme_shade">{errorJson}</pre>
+				slds-box_x-small
+				slds-theme_shade
+				slds-m-around_none">{errorJson}</pre>
 		</div>
 	</div>
 </div>

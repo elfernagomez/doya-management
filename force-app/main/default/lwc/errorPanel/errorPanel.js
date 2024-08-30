@@ -9,7 +9,20 @@ export default class ErrorPanel extends LightningElement {
 	@api
 	errorObject;
 
-	get showErrorJson() {
+	@api
+	variant = "confy"; // confy, compact
+
+	showDetails = false;
+
+	get isConfy() {
+		return this.variant == "confy";
+	}
+
+	get isCompact() {
+		return this.variant == "compact";
+	}
+
+	get showErrorDetailsPanel() {
 		return this.errorObject != null;
 	}
 
@@ -19,5 +32,11 @@ export default class ErrorPanel extends LightningElement {
 				this.errorObject :
 				JSON.stringify(this.errorObject, null, 2)) :
 			null;
+	}
+
+	handleToggleDetails(event) {
+		if (event.preventDefault)
+			event.preventDefault();
+		this.showDetails = !this.showDetails;
 	}
 }

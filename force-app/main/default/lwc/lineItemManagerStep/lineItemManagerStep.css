@@ -1,3 +1,42 @@
 .procedure-panel {
 	width: auto !important;
+	z-index: inherit !important;
+}
+
+.procedure-panel.production {
+	min-width: 8rem;
+}
+
+.procedure-panel.admin {
+	min-width: 12rem;
+}
+
+.procedure-panel:after {
+	z-index: inherit !important;	
+}
+
+.delete-panel {
+	top: 0;
+	right: 0;
+	bottom: 0;
+	min-width: 0;
+}
+
+.delete-panel lightning-button {
+	/* --lwc-lineHeightButton: 1.25rem; */
+}
+
+.status-panel {
+	width: 11rem;
+}
+
+.status-panel .status-panel-item {
+	/* top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0; */
+}
+
+.status-panel .status-panel-item lightning-button {
+	--lwc-lineHeightButton: 1.5rem;
 }

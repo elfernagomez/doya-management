@@ -69,5 +69,12 @@
 		<protected>false</protected>
 		<shortDescription>procedureExtraFieldsSelector_title</shortDescription>
 		<value>Procedure Settings</value>
+	</labels>	
+	<labels>
+		<fullName>fieldMultiSelector_allowEditHelp</fullName>
+		<language>en_US</language>
+		<protected>false</protected>
+		<shortDescription>fieldMultiSelector_allowEditHelp</shortDescription>
+		<value>Allow operation to edit while working. If this is not checked, only Admins can edit this fields</value>
 	</labels>
 </CustomLabels>

@@ -6,6 +6,47 @@ import { LightningElement, api } from 'lwc';
  * @version 1.0
  */
 export default class LwcBase extends LightningElement {
+
+	
+	/**
+	 * Error reporting for components
+	 * @see c:errorPanel
+	 */
+	isError = false;
+	errorTitle;
+	errorObject;
+
+	/**
+	 * Decalres the exitence of an error
+	 * @returns boolean
+	 */
+	get hasError() {
+		return this.isError;
+	}
+
+	/**
+	 * Generic error reporting function for components
+	 * @param {*} message 
+	 * @param {*} error 
+	 */
+	addError(message, error) {
+		console.error(error);
+		this.isError = true;
+		this.errorTitle = message;
+		this.errorObject = error;
+	}
+
+	/**
+	 * Removes any errors.
+	 * @param {*} message 
+	 * @param {*} error 
+	 */
+	removeError(message, error) {
+		this.isError = false;
+		this.errorTitle = null;
+		this.errorObject = null;
+	}
+
 	/**
 	 * Return TRUE if both ids are the same, taking into
 	 * account that salesforce Id might be 15 or 18 characters
@@ -220,9 +261,18 @@ export default class LwcBase extends LightningElement {
 		return list ? list[list.length - 1] || null : null;
 	}
 
+	getDmlErrors(error) {
+		return [
+			error?.body?.message,
+			...(error?.body?.output?.errors?.map(e => e.message) || []),
+			...Object.values(error?.body?.output?.fieldErrors || {})
+				.map(es => es.map(e => e.message))
+		].filter(e => e);
+	}
+
 	// NOTE: Private Helper only from thin line on.
 	// add public methods before this line.
-
+	// --------------------------------------------
 	/**
 	 * Private helper to complete the binarySearch
 	 * public method. Recursive and uses arrays slices.
