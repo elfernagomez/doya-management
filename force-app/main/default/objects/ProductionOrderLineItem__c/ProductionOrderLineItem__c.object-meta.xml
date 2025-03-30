@@ -153,13 +153,13 @@
     <enableSharing>true</enableSharing>
     <enableStreamingApi>true</enableStreamingApi>
     <externalSharingModel>ControlledByParent</externalSharingModel>
-    <label>Production Order Step</label>
+    <label>Work Order Step</label>
     <nameField>
-        <displayFormat>POLI{00000000}</displayFormat>
-        <label>Production Order Step #</label>
+        <displayFormat>WOLI{00000000}</displayFormat>
+        <label>Work Order Step #</label>
         <type>AutoNumber</type>
     </nameField>
-    <pluralLabel>Production Order Steps</pluralLabel>
+    <pluralLabel>Work Order Steps</pluralLabel>
     <searchLayouts></searchLayouts>
     <sharingModel>ControlledByParent</sharingModel>
     <visibility>Public</visibility>

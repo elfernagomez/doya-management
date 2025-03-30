@@ -1,12 +1,9 @@
-import LwcBase from "c/lwcBase";
+import InputBase from 'c/inputBase';
 import { api } from "lwc";
 
-export default class ProductionField extends LwcBase {
+export default class ProductionField extends InputBase {
 	@api
 	field;
-
-	@api
-	mode = "edit"; // view, edit
 
 	@api
 	get record() {
@@ -18,7 +15,7 @@ export default class ProductionField extends LwcBase {
 	}
 
 	@api
-	objectApiName = "ProductionOrderLineItem__c";
+	objectApiName = "WorkOrderLineItem";
 
 	@api
 	isReadonly = false;
@@ -30,7 +27,7 @@ export default class ProductionField extends LwcBase {
 	isEditing = false;
 
 	get showEdit() {
-		return this.mode == "edit" ||
+		return this.isEdit ||
 			this.field.isEditionAllowed && this.isEditing;
 	}
 
@@ -68,7 +65,7 @@ export default class ProductionField extends LwcBase {
 	}
 
 	get showCloseEditButton() {
-		return this.mode == "view" && this.isEditing;
+		return this.isView && this.isEditing;
 	}
 
 	handleRecordFieldChange(event) {

@@ -1,0 +1,78 @@
+<!--
+@author Fernando Gomez
+@since 10/30.2022
+@versino 1.0
+-->
+<template>
+<div class="slds-box
+		slds-box_x-small
+		slds-is-relative
+		slds-theme_default">
+	<div slot="title"
+		class="slds-media">
+		<div class="slds-media__figure">
+			<lightning-icon icon-name="utility:discounts"
+				size="small"></lightning-icon>
+		</div>
+		<div class="slds-media__body">
+			<div class="slds-page-header__name">
+				<div class="slds-page-header__name-title">
+					<h2>
+						<span title="Discounts"
+							class="slds-page-header__title
+								slds-text-heading_small
+								slds-truncate">Discounts</span>
+					</h2>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- <lightning-button-group slot="actions">
+		<lightning-button lwc:if={showDetailsButton}
+			label="Details"
+			icon-name="utility:new_window"
+			icon-position="right"
+			onclick={handleOnOpenDetailsClick}></lightning-button>
+	</lightning-button-group> -->
+	<div lwc:if={isError}
+		class="slds-theme_default slds-var-m-bottom_small">
+		<c-error-panel error-title={errorTitle}
+			error-object={errorObject}></c-error-panel>
+	</div>
+	<div lwc:if={hasProducts}>
+		<div for:each={products}
+			for:item="discount"
+			for:index="index"
+			key={discount.uniqueId}
+			class="slds-var-m-bottom_xx-small">
+			<c-discount-card discount={discount}
+				data-index={index}
+				mode={mode}
+				onproductchange={handleOnProductChange}
+				onproductdelete={handleOnProductDelete}></c-discount-card>
+		</div>
+		<div lwc:if={showAddProduct}
+			class="slds-var-m-top_small"
+			style="max-width:24rem;">
+			<lightning-record-picker
+				label="Add Discount"
+				variant="label-hidden"
+				placeholder="Add Discount..."
+				object-api-name="Product2"
+				filter={discountFilter}
+				onchange={handleOnSelectedProductChange}></lightning-record-picker>
+		</div>
+	</div>
+	<div lwc:elseif={showAddProduct}>
+		<div style="max-width:24rem;">
+			<lightning-record-picker 
+				label="Add Discount"
+				variant="label-hidden"
+				placeholder="Add Discount..."
+				object-api-name="Product2"
+				filter={discountFilter}
+				onchange={handleOnSelectedProductChange}></lightning-record-picker>
+		</div>
+	</div>
+</div>
+</template>

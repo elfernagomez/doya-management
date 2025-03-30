@@ -1,0 +1,38 @@
+<template>
+<lightning-quick-action-panel header="Create Work Orders">
+	<div>
+		<lightning-layout for:each={productGroups}
+			for:item="product"
+			for:index="index"
+			key={product.uniqueId}
+			class="slds-gutters slds-var-m-bottom_xx-small">
+			<lightning-layout-item size="9"
+				class="slds-col">
+				<c-product-card product={product}
+					mode="view"
+					variant="row"
+					hide-unit-price=true
+					hide-totals=true></c-product-card>
+			</lightning-layout-item>
+			<lightning-layout-item size="3"
+				class="slds-col">
+				<lightning-record-picker label="Sop"
+					variant="label-hidden"
+					placeholder="Add Sop..."
+					value={product.sopId}
+					object-api-name="SOP__c"></lightning-record-picker>
+			</lightning-layout-item>
+		</lightning-layout>
+	</div>
+	<div slot="footer">
+		<lightning-button
+			variant="neutral"
+			label="Cancel"></lightning-button>
+
+		<lightning-button
+			variant="brand"
+			label="Create Items"
+			class="slds-m-left_x-small"></lightning-button>
+	</div>
+</lightning-quick-action-panel>
+</template>

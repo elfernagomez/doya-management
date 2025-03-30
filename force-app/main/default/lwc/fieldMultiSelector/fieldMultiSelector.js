@@ -1,4 +1,4 @@
-import LwcBase from "c/lwcBase";
+import InputBase from 'c/inputBase';
 import { track, api, wire } from "lwc";
 import { fieldMultiSelectorLabels } from "c/constants";
 import { getObjectInfo } from "lightning/uiObjectInfoApi";
@@ -8,7 +8,7 @@ import {
 	notifyRecordUpdateAvailable
 } from 'lightning/uiRecordApi';
 
-export default class FieldMultiSelector extends LwcBase {
+export default class FieldMultiSelector extends InputBase {
 	@api
 	recordId;
 
@@ -27,15 +27,6 @@ export default class FieldMultiSelector extends LwcBase {
 	@api
 	excludedFields = [];
 
-	@api
-	get mode() {
-		return this._mode;
-	};
-
-	set mode(v) {
-		this._mode = v;
-	}
-
 	labels = fieldMultiSelectorLabels;
 
 	wiredRecordId;
@@ -44,7 +35,6 @@ export default class FieldMultiSelector extends LwcBase {
 	errorTitle;
 	errorObject;
 
-	_mode = "view";
 	objectInfo;
 	fieldOptions;
 
@@ -52,14 +42,6 @@ export default class FieldMultiSelector extends LwcBase {
 	fields = [];
 
 	isSaveDisabled = true;
-
-	get isView() {
-		return this._mode == "view";
-	}
-
-	get isEdit() {
-		return this._mode == "edit";
-	}
 
 	get hasFields() {
 		return this.fields.length > 0;
@@ -70,15 +52,7 @@ export default class FieldMultiSelector extends LwcBase {
 	}
 
 	get modeOptions() {
-		return [{
-			label: "View",
-			value: "view",
-			iconName: "utility:view"
-		}, {
-			label: "Edit",
-			value: "edit",
-			iconName: "utility:edit"
-		}];
+		return this.variantOptions;
 	}
 
 	@wire(getObjectInfo, {
@@ -118,7 +92,7 @@ export default class FieldMultiSelector extends LwcBase {
 	}
 
 	handleOnModeChange(event) {
-		this.mode = event.detail.value;
+		this.variant = event.detail.value;
 	}
 
 	handleAddFieldClick() {
@@ -174,7 +148,7 @@ export default class FieldMultiSelector extends LwcBase {
 	}
 
 	handleOnCancelClick() {
-		this.mode = "view";
+		this.variant = "view";
 	}
 
 	handleOnDeleteClick(event) {

@@ -18,40 +18,41 @@
 		<c-error-panel error-title={errorTitle}
 			error-object={errorObject}></c-error-panel>
 	</div>
-	<template lwc:if={hasItems}>
-	<div for:each={items}
-		for:item="item"
-		for:index="index"
-		key={item.uniqueId}
-		class="slds-var-m-bottom_xx-small
-			slds-is-relative">
-		<template lwc:if={isAdmin}>
-			<button lwc:if={index}
-				title={labels.orderItemBtn}
+	<lightning-layout lwc:if={hasItems}>
+		<lightning-layout-item for:each={items}
+			for:item="item"
+			for:index="index"
+			key={item.uniqueId}
+			class="slds-var-m-left_x-small
+				slds-var-m-bottom_x-small
+				slds-is-relative">
+			<!-- <template lwc:if={isAdmin}>
+				<button lwc:if={index}
+					title={labels.orderItemBtn}
+					data-index={index}
+					onclick={handleSwitchItemsOrderClick}
+					class="switch-btn
+						slds-button
+						slds-button_icon
+						slds-button_icon-border-filled
+						slds-button_icon-small
+						slds-is-absolute">
+					<c-font-awesome-icon icon-name="solid:arrows-left-right"
+						size="x-small"
+						variant="inherit">
+						<label>{labels.orderItemBt}</label>
+					</c-font-awesome-icon>
+				</button>
+			</template> -->
+			<c-line-item-manager-step item={item}
+				preview-procedure-options={procedureOptions}
+				mode={mode}
 				data-index={index}
-				onclick={handleSwitchItemsOrderClick}
-				class="switch-btn
-					slds-button
-					slds-button_icon
-					slds-button_icon-border-filled
-					slds-button_icon-small
-					slds-is-absolute">
-				<c-font-awesome-icon icon-name="solid:arrows-up-down"
-					size="x-small"
-					variant="inherit">
-					<label>{labels.orderItemBt}</label>
-				</c-font-awesome-icon>
-			</button>
-		</template>
-		<c-line-item-manager-step item={item}
-			preview-procedure-options={procedureOptions}
-			mode={mode}
-			data-index={index}
-			procedure-options={procedureOptions}
-			onitemchange={handleItemChange}
-			onitemdelete={handleItemDelete}></c-line-item-manager-step>
-	</div>
-	</template>
+				procedure-options={procedureOptions}
+				onitemchange={handleItemChange}
+				onitemdelete={handleItemDelete}></c-line-item-manager-step>
+		</lightning-layout-item>
+	</lightning-layout>
 	<template lwc:else>
 		<c-illustration variant="no-task"
 			image-size=""

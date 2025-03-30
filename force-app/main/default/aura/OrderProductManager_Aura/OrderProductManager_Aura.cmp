@@ -6,7 +6,7 @@
 <aura:component implements="force:lightningQuickActionWithoutHeader,force:hasRecordId">
 	<aura:html tag="style">
 		.slds-modal__container {
-			min-width: 80vw;
+			min-width: 70vw;
 			position: relative;
 		}
 		

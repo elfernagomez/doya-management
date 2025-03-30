@@ -1,270 +1,184 @@
 <template>
-<div class="slds-box
-		slds-p-around_none
-		slds-theme_shade">
+<div class="slds-theme_shade procedure-panel">
 <div lwc:if={isAdmin}
-	class="slds-media slds-is-relative">
-	<button lwc:if={index}
-		title={labels.orderItemBtn}
-		data-index={index}
-		onclick={handleOnSwitchItemsOrderClick}
-		class="switch-btn
-			slds-button
-			slds-button_icon
-			slds-button_icon-border-filled
-			slds-button_icon-small
-			slds-is-absolute">
-		<c-font-awesome-icon icon-name="solid:arrows-up-down"
-			size="x-small"
-			variant="inherit">
-			<label>{labels.orderItemBt}</label>
-		</c-font-awesome-icon>
-	</button>
-	<div class="slds-media__body">
-		<lightning-layout>
-			<lightning-layout-item aria-label="Procedure"
-				aria-describedby="popover-body-id"
-				role="dialog"
-				class="slds-popover slds-nubbin_right procedure-panel admin"
-				style={_item.procedureStyle}>
-				<div class="slds-popover__body
-						slds-var-p-left_x-small">
-					<div class="slds-media slds-media_small">
-						<div class="slds-media__figure">
-							<span class="slds-badge">{_item.order}</span>
-						</div>
-						<div class="slds-media__body">
-							<lightning-combobox name="procedureId"
-								label={labels.procedureFieldLabel}
-								value={_item.procedureId}
-								options={_procedureOptions}
-								onchange={handleProcedureFieldChange}
-								required
-								class="procedureField validate"></lightning-combobox>
-							<div lwc:if={_item.procedureId}
-								class="slds-text-align_right">
-								<lightning-button label="Edit Procedure"
-									icon-name="utility:new_window"
-									icon-position="right"
-									onclick={handleEditProcedureClick}
-									variant="base"></lightning-button>
-							</div>
-						</div>
-					</div>
-				</div>
-			</lightning-layout-item>
-			<lightning-layout-item lwc:if={_item.procedureId}
-				flexibility="grow"
-				class="slds-var-p-around_x-small">
-				<lightning-layout multiple-rows="true">
-					<lightning-layout-item lwc:if={item.isMachineNeeded}
-						class="slds-var-m-left_small">
-						<lightning-record-picker 
-							label="Machine"
-							object-api-name="Asset"
-							placeholder="Search Machines..."
-							filter={_item.machineFilter}
-							value={_item.machineId}
-							data-field="machineId"
-							onchange={handleLookupFieldChange}
-							required
-							class="validate"></lightning-record-picker>
-					</lightning-layout-item>
-					<lightning-layout-item for:each={_item.productionFields}
-						for:item="field"
-						for:index="index"
-						key={field.order}
-						class="slds-var-m-left_small">
-						<c-production-field field={field}
-							record={_item.record}
-							mode="edit"
-							onchange={handleRecordFieldChange}></c-production-field>
-					</lightning-layout-item>
-				</lightning-layout>
-				<lightning-layout>
-					<lightning-layout-item lwc:if={_item.showAdminNotes}
-						size="12"
-						class="slds-var-p-left_small">
-						<lightning-textarea name="adminNotes"
-							label="Admin Notes"
-							value={_item.adminNotes}
-							data-field="adminNotes"
-							data-type="string"
-							data-src="item"
-							onchange={handleFlatFieldChange}
-							class="custom-input validate"></lightning-textarea>
-						<lightning-button label={labels.hideItemsNotesBtn}
-							variant="base"
-							icon-name="utility:chevronup"
-							icon-position="right"
-							onclick={handleHideAdminNotesClick}></lightning-button>
-					</lightning-layout-item>
-					<lightning-layout-item lwc:else
-						class="slds-var-p-left_small">
-						<lightning-button label={labels.showItemsNotesBtn}
-							variant="base"
-							icon-name="utility:chevrondown"
-							icon-position="right"
-							onclick={handleShowAdminNotesClick}></lightning-button>
-					</lightning-layout-item>
-				</lightning-layout>
-			</lightning-layout-item>
-		</lightning-layout>
+	class="slds-is-relative admin">
+	<header class={procedureClass}>
+		<div class="slds-media slds-media_center slds-var-p-bottom_large">
+			<div class="slds-media__figure">
+				<span class="slds-badge
+					slds-var-m-top_x-large">{_item.order}</span>
+			</div>
+			<div class="slds-media__body">
+				<lightning-combobox name="procedureId"
+					label={labels.procedureFieldLabel}
+					value={_item.procedureId}
+					options={_procedureOptions}
+					onchange={handleProcedureFieldChange}
+					class="procedureField validate"></lightning-combobox>
+			</div>
+		</div>
+	</header>
+	<div lwc:if={_item.procedureId}
+		class="slds-var-p-horizontal_x-large
+			slds-var-p-vertical_medium">
+		<div lwc:if={item.isMachineNeeded}
+			class="slds-var-m-bottom_small">
+			<lightning-record-picker 
+				label="Machine"
+				object-api-name="Asset"
+				placeholder="Search Machines..."
+				filter={_item.machineFilter}
+				value={_item.machineId}
+				data-field="machineId"
+				onchange={handleLookupFieldChange}
+				required
+				class="validate"></lightning-record-picker>
+		</div>
+		<div for:each={_item.productionFields}
+			for:item="field"
+			for:index="index"
+			key={field.order}
+			class="slds-var-m-bottom_small">
+			<c-production-field field={field}
+				record={_item.record}
+				mode="edit"
+				onchange={handleRecordFieldChange}></c-production-field>
+		</div>
+		<div>
+			<lightning-textarea name="adminNotes"
+				label="Admin Notes"
+				value={_item.adminNotes}
+				data-field="adminNotes"
+				data-type="string"
+				data-src="item"
+				onchange={handleFlatFieldChange}
+				class="custom-input validate"></lightning-textarea>
+		</div>
 	</div>
-	<div class="slds-media__figure
-			slds-media__figure_reverse
-			slds-var-p-top_x-small
-			slds-var-p-right_x-small">
-		<div lwc:if={_item.isDeleting}
-			class="delete-panel
-				slds-panel
-				slds-panel_docked
-				slds-panel_docked-right
-				slds-is-open
-				slds-is-absolute">
-			<div class="slds-panel__body">
-				<lightning-layout>
-					<lightning-layout-item
-						class="slds-var-m-right_small">
-						<p>Are you sure?</p>
-					</lightning-layout-item>
-					<lightning-layout-item
-						class="slds-border_left slds-var-p-left_small">
-						<div class="slds-var-m-bottom_xxx-small">
-							<lightning-button label="Yes, Delete"
-								variant="destructive"
-								onclick={handleConfirmDeleteClick}></lightning-button>
-						</div>
-						<div class="slds-var-m-bottom_xxx-small">
-							<lightning-button label="No, Cancel"
-								variant="brand-outline"
-								onclick={handleCancelDeleteClick}></lightning-button>
-						</div>
-					</lightning-layout-item>
-				</lightning-layout>
+	<div class="slds-var-p-vertical_x-small
+			slds-var-p-horizontal_x-large
+			slds-text-align_center">
+		<div lwc:if={_item.isDeleting}>
+			<p class="slds-var-m-bottom_small">
+				Are you sure?
+			</p>
+			<div class="slds-var-m-bottom_xxx-small">
+				<lightning-button label="Yes, Delete"
+					variant="destructive"
+					onclick={handleConfirmDeleteClick}
+					></lightning-button>
+			</div>
+			<div class="slds-var-m-bottom_xxx-small">
+				<lightning-button label="No, Cancel"
+					variant="brand-outline"
+					onclick={handleCancelDeleteClick}
+					></lightning-button>
 			</div>
 		</div>
 		<lightning-button-icon lwc:else
 			alternative-text={labels.deleteItemBtn}
 			icon-name="utility:delete"
 			variant="border-filled"
-			size="x-small"
+			size="medium"
 			onclick={handleDeleteClick}>
 			<label>{labels.deleteItemBtn}</label>
 		</lightning-button-icon>
 	</div>
 </div>
-<lightning-layout lwc:if={isProd}
-	class="slds-grid_vertical-stretch slds-is-relative">
-	<lightning-layout-item  flexibility="grow"
-		class="slds-border_right">
-		<lightning-layout>
-			<lightning-layout-item aria-label="Procedure"
-				aria-describedby="popover-body-id"
-				role="dialog"
-				class="slds-popover slds-nubbin_right procedure-panel production"
-				style={_item.procedureStyle}>
-				<div class="slds-popover__body
-						slds-var-p-left_x-small">
-					<div class="slds-media slds-media_center">
-						<div class="slds-media__figure">
-							<span class="slds-badge">{_item.order}</span>
-						</div>
-						<div class="slds-media__body">
-							<b>{item.procedureName}</b>
-						</div>
-					</div>
-				</div>
-			</lightning-layout-item>
-			<lightning-layout-item flexibility="grow"
-				class="slds-var-p-left_x-small slds-var-p-vertical_xxx-small">
-				<lightning-layout multiple-rows="true">
-					<lightning-layout-item lwc:if={_item.isMachineNeeded}
-						class="slds-var-p-horizontal_xx-small slds-border_right">
-						<c-production-field field={machineField}
-							record={_item.record}
-							mode="view"
-							is-edit-allowed-override={_item.isInProgress}
-							></c-production-field>
-					</lightning-layout-item>
-					<lightning-layout-item for:each={_item.productionFields}
-						for:item="field"
-						for:index="index"
-						key={field.order}
-						class="slds-var-p-horizontal_small slds-border_right">
-						<c-production-field field={field}
-							record={_item.record}
-							mode="view"
-							is-edit-allowed-override={_item.isInProgress}
-							></c-production-field>
-					</lightning-layout-item>
-				</lightning-layout>
-			</lightning-layout-item>
-		</lightning-layout>
-		<div lwc:if={_item.adminNotes}
-			class="slds-border_top slds-var-p-left_x-small">
-			<div class="slds-media">
-				<div class="slds-media__figure">
-					<lightning-button lwc:if={_item.showAdminNotes}
-						variant="base"
-						label="Admin Notes"
-						icon-name="utility:chevrondown"
-						icon-position="right"
-						onclick={handleHideAdminNotesClick}></lightning-button>
-					<lightning-button lwc:else
-						variant="base"
-						label="Admin Notes"
-						icon-name="utility:chevronright"
-						icon-position="right"
-						onclick={handleShowAdminNotesClick}></lightning-button>
-				</div>
-				<div class="slds-media__body
-						slds-var-p-vertical_xx-small
-						slds-var-m-top_xxx-small">
-					<pre lwc:if={_item.showAdminNotes}
-						class="slds-m-around_none"
-						style="font-family: inherit;
-							white-space: pre-wrap;">{_item.adminNotes}</pre>
-					<p lwc:else
-						class="slds-truncate">{_item.adminNotes}</p>
-				</div>
+<div lwc:if={isProd}
+	class="slds-is-relative prod">
+	<header class={procedureClass}>
+		<div lwc:if={_item.isComplete}
+			class="slds-media slds-media_center slds-var-p-bottom_large">
+			<div class="slds-media__figure">
+				<lightning-icon icon-name="utility:check"
+					size="small"
+					variant="inverse"
+					class="slds-var-m-horizontal-small
+						slds-var-m-top_x-large"></lightning-icon>
+			</div>
+			<div class="slds-media__body">
+				<lightning-input type="text"
+					label={labels.procedureFieldLabel}
+					value={_item.procedureName}
+					readonly
+					class="procedureField"></lightning-input>
 			</div>
 		</div>
-		<div class="slds-border_top slds-var-p-left_x-small">
-			<div class="slds-media">
-				<div class="slds-media__figure">
-					<lightning-button lwc:if={_item.showProductionNotes}
-						variant="base"
-						label="Prod Notes"
-						icon-name="utility:chevrondown"
-						icon-position="right"
-						onclick={handleHideProductionNotesClick}></lightning-button>
-					<lightning-button lwc:else
-						variant="base"
-						label="Prod Notes"
-						icon-name="utility:chevronright"
-						icon-position="right"
-						onclick={handleShowProductionNotesClick}></lightning-button>
-				</div>
-				<div class="slds-media__body
-						slds-var-p-vertical_xx-small
-						slds-var-m-top_xxx-small">
-					<lightning-textarea lwc:if={_item.showProductionNotes}
-						name="productionNotes"
-						label="Prod Notes"
-						variant="label-hidden"
-						value={_item.productionNotes}
-						data-field="productionNotes"
-						data-type="string"
-						data-src="item"
-						onchange={handleFlatFieldChange}
-						class="custom-input validate"></lightning-textarea>
-					<p lwc:else
-						class="slds-truncate">{_item.productionNotes}</p>
-				</div>
+		<div lwc:else
+			class="slds-media slds-media_center slds-var-p-bottom_large">
+			<div class="slds-media__figure">
+				<span class="slds-badge
+					slds-var-m-top_x-large">{_item.order}</span>
+			</div>
+			<div class="slds-media__body">
+				<lightning-combobox name="procedureId"
+					label={labels.procedureFieldLabel}
+					value={_item.procedureId}
+					options={_procedureOptions}
+					onchange={handleProcedureFieldChange}
+					class="procedureField validate"></lightning-combobox>
 			</div>
 		</div>
-	</lightning-layout-item>
+	</header>
+	<div lwc:if={_item.procedureId}
+		class="slds-var-p-horizontal_x-large
+			slds-var-p-vertical_medium">
+		<div lwc:if={item.isMachineNeeded}
+			class="slds-var-m-bottom_small">
+			<c-production-field lwc:if={_item.isComplete}
+				field={machineField}
+				record={_item.record}
+				mode="view"
+				is-edit-allowed-override={_item.isInProgress}
+				></c-production-field>
+			<lightning-record-picker lwc:else
+				label="Machine"
+				object-api-name="Asset"
+				placeholder="Search Machines..."
+				filter={_item.machineFilter}
+				value={_item.machineId}
+				data-field="machineId"
+				onchange={handleLookupFieldChange}
+				required
+				class="validate"></lightning-record-picker>
+		</div>
+		<div for:each={_item.productionFields}
+			for:item="field"
+			for:index="index"
+			key={field.order}
+			class="slds-var-m-bottom_small">
+			<c-production-field lwc:if={_item.isComplete}
+				field={field}
+				record={_item.record}
+				mode="view"
+				is-edit-allowed-override={_item.isInProgress}
+				></c-production-field>
+			<c-production-field lwc:else
+				field={field}
+				record={_item.record}
+				mode="edit"
+				onchange={handleRecordFieldChange}></c-production-field>
+		</div>
+		<div>
+			<template lwc:if={_item.isComplete}>
+				<div lwc:if={_item.adminNotes}>
+					<label class="slds-form-element__label">Admin Notes</label>
+					<lightning-formatted-text value={_item.adminNotes}
+						linkify></lightning-formatted-text>
+				</div>
+			</template>
+			<lightning-textarea lwc:else
+				name="productionNotes"
+				label="Admin Notes"
+				value={_item.adminNotes}
+				data-field="productionNotes"
+				data-type="string"
+				data-src="item"
+				onchange={handleFlatFieldChange}
+				class="custom-input validate"></lightning-textarea>
+		</div>
+	</div>
 	<lightning-layout-item
 		class="slds-is-relative
 			status-panel
@@ -353,7 +267,7 @@
 			</p>
 		</div>
 	</lightning-layout-item>
-</lightning-layout>
+</div>
 <div lwc:if={_item.hasError}
 	class="slds-var-p-horizontal_small slds-var-p-vertical_xx-small">
 	<c-error-panel error-title={_item.errorMessage}

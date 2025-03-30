@@ -1,0 +1,18 @@
+.small-row {
+	width: 4rem;
+}
+
+.medium-row {
+	width: 5rem;
+}
+
+.delete-panel {
+	top: 0;
+	right: 0;
+	bottom: 0;
+	min-width: 0;
+}
+
+.delete-panel lightning-button {
+	--lwc-lineHeightButton: 1.25rem;
+}

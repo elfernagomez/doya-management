@@ -18,7 +18,6 @@ export function applyProcedureRecord(item, procedureRecord) {
 export function setProcedure(item, procedure) {
 	if (procedure) {
 		item.procedureName = procedure.label;
-		item.procedureStyle = `background-color:${procedure.colorCode}`;
 		item.isMachineNeeded = procedure.isMachineInfoRequired;
 		item.productionFields = procedure.productionFields;
 		item.machineFilter =
@@ -34,7 +33,6 @@ export function setProcedure(item, procedure) {
 
 export function cleanProcedureDependencies(item) {
 	item.procedureName = null;
-	item.procedureStyle = null;
 	item.isMachineNeeded = false;
 	item.machineFilter = null;
 	item.productionFields = [];
@@ -141,7 +139,7 @@ export default class LineItemManagerStep extends NavigationMixin(LwcBase) {
 	}
 
 	@api
-	objectApiName = "ProductionOrderLineItem__c";
+	objectApiName = "WorkOrderLineItem";
 
 	@api
 	trackChanges = false;
@@ -152,7 +150,7 @@ export default class LineItemManagerStep extends NavigationMixin(LwcBase) {
 	@track
 	_item;
 
-	_mode = "admin";
+	_mode = "prod";
 	labels = lineItemManagerLabels;
 
 	get isView() {
@@ -184,6 +182,24 @@ export default class LineItemManagerStep extends NavigationMixin(LwcBase) {
 			"isFromOptions": false,
 			"isOptionRestricted": false
 		};
+	}
+
+	get procedureClass() {
+		let statusClass = "";
+
+		if (this._item.isInProgress)
+			statusClass = "inProgress";
+		else if (this._item.isComplete)
+			statusClass = "complete ";
+
+		return [
+			// "slds-media",
+			// "slds-media_center",
+			"slds-var-p-left_small",
+			"slds-var-p-right_x-large",
+			"slds-var-p-vertical_small",
+			statusClass
+		].join(" ");
 	}
 
 	handleEditProcedureClick() {

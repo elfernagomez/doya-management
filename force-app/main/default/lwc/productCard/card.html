@@ -1,0 +1,336 @@
+<template>
+<div lwc:if={isView}
+	class="slds-box slds-p-around_none slds-is-relative">
+	<header class="slds-media
+			slds-var-p-horizontal_medium
+			slds-var-p-vertical_small">
+		<div class="slds-media__body">
+			<h3 title={_product.productName}
+				class="slds-text-heading_small slds-truncate">
+				<b>{_product.productName}</b>
+			</h3>
+			<p class="slds-text-body_small">{_product.productCode}</p>
+		</div>
+	</header>
+	<div class="slds-border_top
+			slds-var-p-horizontal_medium
+			slds-var-p-vertical_small">
+		<lightning-layout
+			class="slds-gutters
+				slds-gutters_direct
+				slds-var-m-bottom_x-small">
+			<lightning-layout-item size="6"
+				class="slds-col slds-no-flex">
+				<div class="slds-form-element slds-form-element_readonly">
+					<label class="slds-form-element__label">
+						Qty
+					</label>
+					<div class="slds-form-element__control">
+						<div class="slds-form-element__static">
+							<lightning-formatted-number
+								maximum-fraction-digits="2"
+								value={_product.qty}></lightning-formatted-number>&nbsp;
+						</div>
+					</div>
+				</div>
+			</lightning-layout-item>
+			<lightning-layout-item size="6"
+				class="slds-col slds-no-flex">
+				<div class="slds-form-element slds-form-element_readonly">
+					<label class="slds-form-element__label">
+						Unit Type
+					</label>
+					<div class="slds-form-element__control">
+						<div class="slds-form-element__static">
+							{_product.unitType}&nbsp;
+						</div>
+					</div>
+				</div>
+			</lightning-layout-item>
+		</lightning-layout>
+		<lightning-layout
+			class="slds-gutters
+				slds-gutters_direct
+				slds-var-m-bottom_x-small">
+			<lightning-layout-item size="12"
+				class="slds-col slds-no-flex">
+				<div class="slds-form-element slds-form-element_readonly">
+					<label class="slds-form-element__label">
+						Price
+					</label>
+					<div class="slds-form-element__control">
+						<lightning-formatted-number 
+							format-style="currency"
+							currency-code="USD"
+							value={_product.unitPrice}></lightning-formatted-number>&nbsp;
+					</div>
+				</div>
+			</lightning-layout-item>
+		</lightning-layout>
+		<lightning-layout
+			class="slds-gutters
+				slds-gutters_direct
+				slds-var-m-bottom_x-small">
+			<lightning-layout-item size="4"
+				class="slds-col slds-no-flex">
+				<div class="slds-form-element slds-form-element_readonly">
+					<label class="slds-form-element__label">
+						Width
+					</label>
+					<div class="slds-form-element__control">
+						<lightning-formatted-number
+							maximum-fraction-digits="2"
+							value={_product.width}></lightning-formatted-number>&nbsp;
+					</div>
+				</div>
+			</lightning-layout-item>
+			<lightning-layout-item size="4"
+				class="slds-col slds-no-flex">
+				<div class="slds-form-element slds-form-element_readonly">
+					<label class="slds-form-element__label">
+						Height
+					</label>
+					<div class="slds-form-element__control">
+						<lightning-formatted-number
+							maximum-fraction-digits="2"
+							value={_product.height}></lightning-formatted-number>&nbsp;
+					</div>
+				</div>
+			</lightning-layout-item>
+			<lightning-layout-item lwc:if={_product.depth}
+				size="4"
+				class="slds-col slds-no-flex">
+				<div class="slds-form-element slds-form-element_readonly">
+					<label class="slds-form-element__label">
+						Depth
+					</label>
+					<div class="slds-form-element__control">
+						<lightning-formatted-number
+							maximum-fraction-digits="2"
+							value={_product.depth}></lightning-formatted-number>&nbsp;
+					</div>
+				</div>
+			</lightning-layout-item>
+		</lightning-layout>
+	</div>	
+	<footer class="slds-media
+			slds-border_top
+			slds-var-p-horizontal_medium
+			slds-var-p-vertical_small">
+		<lightning-layout class="slds-media__body">
+			<lightning-layout-item size="6">
+				<div class="slds-form-element">
+					<label class="slds-form-element__label slds-no-flex">
+						Unit Price
+					</label>
+					<div class="">
+						<lightning-formatted-number 
+							format-style="currency"
+							currency-code="USD"
+							value={_product.unitPrice}></lightning-formatted-number>
+					</div>
+				</div>
+			</lightning-layout-item>
+			<lightning-layout-item size="6">
+				<div class="slds-form-element">
+					<label class="slds-form-element__label slds-no-flex">
+						Total
+					</label>
+					<div class="slds-text-heading_small">
+						<lightning-formatted-number 
+							format-style="currency"
+							currency-code="USD"
+							value={_product.totalPrice}></lightning-formatted-number>
+					</div>
+				</div>
+			</lightning-layout-item>
+		</lightning-layout>
+	</footer>
+	<div lwc:if={_product.isDeleting}
+		class="slds-is-absolute">
+		Confirm?&nbsp;
+		<a href="#"
+			data-value="true"
+			onclick={handleConfirmDeleteProductClicked}
+			class="slds-text-color_destructive">Yes</a>
+		&nbsp;|&nbsp;
+		<a href="#"
+			data-value="false"
+			onclick={handleConfirmDeleteProductClicked}>No</a>
+	</div>
+</div>
+<div lwc:if={isEdit}
+	class="slds-box slds-box_x-small slds-is-relative">
+	<header class="slds-media">
+		<div class="slds-media__figure">
+			<lightning-button-icon icon-name="utility:drag_and_drop"
+				title="Drag to move to another delivery group"
+				variant="bare"
+				small="small"
+				onclick={handleDeleteProductClicked}></lightning-button-icon>
+		</div>
+		<div lwc:if={_product.isNew}
+			class="slds-media__body">
+			<lightning-record-edit-form object-api-name="OrderItem">
+				<lightning-input-field variant="label-hidden"
+					field-name="Product2Id"
+					disabled={_product.isDisabled}
+					value={_product.productId}
+					onchange={handleProductSelection}>
+				</lightning-input-field>
+			</lightning-record-edit-form>
+		</div>
+		<div lwc:else
+			class="slds-media__body">
+			<h3 title={_product.productName}
+				class="slds-text-heading_small slds-truncate">
+				<b>{_product.productName}</b>
+			</h3>
+			<p class="slds-text-body_smal">{_product.productCode}</p>
+		</div>
+		<div class="slds-media__figure slds-media__figure_reverse">
+			<lightning-button-icon icon-name="utility:delete"
+				title="Remove Product From Current Order"
+				variant="bare"
+				small="small"
+				onclick={handleDeleteProductClicked}></lightning-button-icon>
+		</div>
+	</header>
+	<div class="slds-border_top slds-var-m-top_small">
+		<lightning-layout>
+			<lightning-layout-item size="4">
+				<lightning-input type="number"
+					label="Qty"
+					step="1"
+					min="1"
+					disabled={_product.isDisabled}
+					value={_product.qty}
+					variant="label-stacked"
+					data-src="product"
+					data-field="qty"
+					data-type="float"
+					onchange={handleFieldChange}
+					class="small-row"></lightning-input>
+			</lightning-layout-item>
+			<lightning-layout-item size="8">
+				<lightning-select label="Unit Type"
+					disabled={_product.isDisabled}
+					options={unitTypeOptions}
+					type="button"
+					value={_product.unitType}
+					variant="label-stacked"
+					data-src="product"
+					data-field="unitType"
+					data-type="string"
+					onchange={handleFieldChange}></lightning-select>
+			</lightning-layout-item>
+		</lightning-layout>
+		<div>
+			<lightning-input type="number"
+				label="Unit Price"
+				formatter="currency"
+				step="0.01"
+				disabled={_product.isDisabled}
+				value={_product.unitPrice}
+				variant="label-stacked"
+				data-src="product"
+				data-field="unitPrice"
+				data-type="float"
+				onchange={handleFieldChange}></lightning-input>
+		</div>
+		<lightning-layout>
+			<lightning-layout-item size="4">
+				<lightning-input type="number"
+					label="Width"
+					formatter="decimal"
+					step="0.01"
+					value={_product.width}
+					variant="label-stacked"
+					data-src="product"
+					data-field="width"
+					data-type="float"
+					disabled={isDimensionsDisabled}
+					onchange={handleFieldChange}
+					class="small-row"></lightning-input>
+			</lightning-layout-item>
+			<lightning-layout-item size="4">
+				<lightning-input type="number"
+					label="Height"
+					formatter="decimal"
+					step="0.01"
+					value={_product.height}
+					variant="label-stacked"
+					data-src="product"
+					data-field="height"
+					data-type="float"
+					disabled={isDimensionsDisabled}
+					onchange={handleFieldChange}
+					class="small-row"></lightning-input>
+			</lightning-layout-item>
+			<lightning-layout-item lwc:if={_product.depth}
+				size="4">
+				<lightning-input type="number"
+					label="Depth"
+					formatter="decimal"
+					step="0.01"
+					value={_product.depth}
+					variant="label-stacked"
+					data-src="product"
+					data-field="depth"
+					data-type="float"
+					disabled
+					onchange={handleFieldChange}
+					class="small-row"></lightning-input>
+			</lightning-layout-item>
+		</lightning-layout>
+		<div lwc:if={_product.isValid}></div>
+		<div lwc:else
+			class="slds-text-color_error">
+			<lightning-formatted-rich-text value={_product.errorMessage}>
+			</lightning-formatted-rich-text>
+		</div>
+	</div>	
+	<footer class="slds-border_top slds-media">
+		<lightning-layout class="slds-media__body">
+			<lightning-layout-item size="6">
+				<div class="slds-form-element">
+					<label class="slds-form-element__label slds-no-flex">
+						Price
+					</label>
+					<div class="slds-text-heading_small">
+						<lightning-formatted-number 
+							format-style="currency"
+							currency-code="USD"
+							value={_product.listPrice}></lightning-formatted-number>
+					</div>
+				</div>
+			</lightning-layout-item>
+			<lightning-layout-item size="6">
+				<div class="slds-form-element">
+					<label class="slds-form-element__label slds-no-flex">
+						Total
+					</label>
+					<div class="slds-text-heading_small">
+						<lightning-formatted-number 
+							format-style="currency"
+							currency-code="USD"
+							value={_product.totalPrice}></lightning-formatted-number>
+					</div>
+				</div>
+			</lightning-layout-item>
+		</lightning-layout>
+	</footer>
+	<div lwc:if={_product.isDeleting}
+		class="slds-is-absolute">
+		Confirm?&nbsp;
+		<a href="#"
+			data-value="true"
+			onclick={handleConfirmDeleteProductClicked}
+			class="slds-text-color_destructive">Yes</a>
+		&nbsp;|&nbsp;
+		<a href="#"
+			data-value="false"
+			onclick={handleConfirmDeleteProductClicked}>No</a>
+	</div>
+</div>
+</template>

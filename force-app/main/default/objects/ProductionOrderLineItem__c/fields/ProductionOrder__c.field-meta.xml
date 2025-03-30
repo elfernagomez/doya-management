@@ -4,7 +4,6 @@
     <externalId>false</externalId>
     <label>Production Order</label>
     <referenceTo>ProductionOrder__c</referenceTo>
-    <relationshipLabel>Production Order Steps</relationshipLabel>
     <relationshipName>ProductionOrderLineItems</relationshipName>
     <relationshipOrder>0</relationshipOrder>
     <reparentableMasterDetail>false</reparentableMasterDetail>

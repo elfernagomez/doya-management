@@ -4,7 +4,7 @@
     <externalId>false</externalId>
     <label>Lamination</label>
     <required>false</required>
-    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
     <type>Picklist</type>
     <valueSet>
         <restricted>true</restricted>

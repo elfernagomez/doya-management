@@ -1,0 +1,387 @@
+<template>
+<div class="slds-box
+		slds-box_x-small
+		slds-is-relative
+		slds-theme_shade">
+	<lightning-card>
+		<div slot="title"
+			class="slds-media">
+			<div class="slds-media__figure">
+				<lightning-icon icon-name={headerIconName}
+					size="small"></lightning-icon>
+			</div>
+			<div class="slds-media__body">
+				<div class="slds-page-header__name">
+					<div class="slds-page-header__name-title">
+						<h2>
+							<span title={group.name}
+								class="slds-page-header__title
+									slds-text-heading_small
+									slds-truncate">{group.name}</span>
+						</h2>
+					</div>
+				</div>
+				<p lwc:if={group.isPlaceHolder}
+					class="slds-page-header__name-meta">
+					<span>Products not placed in a delivery group yet</span>
+				</p>
+				<div lwc:else
+					class="slds-page-header__name-meta">
+					<ul class="slds-list_horizontal slds-has-dividers_left">
+						<li lwc:if={group.dueDate}
+							class="slds-item">
+							<lightning-formatted-date-time
+								value={group.dueDate}
+								year="numeric"
+								month="numeric"
+								day="numeric"></lightning-formatted-date-time>
+						</li>
+						<li lwc:if={group.deliveryType}
+							class="slds-item">{group.deliveryType}</li>
+						<li lwc:if={group.addressLabel}
+							class="slds-item">{group.addressLabel}</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<lightning-button-group slot="actions">
+			<lightning-button lwc:if={showDetailsButton}
+				label="Details"
+				icon-name="utility:new_window"
+				icon-position="right"
+				onclick={handleOnOpenDetailsClick}></lightning-button>
+			<lightning-button lwc:if={showCloneButton}
+				label="Clone"
+				onclick={handleOnCloneRequestClick}></lightning-button>
+			<lightning-button-icon lwc:if={showDeleteButton}
+				title="Delete"
+				icon-name="utility:delete"
+				variant="border-filled"
+				onclick={handleOnStartDeleteClick}></lightning-button-icon>
+		</lightning-button-group>
+		<div >
+			<div lwc:if={isError}
+				class="slds-var-m-bottom_small">
+				<c-error-panel error-title={errorTitle}
+					error-object={errorObject}></c-error-panel>
+			</div>
+			<slot></slot>
+		</div>
+	</lightning-card>
+</div>
+<c-modal size="small"
+	disable-scrolling=true
+	class="detailsModal">
+	<div slot="header">
+		Group Details
+	</div>
+	<div slot="body"
+		class="slds-var-p-around_xx-large slds-is-relative"
+		style="min-height:22rem;">
+		<lightning-record-view-form lwc:if={isView}
+			object-api-name="DeliveryGroup__c"
+			record-id={recordId}>
+			<div role="list"
+				class="slds-form">
+				<div class="slds-form__row">
+					<div role="listitem"
+						class="slds-form__item slds-show">
+						<lightning-output-field
+							variant="label-stacked"
+							field-name="Name"
+							class="slds-form-element
+								slds-form-element_edit
+								slds-form-element_readonly
+								slds-form-element_stacked
+								slds-hint-parent"></lightning-output-field>
+						<lightning-output-field
+							variant="label-stacked"
+							field-name="DueDate__c"
+							class="slds-form-element
+								slds-form-element_edit
+								slds-form-element_readonly
+								slds-form-element_stacked
+								slds-hint-parent
+								slds-var-m-top_large"></lightning-output-field>
+						<lightning-output-field
+							variant="label-stacked"
+							field-name="DeliveryType__c"
+							class="slds-form-element
+								slds-form-element_edit
+								slds-form-element_readonly
+								slds-form-element_stacked
+								slds-hint-parent
+								slds-var-m-top_large"></lightning-output-field>
+					</div>
+					<div role="listitem"
+						class="slds-form__item slds-show">
+						<lightning-output-field
+							variant="label-stacked"
+							field-name="LocationType__c"
+							class="slds-form-element
+								slds-form-element_edit
+								slds-form-element_readonly
+								slds-form-element_stacked
+								slds-hint-parent"></lightning-output-field>
+						<div lwc:if={showVenue}>
+							<lightning-output-field
+								variant="label-stacked"
+								field-name="Venue__c"
+								class="slds-form-element
+									slds-form-element_edit
+									slds-form-element_readonly
+									slds-form-element_stacked
+									slds-hint-parent
+									slds-var-m-top_large"></lightning-output-field>
+							<div lwc:if={venueAddress}
+								class="slds-form-element
+									slds-form-element_edit
+									slds-form-element_readonly
+									slds-form-element_stacked
+									slds-hint-parent
+									slds-var-m-top_large">
+								<span class="slds-form-element__label">
+									Venue Address
+								</span>
+								<div class="slds-form-element__control">
+									<div class="slds-form-element__static">
+										{venueAddress.street}<br/>
+										{venueAddress.city}
+										{venueAddress.state},
+										{venueAddress.postalCode}<br/>
+										{venueAddress.country}
+									</div>
+								</div>
+							</div>
+						</div>
+						<div lwc:if={showAddress}
+							class="slds-form-element
+								slds-form-element_edit
+								slds-form-element_readonly
+								slds-form-element_stacked
+								slds-hint-parent
+								slds-var-m-top_large">
+							<label class="slds-form-element__label">Address</label>
+							<div class="slds-form-element__control">
+								<div class="slds-form-element__static">
+									<lightning-formatted-rich-text
+										value={group.addressHtml}
+										></lightning-formatted-rich-text>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</lightning-record-view-form>
+		<lightning-record-edit-form lwc:if={isEdit}
+			object-api-name="DeliveryGroup__c"
+			record-id={recordId}
+			onchange={handleOnDetailsFieldChange}
+			onsubmit={handleOnSubmit}
+			onsuccess={handleOnSuccess}
+			onerror={handleOnError}
+			class="detailsForm">
+			<div lwc:if={isError}
+				class="slds-var-m-bottom_small">
+				<c-error-panel error-title={errorTitle}
+					error-object={errorObject}></c-error-panel>
+			</div>
+			<div role="list"
+				class="slds-form">
+				<div class="slds-form__row">
+					<div role="listitem"
+						class="slds-form__item slds-show">
+						<lightning-input-field variant="label-stacked"
+							field-name="Name"
+							onchange={handleOnDetailsFieldChange}
+							required
+							class="validate
+								slds-size_full"></lightning-input-field>
+						<lightning-input-field variant="label-stacked"
+							field-name="DueDate__c"
+							onchange={handleOnDetailsFieldChange}
+							required
+							class="validate
+								slds-size_full"></lightning-input-field>
+						<lightning-input-field variant="label-stacked"
+							field-name="DeliveryType__c"
+							onchange={handleOnDetailsFieldChange}
+							required
+							class="validate
+								slds-size_full"></lightning-input-field>
+					</div>
+					<div role="listitem"
+						class="slds-form__item slds-show">
+						<lightning-radio-group name="locationTypeChoice"
+							label="Location Type (Venue account or address)"
+							options={locationTypeOptions}
+							value={locationTypeChoice}
+							type="button"
+							onchange={handleOnLocationTypeChange}
+							class="validate
+								slds-var-m-bottom_large"></lightning-radio-group>
+
+						<div lwc:if={showVenue}>
+							<lightning-input-field
+								field-name="Venue__c"
+								variant="label-stacked"
+								onchange={handleOnDetailsFieldChange}
+								required></lightning-input-field>
+
+							<div lwc:if={venueAddress}
+								class="slds-form-element
+									slds-form-element_edit
+									slds-form-element_readonly
+									slds-form-element_stacked
+									slds-hint-parent
+									slds-var-m-top_large">
+								<span class="slds-form-element__label">
+									Venue Address
+								</span>
+								<div class="slds-form-element__control">
+									<div class="slds-form-element__static">
+										{venueAddress.street}<br/>
+										{venueAddress.city}
+										{venueAddress.state},
+										{venueAddress.postalCode}<br/>
+										{venueAddress.country}
+									</div>
+								</div>
+							</div>
+						</div>
+						<div lwc:if={showAddress}>
+							<lightning-layout multiple-rows="true"
+								class="slds-gutters">
+								<lightning-layout-item size="12"
+									class="slds-col">
+									<lightning-input-field
+										variant="label-stacked"
+										field-name="Address__Street__s"
+										label="Street"
+										onchange={handleOnDetailsFieldChange}
+										class="validate"></lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="6"
+									class="slds-col">
+									<lightning-input-field
+										variant="label-stacked"
+										field-name="Address__City__s"
+										label="City"
+										onchange={handleOnDetailsFieldChange}
+										class="validate"></lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="6"
+									class="slds-col">
+									<lightning-input-field
+										variant="label-stacked"
+										field-name="Address__StateCode__s"
+										label="State"
+										onchange={handleOnDetailsFieldChange}
+										class="validate"></lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="6"
+									class="slds-col">
+									<lightning-input-field
+										variant="label-stacked"
+										field-name="Address__PostalCode__s"
+										label="Zip Code"
+										onchange={handleOnDetailsFieldChange}
+										class="validate"></lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="6"
+									class="slds-col">
+									<lightning-input-field
+										variant="label-stacked"
+										field-name="Address__CountryCode__s"
+										label="Country"
+										onchange={handleOnDetailsFieldChange}
+										class="validate"></lightning-input-field>
+								</lightning-layout-item>
+							</lightning-layout>
+						</div>
+					</div>
+				</div>
+			</div>
+			<lightning-button lwc:ref="hiddenDetailsButton"
+				variant="brand"
+				type="submit"
+				label="Hidden Save"
+				hidden></lightning-button>
+		</lightning-record-edit-form>
+		<lightning-spinner lwc:if={isLoading}
+			variant="brand"></lightning-spinner>
+	</div>
+	<div lwc:if={isView}
+		slot="footer">
+		<lightning-button label="Done"
+			variant="neutral"
+			type="cancel"
+			disabled={isCancelButtonDisabled}
+			onclick={handleOnCancelDetailsClick}
+			class="slds-var-m-horizontal_x-small"></lightning-button>
+	</div>
+	<div lwc:if={isEdit}
+		slot="footer">
+		<lightning-button label="Cancel"
+			variant="neutral"
+			type="cancel"
+			disabled={isCancelButtonDisabled}
+			onclick={handleOnCancelDetailsClick}
+			class="slds-var-m-horizontal_x-small"></lightning-button>
+
+		<lightning-button label="Save"
+			variant="brand"
+			disabled={isSaveButtonDisabled}
+			onclick={handleOnSaveClick}
+			class="slds-var-m-horizontal_x-small"></lightning-button>
+	</div>
+</c-modal>
+<c-modal lwc:if={isEdit}
+	size="small"
+	disable-scrolling=true
+	class="cloneModal">
+	<div slot="header">
+		Clone Group Details
+	</div>
+	<div slot="body"
+		class="slds-var-p-around_xx-large slds-is-relative"
+		style="min-height:8rem;">
+		<div lwc:if={isError}
+			class="slds-var-m-bottom_small">
+			<c-error-panel error-title={errorTitle}
+				error-object={errorObject}></c-error-panel>
+		</div>
+		<div role="list"
+			class="slds-form">
+			<div class="slds-form__row">
+				<div role="listitem"
+					class="slds-form__item slds-show">
+					<lightning-input variant="label-stacked"
+						label="New Delivery Group Name"
+						value={clonedGroupName}
+						required
+						onchange={handleOnCloneFieldChange}
+						class="cloneField slds-size_full"></lightning-input>
+				</div>
+			</div>
+		</div>
+		<lightning-spinner lwc:if={isLoading}
+			variant="brand"></lightning-spinner>
+	</div>
+	<div slot="footer">
+		<lightning-button label="Cancel"
+			variant="neutral"
+			type="cancel"
+			disabled={isCancelButtonDisabled}
+			onclick={handleOnCancelCloneClick}
+			class="slds-var-m-horizontal_x-small"></lightning-button>
+
+		<lightning-button label="Clone"
+			variant="brand"
+			disabled={isSaveButtonDisabled}
+			onclick={handleOnCloneSubmit}
+			class="slds-var-m-horizontal_x-small"></lightning-button>
+	</div>
+</c-modal>
+</template>

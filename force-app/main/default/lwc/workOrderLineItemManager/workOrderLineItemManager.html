@@ -1,0 +1,26 @@
+<!--
+@author Fernando Gomez
+@since 3/28/2023
+@versino 1.0
+-->
+<template>
+<lightning-card hide-header="true">
+	<div lwc:if={isError}
+		class="slds-var-p-horizontal_small">
+		<c-error-panel error-title={errorTitle}
+			error-object={errorObject}></c-error-panel>
+	</div>
+	<c-line-item-manager lwc:if={isReady}
+		title="Steps"
+		details={details}
+		onitemcreate={handleItemCreated}
+		onitemchange={handleItemChange}
+		onitemdelete={handleItemDelete}>
+	</c-line-item-manager>
+
+	<!-- <template lwc:if={isLoading}>
+		<lightning-spinner variant="brand"
+			alternative-text="Loading..."></lightning-spinner>
+	</template> -->
+</lightning-card>
+</template>

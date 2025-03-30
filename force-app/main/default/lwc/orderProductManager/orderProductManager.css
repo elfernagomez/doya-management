@@ -1,3 +1,8 @@
+.custom-header {
+	border-bottom-left-radius: 0 !important;
+	border-bottom-right-radius: 0 !important;
+}
+
 .anchor-top {
 	position: absolute;
 	top: 0;
@@ -14,8 +19,18 @@
 
 .anchor-all {
 	position: absolute;
-	top: 76px;
+	top: 0;
 	left: 0;
-	bottom: 58px;
+	bottom: 0;
 	right: 0;
+}
+
+.dropzone {
+	border-radius: var(--lwc-borderRadiusMedium, 0.25rem);
+	background-color: #ffffff91;
+	border: 3px var(--slds-g-color-border-1, #0176d3) solid;
+}
+
+.dropzone[data-dragging="true"] {
+	border: 3px var(--slds-g-color-brand-base-50, #0176d3) solid;
 }

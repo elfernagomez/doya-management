@@ -1,14 +1,33 @@
 .procedure-panel {
-	width: auto !important;
-	z-index: inherit !important;
+	border-radius: var(--lwc-borderRadiusMedium);
 }
 
-.procedure-panel.production {
-	min-width: 8rem;
+.procedure-panel header {
+	background-color: var(--lwc-brandDisabled);
+	border-radius: var(--lwc-borderRadiusMedium);
 }
 
-.procedure-panel.admin {
-	min-width: 12rem;
+.procedure-panel header.complete {
+	background-color: var(--lwc-brandPrimary);
+}
+
+.procedure-panel header.inProgress {
+	background-color: var(--lwc-brandAccessibleActive);
+}
+
+.procedure-panel header .procedureField {
+	--slds-g-color-neutral-base-30: var(--slds-g-color-neutral-base-100);
+	--lwc-colorTextLabel: var(--slds-g-color-neutral-base-100);
+}
+
+.procedure-panel .prod header.complete .procedureField {
+	--slds-c-input-text-color: var(--slds-g-color-neutral-base-100);
+	--slds-g-color-neutral-base-30: transparent;
+	--lwc-colorTextLabel: transparent;
+}
+
+.procedure-panel {
+	max-width: 14rem;
 }
 
 .procedure-panel:after {

@@ -41,7 +41,7 @@ export default class LwcBase extends LightningElement {
 	 * @param {*} message 
 	 * @param {*} error 
 	 */
-	removeError(message, error) {
+	removeError() {
 		this.isError = false;
 		this.errorTitle = null;
 		this.errorObject = null;

@@ -1,80 +1,214 @@
-import LwcBase from 'c/lwcBase';
-import { api, wire } from 'lwc';
-import { getRecord, getFieldValue } from 'lightning/uiRecordApi';
-import { getRelatedListRecords } from 'lightning/uiRelatedListApi';
-import { CloseActionScreenEvent } from 'lightning/actions';
-import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import InputBase from 'c/inputBase';
+import { api, track, wire } from "lwc";
+import {
+	getRecord,
+	getFieldValue,
+	createRecord,
+	deleteRecord
+} from "lightning/uiRecordApi";
+import { ShowToastEvent } from "lightning/platformShowToastEvent";
+import { 
+	createNewProduct,
+	addErrorToProduct,
+	removeErrorFromProduct
+} from "c/productCard";
+import {
+	createNewDelvieryGroup,
+	createGroupRecord,
+	createGroupFromApexRecord,
+	DEFAULT_GROUP_NAME
+} from "c/deliveryGroupCard";
+
+import getDeliveryGroups
+	from "@salesforce/apex/OrderProductManagerCtrl.getDeliveryGroups";
+import getOrderProductsByProductType
+	from "@salesforce/apex/OrderProductManagerCtrl.getOrderProductsByProductType";
 import saveOrderProducts
-	from '@salesforce/apex/OrderProductManagerCtrl.saveOrderProducts';
-import NAME_FIELD from '@salesforce/schema/Order.OrderNumber';
-import ACCOUNT_ID_FIELD from '@salesforce/schema/Order.AccountId';
-import ACCOUNT_NAME_FIELD from '@salesforce/schema/Order.Account.Name';
+	from "@salesforce/apex/OrderProductManagerCtrl.saveOrderProducts";
+
+import NAME_FIELD from "@salesforce/schema/Order.OrderNumber";
+import DUE_DATE_FIELD from "@salesforce/schema/Order.DueDate__c";
+import STATUS_FIELD from "@salesforce/schema/Order.Status";
+import ACCOUNT_ID_FIELD from "@salesforce/schema/Order.AccountId";
+import ACCOUNT_NAME_FIELD from "@salesforce/schema/Order.Account.Name";
+
+import GROUP_OBJECT
+	from "@salesforce/schema/DeliveryGroup__c";
+
+import ITEM_OBJECT
+	from "@salesforce/schema/OrderItem";
+
+import ITEM_ID_FIELD
+	from "@salesforce/schema/OrderItem.Id";
+import ITEM_ORDER_ID_FIELD
+	from "@salesforce/schema/OrderItem.OrderId";
+import ITEM_PRODUCT_ID_FIELD
+	from "@salesforce/schema/OrderItem.Product2Id";
+import ITEM_PRODUCT_NAME_FIELD
+	from "@salesforce/schema/OrderItem.Product2.Name";
+import ITEM_PRODUCT_CODE_FIELD
+	from "@salesforce/schema/OrderItem.Product2.ProductCode";
+import ITEM_PRODUCT_RECORD_TYPE_ID_FIELD
+	from "@salesforce/schema/OrderItem.Product2.RecordTypeId";
+import ITEM_PRODUCT_RECORD_TYPE_NAME_FIELD
+	from "@salesforce/schema/OrderItem.Product2.RecordType.Name";
+import ITEM_QTY_FIELD
+	from "@salesforce/schema/OrderItem.Quantity";
+import ITEM_UNIT_TYPE_FIELD
+	from "@salesforce/schema/OrderItem.UnitType__c";
+import ITEM_DEPTH_FIELD
+	from "@salesforce/schema/OrderItem.Depth__c";
+import ITEM_WIDTH_FIELD
+	from "@salesforce/schema/OrderItem.Width__c";
+import ITEM_HEIGHT_FIELD
+	from "@salesforce/schema/OrderItem.Height__c";
+import ITEM_DELIVERY_GROUP_FIELD
+	from "@salesforce/schema/OrderItem.DeliveryGroup__c";
+import ITEM_DISCOUNT_TYPE_FIELD
+	from "@salesforce/schema/OrderItem.DiscountType__c";
+import ITEM_DISCOUNT_AMOUNT_FIELD
+	from "@salesforce/schema/OrderItem.DiscountAmount__c";
+import ITEM_BASE_PRICE_FIELD
+	from "@salesforce/schema/OrderItem.BasePrice__c";
+import ITEM_UNIT_PRICE_FIELD
+	from "@salesforce/schema/OrderItem.UnitPrice";
+import ITEM_TOTAL_PRICE_FIELD
+	from "@salesforce/schema/OrderItem.TotalPrice";
+import ITEM_CREATED_DATE_FIELD
+	from "@salesforce/schema/OrderItem.CreatedDate";
+/* import ITEM_FINISH_FIELD
+	from "@salesforce/schema/OrderItem.Finish__c"; */
+
+export function getFieldApiNames() {
+	return [
+		`${ITEM_OBJECT.objectApiName}.${ITEM_ID_FIELD.fieldApiName}`,
+		`${ITEM_OBJECT.objectApiName}.${ITEM_DELIVERY_GROUP_FIELD.fieldApiName}`,
+		`${ITEM_OBJECT.objectApiName}.${ITEM_PRODUCT_ID_FIELD.fieldApiName}`,
+		`${ITEM_OBJECT.objectApiName}.${ITEM_PRODUCT_NAME_FIELD.fieldApiName}`,
+		`${ITEM_OBJECT.objectApiName}.${ITEM_PRODUCT_CODE_FIELD.fieldApiName}`,
+		`${ITEM_OBJECT.objectApiName}.${ITEM_PRODUCT_RECORD_TYPE_ID_FIELD.fieldApiName}`,
+		`${ITEM_OBJECT.objectApiName}.${ITEM_PRODUCT_RECORD_TYPE_NAME_FIELD.fieldApiName}`,
+		// `${ITEM_OBJECT.objectApiName}.${ITEM_FINISH_FIELD.fieldApiName}`,
+		`${ITEM_OBJECT.objectApiName}.${ITEM_UNIT_TYPE_FIELD.fieldApiName}`,
+		`${ITEM_OBJECT.objectApiName}.${ITEM_QTY_FIELD.fieldApiName}`,
+		`${ITEM_OBJECT.objectApiName}.${ITEM_DEPTH_FIELD.fieldApiName}`,
+		`${ITEM_OBJECT.objectApiName}.${ITEM_WIDTH_FIELD.fieldApiName}`,
+		`${ITEM_OBJECT.objectApiName}.${ITEM_HEIGHT_FIELD.fieldApiName}`,
+		`${ITEM_OBJECT.objectApiName}.${ITEM_DISCOUNT_TYPE_FIELD.fieldApiName}`,
+		`${ITEM_OBJECT.objectApiName}.${ITEM_DISCOUNT_AMOUNT_FIELD.fieldApiName}`,
+		`${ITEM_OBJECT.objectApiName}.${ITEM_BASE_PRICE_FIELD.fieldApiName}`,
+		`${ITEM_OBJECT.objectApiName}.${ITEM_UNIT_PRICE_FIELD.fieldApiName}`,
+		`${ITEM_OBJECT.objectApiName}.${ITEM_TOTAL_PRICE_FIELD.fieldApiName}`,
+		`${ITEM_OBJECT.objectApiName}.${ITEM_CREATED_DATE_FIELD.fieldApiName}`
+	];
+}
+
+export function convertFromRecord(r) {
+	return {
+		...createNewProduct(),
+		uniqueId: getFieldValue(r, ITEM_ID_FIELD),
+		groupId: getFieldValue(r, ITEM_DELIVERY_GROUP_FIELD),
+		productId: getFieldValue(r, ITEM_PRODUCT_ID_FIELD),
+		productName: getFieldValue(r, ITEM_PRODUCT_NAME_FIELD),
+		productCode: getFieldValue(r, ITEM_PRODUCT_CODE_FIELD),
+		productTypeId: getFieldValue(r, ITEM_PRODUCT_RECORD_TYPE_ID_FIELD),
+		productTypeName: getFieldValue(r, ITEM_PRODUCT_RECORD_TYPE_NAME_FIELD),
+		// finish: getFieldValue(r, ITEM_FINISH_FIELD),
+		unitType: getFieldValue(r, ITEM_UNIT_TYPE_FIELD),
+		qty: getFieldValue(r, ITEM_QTY_FIELD),
+		depth: getFieldValue(r, ITEM_DEPTH_FIELD),
+		width: getFieldValue(r, ITEM_WIDTH_FIELD),
+		height: getFieldValue(r, ITEM_HEIGHT_FIELD),		
+		discountType: getFieldValue(r, ITEM_DISCOUNT_TYPE_FIELD),
+		discountAmount: getFieldValue(r, ITEM_DISCOUNT_AMOUNT_FIELD),
+		unitPrice: getFieldValue(r, ITEM_BASE_PRICE_FIELD),
+		listPrice: getFieldValue(r, ITEM_UNIT_PRICE_FIELD),
+		totalPrice: getFieldValue(r, ITEM_TOTAL_PRICE_FIELD),
+		createdDate: new Date(getFieldValue(r, ITEM_CREATED_DATE_FIELD)),
+		isProduct: getFieldValue(r, ITEM_DISCOUNT_TYPE_FIELD) == "Product",
+		isDiscount: getFieldValue(r, ITEM_DISCOUNT_TYPE_FIELD) == "Discount",
+		isPercentage: getFieldValue(r, PRODUCT_DISCOUNT_TYPE_FIELD) == "Percentage",
+		isFixed: getFieldValue(r, PRODUCT_DISCOUNT_TYPE_FIELD) == "Fixed Amount",
+		isNew: false
+	};
+}
+
+export function convertFromApexRecord(r) {
+	return {
+		...createNewProduct(),
+		uniqueId: r.Id,
+		groupId: r.DeliveryGroup__c,
+		productId: r.Product2Id,
+		productName: r.Product2.Name,
+		productCode: r.Product2.ProductCode,
+		productTypeId: r.Product2.RecordTypeId,
+		productTypeName: r.Product2.RecordType?.DeveloperName,
+		unitType: r.UnitType__c,
+		qty: r.Quantity,
+		depth: r.Depth__c,
+		width: r.Width__c,
+		height: r.Height__c,
+		discountType: r.DiscountType__c,
+		discountAmount: r.DiscountAmount__c,
+		unitPrice: r.BasePrice__c,
+		listPrice: r.UnitPrice,
+		totalPrice: r.TotalPrice,
+		createdDate: new Date(r.CreatedDate),
+		isProduct: r.Product2.RecordType?.DeveloperName == "Product",
+		isDiscount: r.Product2.RecordType?.DeveloperName == "Discount",
+		isPercentage: r.DiscountType__c == "Percentage",
+		isFixed: r.DiscountType__c == "Fixed Amount",
+		isNew: false
+	};
+}
 
 /**
  * @author Fernando Gomez
  * @since 10/30.2022
  * @versino 1.0
  */
-export default class OrderProductManager extends LwcBase {
+export default class OrderProductManager extends InputBase {
 	@api
 	recordId;
 
-	@api
-	details = {
-		products: [],
-		deletedIds: []
-	};
+	@track
+	groups = [];
+
+	@track
+	discounts = [];
+
+	mode = "view";
+
+	order;
+	refreshHandlerId;
+	wiredDeliveryGroupsResult;
+	openGroupSections;
 
 	isReady = false;
-	subtotal = 0;
-	taxesPercent = 0.07;
-	taxes = 0;
-	discounts = 0;
-	total = 0;
-
 	isSaveDisabled = true;
 	isLoading = false;
+	searchProductsKey = null;
 
-	@wire(getRecord, { 
-		recordId: "$recordId",
-		fields: [NAME_FIELD, ACCOUNT_ID_FIELD, ACCOUNT_NAME_FIELD]
-	})
-	order;
-
-	@wire(getRelatedListRecords, {
-		parentRecordId: "$recordId",
-		relatedListId: 'OrderItems',
-		fields: [
-			"OrderItem.OrderId",
-			"OrderItem.Product2Id",
-			"OrderItem.Quantity",
-			"OrderItem.UnitPrice",
-			"OrderItem.HandlingPrice__c",
-			"OrderItem.Depth__c",
-			"OrderItem.Width__c",
-			"OrderItem.Height__c",
-			"OrderItem.DeliveryType__c",
-			"OrderItem.TotalPrice"
-		],
-		sortBy: ['OrderItem.CreatedDate']
-	})
-	listInfo({ error, data }) {
-		if (data) {
-			data.records.forEach(
-				r => this.details.products.push(this._createWrapper(r)));
-			this.isReady = true;
-		} else if (error) {
-			console.error(error);
-			this.toast('Error',
-				`There was a problem. ${error.body.message}`,
-				'error',
-				'sticky');
-			this.dispatchEvent(new CustomEvent('cancel'));
-		}
+	get listViewOptions() {
+		return [{
+			label: "Tiles",
+			value: "tiles",
+			iconName: "utility:tile_card_list",
+			isChecked: true
+		}, {
+			label: "List",
+			value: "list",
+			iconName: "utility:list",
+			isChecked: false
+		}];
 	}
 
 	get title() {
-		return `Order #${getFieldValue(this.order.data, NAME_FIELD) || ""}'s Products`;
+		return "Products";
+	}
+
+	get isDraft() {
+		return getFieldValue(this.order.data, STATUS_FIELD) == "Draft";
 	}
 
 	get subtitle() {
@@ -82,135 +216,422 @@ export default class OrderProductManager extends LwcBase {
 			${getFieldValue(this.order.data, ACCOUNT_NAME_FIELD)}</a>`;
 	}
 
-	handleOnProductsChange(event) {
-		this.details = {...event.detail};
-		this.isSaveDisabled = false;
-		this._calculateTotals();
+	get hideAddProducts() {
+		return this.searchProductsKey != null;
 	}
 
-	handleCancelClick(event) {
-		this.dispatchEvent(new CustomEvent('cancel'));
-		this.dispatchEvent(new CloseActionScreenEvent());
+	get dueDate() {
+		return getFieldValue(this.order.data, DUE_DATE_FIELD);
+	}
+
+	@wire(getRecord, { 
+		recordId: "$recordId",
+		fields: [
+			NAME_FIELD,
+			DUE_DATE_FIELD,
+			STATUS_FIELD,
+			ACCOUNT_ID_FIELD,
+			ACCOUNT_NAME_FIELD
+		]
+	})
+	order;
+
+	connectedCallback() {
+		this.getDeliveryGroupsAndProducts();
+		this.getDiscounts();
+	}
+
+	handleOnViewChange(event) {
+		switch (event.detail.value) {
+			case "view":
+			case "edit":
+				this.handleOnModeChange(event);
+				break;
+			case "tiles":
+			case "list":
+				break;
+			default:
+				break;
+		}
+	}
+
+	handleOnAddGroupClick() {
+		this.addNewGroup();
+	}
+
+	handleOnProductCreated(event) {
+		this.addProduct(
+			event.target.dataset.groupId,
+			event.detail);
+	}
+
+	handleOnProductChange(event) {
+		this.updateProduct(event.detail);
+	}
+
+	handleOnProductDelete(event) {
+		this.deleteProduct(event.detail);
+	}
+
+	handleOnSearchProductsChange(event) {
+		this.searchProductsKey =
+			event.target.value?.trim().toLowerCase() || null;
+		this.filterProducts();
 	}
 
 	handleSaveClick(event) {
 		this._save();
 	}
 
-	_calculateTotals() {
-		this.subtotal = this.details.products.reduce((a, c) => {
-			return a + (c.totalPrice || 0);
-		}, 0);
-		this.taxes = this.subtotal * this.taxesPercent;
-		this.total = this.subtotal + this.taxes - (this.discounts || 0);
+	handleOnProductDragStart(event) {
+		let product = event.detail;
+		if (product)
+			this.groups
+				.filter(g => g.uniqueId != event.detail.groupId)
+				.forEach(g => this.applyChangesToGroup(
+					g.uniqueId,
+					{ isDropEnabled: true }));
 	}
 
-	_createWrapper(r) {
-		return {
-			uniqueId: r.id,
-			product2Id: r.fields.Product2Id.value,
-			qty: r.fields.Quantity.value,
-			unitPrice: r.fields.UnitPrice.value,
-			handlingPrice: r.fields.HandlingPrice__c.value,
-			depth: r.fields.Depth__c.value,
-			width: r.fields.Width__c.value,
-			height: r.fields.Height__c.value,
-			deliveryType: r.fields.DeliveryType__c.value,
-			totalPrice: r.fields.TotalPrice.value,
-			isDeleting: false,
-			isDisabled: false,
-			isValid: true,
-			errorMessage: null,
-			isNew: false
-		};
+	handleOnProductDragEnd(event) {
+		this.groups
+			.forEach(g => this.applyChangesToGroup(
+				g.uniqueId,
+				{
+					isDropEnabled: false,
+					isDragging: false
+				}));
 	}
 
-	_createFromWrapper(w) {
-		return {
-			Id: w.isNew ? null : w.uniqueId,
-			OrderId: this.recordId,
-			Product2Id: w.product2Id,
-			Quantity: w.qty,
-			UnitPrice: w.unitPrice,
-			HandlingPrice__c: w.handlingPrice,
-			Depth__c: w.depth,
-			Width__c: w.width,
-			Height__c: w.height,
-			DeliveryType__c: w.deliveryType,
-			TotalPrice: w.totalPrice
-		};
+	handleOnDragOver(event) {
+		event.preventDefault();
+		this.applyChangesToGroup(
+			event.currentTarget.dataset.groupId,
+			{ isDragging: true });
 	}
 
-	_validate() {
-		let isValid = true;
-		this.details.products.forEach(w => {
-			let issues = [];
-			console.log(w);
+	handleOnDragLeave(event) {
+		this.applyChangesToGroup(
+			event.currentTarget.dataset.groupId,
+			{ isDragging: false });
+	}
 
-			if (!w.product2Id)
-				issues.push(
-					"- Product is required");
+	handleOnDrop(event) {
+		let product = JSON.parse(event.dataTransfer.getData("text/json"));
+		let sourceGroupId = product.groupId;
+		let targetGroupId = event.currentTarget.dataset.groupId;
+		this.moveProduct(product.uniqueId, targetGroupId, sourceGroupId);
+	}
 
-			if (!w.qty || w.qty < 1)
-				issues.push(
-					"- Qty is required and it must be a positive number");
-					
-			if (!w.unitPrice || w.unitPrice < 0)
-				issues.push(
-					"- Unit Price is required and it cannot be a negative amount");
+	handleOnGroupEdit() {
+		this.getDeliveryGroupsAndProducts();
+	}
 
-			if (issues.length > 0) {
-				isValid = false;
-				w.isValid = false;
-				w.errorMessage = issues.join("<br/>");
-			} else {
-				w.isValid = true;
-				w.errorMessage = null;
-			}
+	handleOnGroupClone() {
+		this.getDeliveryGroupsAndProducts();
+	}
+
+	handleOnGroupDelete(event) {
+		this.deleteGroup(event.detail.recordId);
+	}
+
+	getDeliveryGroupsAndProducts() {
+		getDeliveryGroups({
+			orderId: this.recordId
+		})
+		.then(data => {
+			// this.wiredDeliveryGroupsResult = result;
+			this.groups = [
+				...data.map(r => ({
+					...createGroupFromApexRecord(r),
+					products: r.OrderProducts__r?.map(
+						op => convertFromApexRecord(op)) || []
+				}),
+				{
+					uniqueId: "null",
+					name: "Ungrouped",
+					isPlaceHolder: true,
+					products: []
+				})
+			];
+
+			// if the order is in draft, we enable edit
+			if (this.isDraft)
+				this.mode = "edit";
+		})
+		.catch(error => {
+			console.error(error);
+			this.toast("Error",
+				`There was a problem. ${error.body?.message}`,
+				"error",
+				"sticky");
 		});
-
-		return isValid;
 	}
 
-	_save() {
-		// first, we fetch the changes from the child component
-		this.details = this.template.querySelector('c-product-manager').details;
+	getDiscounts() {
+		getOrderProductsByProductType({
+			orderId: this.recordId,
+			productTypeName: "Discount"
+		})
+		.then(data => {
+			this.discounts = data.map(r => convertFromApexRecord(r));
+		})
+		.catch(error => {
+			console.error(error);
+			this.toast("Error",
+				`There was a problem. ${error.body?.message}`,
+				"error",
+				"sticky");
+		});
+	}
 
-		if (!this._validate()) {
-			// we have to refresh the references so they
-			// get updated in the child compoenent
-			// this.details = Object.assign({}, this.details);
+	addNewGroup() {
+		const group = {
+			...createNewDelvieryGroup(),
+			uniqueId: `unsaved_${this.groups.length + 1}`,
+			name: `${DEFAULT_GROUP_NAME} #${this.groups.length + 1}`,
+			dueDate: this.dueDate
+		};
+		this.groups.push(group);
+		this.createNewGroupRecord(group);
+	}
 
-			// and show a general toast message
-			this.toast(
-				"There were some issues.",
-				"Please, fix the issues in the items and try again.",
-				"error");
-		} else {
-			let records = [];
-			this.details.products.forEach(w => records.push(this._createFromWrapper(w)));
-			this.isSaveDisabled = true;
-			this.isLoading = true;
+	deleteGroup(groupId) {
+		let index = this.groups.findIndex(g => g.uniqueId == groupId);
+		const group = this.groups.splice(index, 1)[0];
 
-			saveOrderProducts({
-				itemsToUpsert: records,
-				itemsToDelete: this.details.deletedIds
-			})
-			.then(result => {
-				this.isLoading = false;
-				this.toast('Success', 'Changes saved successfully.', 'success');
-				this.dispatchEvent(new CustomEvent('cancel'));
-			})
-			.catch(error => {
-				console.error(error);
-				this.toast('Error',
-					`There was a problem. ${error.body.message}`,
-					'error',
-					'sticky');
-				this.isSaveDisabled = false;
-				this.isLoading = false;
-			});
+		const fallback = (error) => {
+			console.error(error);
+			// put the group back on its place
+			this.groups.splice(index, 0, group);
+			this.toast("Error",
+				`Group was not deleted. There was a problem. ${
+					error.body?.message}`,
+				"error",
+				"sticky");
+		};
+		
+		// first, we remove all products
+		// inside the group...
+		saveOrderProducts({
+			itemsToUpsert: [],
+			itemsToDelete: group.products.map(p => p.uniqueId)
+		})
+		.then(() => deleteRecord(groupId).catch(fallback))
+		.catch(fallback);
+	}
+
+	createNewGroupRecord(group) {
+		createRecord({
+			apiName: GROUP_OBJECT.objectApiName,
+			fields: {
+				...createGroupRecord(group),
+				Order__c: this.recordId
+			}
+		})
+		.then(result => {
+			this.sortGroups();
+			this.applyChangesToGroup(
+				group.uniqueId,
+				{
+					uniqueId: result.id
+				});
+		})
+		.catch(error =>
+			this.toast("Error",
+				`Group was not created. There was a problem. ${error.body?.message}`,
+				"error",
+				"sticky"));
+	}
+
+	addProduct(groupId, product) {
+		const newProduct = {
+			...product
+		};
+
+		if (newProduct.isProduct) {
+			newProduct.groupId = groupId;
+			this.getGroupById(groupId).products.push(newProduct);
 		}
+		
+		if (newProduct.isDiscount) {
+			this.discounts.push(newProduct);
+		}
+		
+		this.applyChangesToProduct(
+			groupId,
+			newProduct.uniqueId,
+			newProduct.isProduct,
+			newProduct.isDiscount,
+			newProduct);
+		this.saveProduct(newProduct);
+	}
+
+	updateProduct(product) {
+		this.applyChangesToProduct(
+			product.groupId,
+			product.uniqueId,
+			product.isProduct,
+			product.isDiscount,
+			product);
+		this.saveProduct(product);
+	}
+
+	moveProduct(productId, targetGroupId, sourceGroupId) {
+		let sourceGroup = this.getGroupById(sourceGroupId);
+		// remove from dource group
+		let indexInSource = sourceGroup.products.findIndex(p => p.uniqueId == productId);
+		let product = sourceGroup.products.splice(indexInSource, 1)[0];
+		// group id must change
+		product.groupId = targetGroupId;
+		sourceGroup.products = [...sourceGroup.products];
+		// and the source group reference to products must change as well
+		// add to target group
+		let targetGroup = this.getGroupById(targetGroupId);
+		targetGroup.products = [
+			...targetGroup.products,
+			product
+		].sort((a, b) => a.createdDate - b.createdDate);
+
+		// and save info
+		this.saveProduct(product);
+	}
+
+	saveProduct(product) {
+		this.removeErrorFromProduct(product);
+		saveOrderProducts({
+			itemsToUpsert: [this.convertToRecord(product)],
+			itemsToDelete: []
+		})
+		.then(result => {
+			const prod = convertFromApexRecord(result[0]);
+
+			// calculated fields
+			const changes = {
+				listPrice: prod.listPrice,
+				totalPrice: prod.totalPrice
+			};
+
+			if (product.isNew) {
+				changes.isNew = false;
+				changes.uniqueId = prod.uniqueId;
+			}
+
+			console.log("after save: ");
+			this.applyChangesToProduct(
+				product.groupId,
+				product.uniqueId,
+				product.isProduct,
+				product.isDiscount,
+				changes);
+
+			// is product changes we need to refresh
+			// the discount number
+			if (product.isProduct)
+				this.getDiscounts();
+		})
+		.catch(error =>
+			this.addErrorToProduct(
+				product,
+				"Product was not created",
+				error));
+	}
+
+	deleteProduct(product) {
+		if (product.isNew)
+			this.removeProduct(
+				product.groupId,
+				product.uniqueId,
+				product.isProduct,
+				product.isDiscount);
+		else {
+			this.applyChangesToProduct(
+				product.groupId,
+				product.uniqueId,
+				product.isProduct,
+				product.isDiscount,
+				{
+					isDisabled: true
+				});
+
+			removeErrorFromProduct(product);
+			saveOrderProducts({
+				itemsToUpsert: [],
+				itemsToDelete: [product.uniqueId]
+			})
+			.then(() => {
+				this.removeProduct(
+					product.groupId,
+					product.uniqueId,
+					product.isProduct,
+					product.isDiscount);
+
+				// is product changes we need to refresh
+				// the discount number
+				if (product.isProduct)
+					this.getDiscounts();
+			})
+			.catch(error =>
+				this.addErrorToProduct(
+					product,
+					"Product was not deleted",
+					error));
+		}
+	}
+
+	filterProducts() {
+		let key = this.searchProductsKey;
+		this.groups.forEach(g =>
+			g.products.forEach(p =>
+				this.applyChangesToProduct(
+					p.groupId,
+					p.uniqueId,
+					p.isProduct,
+					p.isDiscount,
+					{
+						isHidden: key ?
+							!p.productName.toLowerCase().includes(key) &&
+							!p.productCode.toLowerCase().includes(key) : false
+					})));
+	}
+
+	convertToRecord(product) {
+		let record = {};
+
+		if (product.isNew) {
+			record[ITEM_ORDER_ID_FIELD.fieldApiName] = this.recordId;
+			record[ITEM_PRODUCT_ID_FIELD.fieldApiName] = product.productId;
+		} else
+			record[ITEM_ID_FIELD.fieldApiName] = product.uniqueId;
+		
+		// product fields
+		if (product.isProduct) {
+			record[ITEM_DELIVERY_GROUP_FIELD.fieldApiName] = product.groupId;
+			record[ITEM_QTY_FIELD.fieldApiName] = product.qty;
+			record[ITEM_UNIT_TYPE_FIELD.fieldApiName] = product.unitType;
+			record[ITEM_DEPTH_FIELD.fieldApiName] = product.depth;
+			record[ITEM_WIDTH_FIELD.fieldApiName] = product.width;
+			record[ITEM_HEIGHT_FIELD.fieldApiName] = product.height;
+			record[ITEM_BASE_PRICE_FIELD.fieldApiName] = product.unitPrice;
+			record[ITEM_UNIT_PRICE_FIELD.fieldApiName] = product.listPrice;
+		}
+		
+		// discount fields
+		if (product.isDiscount) {
+			record[ITEM_QTY_FIELD.fieldApiName] = 1;
+			record[ITEM_DISCOUNT_TYPE_FIELD.fieldApiName] = product.discountType;
+			record[ITEM_DISCOUNT_AMOUNT_FIELD.fieldApiName] = product.discountAmount;
+
+			if (product.isFixed) {
+				record[ITEM_BASE_PRICE_FIELD.fieldApiName] =
+					product.discountAmount * -1;
+				record[ITEM_UNIT_PRICE_FIELD.fieldApiName] =
+					product.discountAmount * -1;
+			}
+		}
+
+		console.log(JSON.stringify(record));
+		return record;
 	}
 
 	toast(title, msg, variant, mode) {
@@ -220,5 +641,108 @@ export default class OrderProductManager extends LwcBase {
 			variant: variant,
 			mode: mode
 		}));
+	}
+
+	getFieldFullName(object, field) {
+		return `${object.objectApiName}.${field.fieldApiName}`;
+	}
+
+	addErrorToProduct(product, errorTitle, errorObject) {
+		console.error(errorObject);
+		let msg = [
+			errorTitle,
+			...this.getDmlErrors(errorObject)
+		].join(". ");
+		
+		addErrorToProduct(product, msg, errorObject);
+		this.applyChangesToProduct(
+			product.groupId,
+			product.uniqueId,
+			product.isProduct,
+			product.isDiscount,
+			product);
+	}
+
+	removeErrorFromProduct(product) {
+		removeErrorFromProduct(product);
+		this.applyChangesToProduct(
+			product.groupId,
+			product.uniqueId,
+			product.isProduct,
+			product.isDiscount,
+			product);
+	}
+
+	getGroupById(groupId) {
+		return this.groups.find(g => g.uniqueId == (groupId || "null"));
+	}
+
+	getDiscountById(discountId) {
+		return this.discounts.find(d => d.uniqueId == discountId);
+	}
+
+	applyChangesToGroup(groupId, changes) {
+		let group = this.getGroupById(groupId);
+		Object.keys(changes).forEach(
+			k => {
+				let v = changes[k];
+				group[k] = v == null ? null : v;
+			});
+	}
+
+	applyChangesToProduct(groupId, uniqueId, isProduct, isDiscount, changes) {
+		if (isProduct) {
+			let group = this.getGroupById(groupId);
+			let indexInGroup = group.products.findIndex(p => p.uniqueId == uniqueId);
+			let groupProducts = [...group.products];
+			let product = groupProducts[indexInGroup];
+			groupProducts[indexInGroup] = {
+				...product,
+				...changes
+			};
+			// but here we do have to change the
+			// reference in products otherwise the UI
+			// weon't recognize it
+			group.products = groupProducts;
+		}
+
+		if (isDiscount) {
+			const discountIndex = this.discounts.findIndex(d => d.uniqueId == uniqueId);
+			const discount = this.getDiscountById(uniqueId);
+			this.discounts[discountIndex] = {
+				...discount,
+				...changes
+			};
+			this.discounts = [...this.discounts];
+		}
+	}
+
+	removeProduct(groupId, uniqueId, isProduct, isDiscount) {
+		if (isProduct) {
+			let group = this.getGroupById(groupId);
+			let indexInGroup = group.products.findIndex(p => p.uniqueId == uniqueId);
+			let groupProducts = [...group.products];
+			groupProducts.splice(indexInGroup, 1);
+			group.products = groupProducts;
+		}
+
+		if (isDiscount) {
+			const discountIndex =
+				this.discounts.findIndex(d => d.uniqueId == uniqueId);
+			this.discounts.splice(discountIndex, 1);
+			this.discounts = [...this.discounts];
+		}
+	}
+
+	sortGroups() {
+		/* try {
+		this.groups.sort((n, o) => {
+			let nt = n.dueDate?.getTime() || 0;
+			let ot = o.dueDate?.getTime() || 0;
+			return nt - ot;
+		});
+		} catch (e) {
+			console.error(e.stack)
+		} */
 	}
 }

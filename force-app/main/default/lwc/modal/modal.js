@@ -20,8 +20,15 @@ export default class Modal extends LightningElement {
 	@api
 	size; // small | medium | large | full
 
+	@api
+	disableScrolling = false;
+
 	get showCloseButton() {
 		return !this.closeButtonHidden;
+	}
+
+	get contentStyle() {
+		return this.disableScrolling ? "overflow:visible;" : "";
 	}
 
 	onCloseClick(e) {

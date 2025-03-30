@@ -4,251 +4,81 @@
 @versino 1.0
 -->
 <template>
+<div lwc:if={isError}
+	class="slds-theme_default slds-var-m-bottom_small">
+	<c-error-panel error-title={errorTitle}
+		error-object={errorObject}></c-error-panel>
+</div>
 <div lwc:if={hasProducts}>
-	<lightning-card>
-		<template for:each={products}
+	<div lwc:if={isCard}
+		class="slds-grid
+			slds-gutters
+			slds-gutters_direct
+			slds-wrap">
+		<div for:each={products}
 			for:item="product"
-			for:index="index">
-			<div key={product.uniqueId}
-				class="row slds-box slds-box_x-small
-					slds-var-m-bottom_x-small slds-is-relative">
-				<lightning-layout>
-					<lightning-layout-item lwc:if={product.isNew}
-						size="5"
-						class="slds-var-p-horizontal_xx-small">
-						<lightning-record-edit-form object-api-name="OrderItem">
-							<lightning-input-field field-name="Product2Id"
-								disabled={product.isDisabled}
-								value={product.product2Id}
-								onchange={handleProductSelection}
-								data-index={index}>
-							</lightning-input-field>
-						</lightning-record-edit-form>
-						<template lwc:if={product.product2Id}>&nbsp;</template>
-						<template lwc:else>
-							Or&nbsp;
-							<a href="#"
-								data-index={index}
-								onclick={handleNewProductClick}>
-								New Product
-							</a>
-						</template>
-					</lightning-layout-item>
-					<lightning-layout-item lwc:else
-						size="5"
-						class="slds-var-p-horizontal_xx-small">
-						<lightning-record-edit-form object-api-name="OrderItem">
-							<lightning-input-field field-name="Product2Id"
-								disabled=true
-								value={product.product2Id}>
-							</lightning-input-field>
-						</lightning-record-edit-form>
-					</lightning-layout-item>
-					<lightning-layout-item class="slds-var-p-horizontal_xx-small">
-						<lightning-input type="number"
-							label="Qty"
-							class="small-input"
-							step="1"
-							min="1"
-							disabled={product.isDisabled}
-							value={product.qty}
-							data-index={index}
-							data-src="product"
-							data-field="qty"
-							data-type="float"
-							onchange={handleFieldChange}></lightning-input>
-					</lightning-layout-item>
-					<lightning-layout-item>
-						<lightning-layout vertical-align="center">
-							<lightning-layout-item size="4"
-								class="slds-var-p-horizontal_xx-small">
-								<lightning-input type="number"
-									label="Width"
-									formatter="decimal"
-									step="0.01"
-									disabled={product.isDisabled}
-									value={product.width}
-									data-index={index}
-									data-src="product"
-									data-field="width"
-									data-type="float"
-									onchange={handleFieldChange}>
-								</lightning-input>
-							</lightning-layout-item>
-							<lightning-layout-item size="4"
-								class="slds-var-p-horizontal_xx-small">
-								<lightning-input type="number"
-									label="Height"
-									formatter="decimal"
-									step="0.01"
-									disabled={product.isDisabled}
-									value={product.height}
-									data-index={index}
-									data-src="product"
-									data-field="height"
-									data-type="float"
-									onchange={handleFieldChange}>
-								</lightning-input>
-							</lightning-layout-item>
-							<lightning-layout-item size="4"
-								class="slds-var-p-horizontal_xx-small">
-								<lightning-input type="number"
-									label="Depth"
-									formatter="decimal"
-									step="0.01"
-									disabled={product.isDisabled}
-									value={product.depth}
-									data-index={index}
-									data-src="product"
-									data-field="depth"
-									data-type="float"
-									onchange={handleFieldChange}>
-								</lightning-input>
-							</lightning-layout-item>
-						</lightning-layout>
-						<lightning-layout>
-							<lightning-layout-item size="4"
-								class="slds-var-p-horizontal_xx-small">
-								<lightning-input type="number"
-									label="Unit Price"
-									formatter="currency"
-									step="0.01"
-									disabled={product.isDisabled}
-									value={product.unitPrice}
-									data-index={index}
-									data-src="product"
-									data-field="unitPrice"
-									data-type="float"
-									onchange={handleFieldChange}></lightning-input>
-							</lightning-layout-item>
-							<lightning-layout-item size="4">
-								<lightning-record-edit-form object-api-name="OrderItem">
-									<lightning-input-field field-name="DeliveryType__c"
-										disabled={product.isDisabled}
-										value={product.deliveryType}
-										data-index={index}
-										data-src="product"
-										data-field="deliveryType"
-										data-type="string"
-										onchange={handleFieldChange}>
-									</lightning-input-field>
-								</lightning-record-edit-form>
-							</lightning-layout-item>
-							<lightning-layout-item size="4"
-								class="slds-var-p-horizontal_xx-small">
-								<lightning-input type="number"
-									label="Handling"
-									formatter="currency"
-									step="0.01"
-									disabled={product.isDisabled}
-									value={product.handlingPrice}
-									data-index={index}
-									data-src="product"
-									data-field="handlingPrice"
-									data-type="float"
-									onchange={handleFieldChange}>
-								</lightning-input>
-							</lightning-layout-item>
-						</lightning-layout>
-					</lightning-layout-item>
-				</lightning-layout>
-				<div lwc:if={product.isValid}></div>
-				<div lwc:else
-					class="slds-text-color_error">
-					<lightning-formatted-rich-text value={product.errorMessage}>
-					</lightning-formatted-rich-text>
-				</div>
-
-				<div class="row-total slds-border_left slds-var-p-around_x-small">
-					<label class="slds-form-element__label slds-no-flex">
-						Total
-					</label>
-					<div class="slds-text-heading_medium slds-var-m-bottom_small">
-						<lightning-formatted-number 
-							format-style="currency"
-							currency-code="USD"
-							value={product.totalPrice}></lightning-formatted-number>
-					</div>
-					<div lwc:if={product.isDeleting}>
-						Confirm?&nbsp;
-						<a href="#"
-							data-index={index}
-							data-value="true"
-							onclick={handleConfirmDeleteProductClicked}
-							class="slds-text-color_destructive">Yes</a>
-						&nbsp;|&nbsp;
-						<a href="#"
-							data-index={index}
-							data-value="false"
-							onclick={handleConfirmDeleteProductClicked}>No</a>
-					</div>
-					<div lwc:else>
-						<a href="#"
-							data-index={index}
-							onclick={handleDeleteProductClicked}
-							class="slds-text-color_destructive">Delete</a>
-					</div>
-				</div>
-			</div>
-		</template>
-		<div>
-			<lightning-button label="Add"
-				icon-name="utility:add"
-				onclick={handleAddProductsClick}></lightning-button>
+			for:index="index"
+			key={product.uniqueId}
+			class="slds-col
+				slds-no-flex
+				slds-var-m-bottom_medium"
+			style="min-width:14rem;max-width:16rem;">
+			<c-product-card product={product}
+				data-index={index}
+				mode={mode}
+				variant="card"
+				onproductchange={handleOnProductChange}
+				onproductdelete={handleOnProductDelete}
+				onproductdragstart={handleOnProductDragStart}
+				onproductdragend={handleOnProductDragEnd}></c-product-card>
 		</div>
-	</lightning-card>
+	</div>
+	<div lwc:if={isList}
+		class="">
+		<div for:each={products}
+			for:item="product"
+			for:index="index"
+			key={product.uniqueId}
+			class="slds-var-m-bottom_xx-small">
+			<c-product-card product={product}
+				data-index={index}
+				mode={mode}
+				variant="row"
+				onproductchange={handleOnProductChange}
+				onproductdelete={handleOnProductDelete}
+				onproductdragstart={handleOnProductDragStart}
+				onproductdragend={handleOnProductDragEnd}></c-product-card>
+		</div>
+	</div>
+	<div lwc:if={showAddProduct}
+		class="slds-var-m-top_small"
+		style="max-width:24rem;">
+		<lightning-record-picker
+			label="Add Product"
+			variant="label-hidden"
+			placeholder="Add Product..."
+			object-api-name="Product2"
+			filter={productFilter}
+			onchange={handleOnSelectedProductChange}></lightning-record-picker>
+	</div>
 </div>
 <div lwc:else>
-	<div class="slds-illustration slds-illustration_small slds-var-p-vertical_xx-large">
-		<c-illustration variant="desert"></c-illustration>
-		<div class="slds-text-longform">
-			<h3 class="slds-text-heading_medium">
-				No products yet.
-			</h3>
-			<lightning-layout vertical-align="center"
-				horizontal-align="center"
-				class="slds-var-m-top_large">
-				<lightning-layout-item>Add</lightning-layout-item>
-				<lightning-layout-item padding="horizontal-small">
-					<lightning-input type="number"
-						label="Number of Products to add"
-						variant="label-hidden"
-						class="small-input"
-						step="1"
-						min="1"
-						value={locals.numberOfProductsToAdd}
-						data-src="locals"
-						data-field="numberOfProductsToAdd"
-						data-type="int"
-						onchange={handleFieldChange}></lightning-input>
-				</lightning-layout-item>
-				<lightning-layout-item>Product(s)</lightning-layout-item>
-			</lightning-layout>
-			<div class="slds-var-m-top_small">
-				<lightning-button label="Add"
-					icon-name="utility:add"
-					onclick={handleAddProductsClick}></lightning-button>
+	<div class="slds-var-p-around_large">
+		<c-illustration variant="desert"
+			heading="No products yet."></c-illustration>
+		<div lwc:if={showAddProduct}
+			class="slds-grid slds-grid_align-center">
+			<div class="slds-size_full"
+				style="max-width:24rem;">
+				<lightning-record-picker
+					label="Add Product"
+					variant="label-hidden"
+					placeholder="Add Product..."
+					object-api-name="Product2"
+					filter={productFilter}
+					onchange={handleOnSelectedProductChange}></lightning-record-picker>
 			</div>
 		</div>
 	</div>
-</div>
-
-<!-- new product modal -->
-<div lwc:if={isNewProductPanelOpen}
-	class="panel-container">
-	<c-panel title="New Product"
-		onpanelclose={handleNewProductPanelClose}>
-		<div slot="body"
-			class="slds-var-p-vertical_medium slds-var-p-horizontal_large">
-			<lightning-record-form
-				object-api-name="Product2"
-				layout-type="Full"
-				columns="2"
-				mode="edit"
-				onsuccess={handleCreateProductSuccess}
-				oncancel={handleNewProductPanelClose}>
-			</lightning-record-form>
-		</div>
-	</c-panel>
 </div>
 </template>

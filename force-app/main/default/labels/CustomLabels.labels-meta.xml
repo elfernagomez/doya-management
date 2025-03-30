@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
 	<labels>
+		<fullName>ProductManager_noPriceBookError</fullName>
+		<language>en_US</language>
+		<protected>false</protected>
+		<shortDescription>ProductManager_noPriceBookError</shortDescription>
+		<value>The Product has not been added to the Order\'s Pricebook. This usually means a standard price has not been set for the Product. Please, add a standard price to the product/discount.</value>
+	</labels>
+	<labels>
 		<fullName>lineItemManager_addItemBtn</fullName>
 		<language>en_US</language>
 		<protected>false</protected>
