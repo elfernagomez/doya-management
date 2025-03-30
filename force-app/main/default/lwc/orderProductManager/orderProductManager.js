@@ -1,5 +1,6 @@
 import InputBase from 'c/inputBase';
 import { api, track, wire } from "lwc";
+import { notifyRecordUpdateAvailable } from 'lightning/uiRecordApi';
 import {
 	getRecord,
 	getFieldValue,
@@ -529,6 +530,9 @@ export default class OrderProductManager extends InputBase {
 			// the discount number
 			if (product.isProduct)
 				this.getDiscounts();
+
+			// tofiy the view the order totals have changed
+			notifyRecordUpdateAvailable([{ recordId: this.recordId }]);
 		})
 		.catch(error =>
 			this.addErrorToProduct(
@@ -570,6 +574,9 @@ export default class OrderProductManager extends InputBase {
 				// the discount number
 				if (product.isProduct)
 					this.getDiscounts();
+
+				// tofiy the view the order totals have changed
+				notifyRecordUpdateAvailable([{ recordId: this.recordId }]);
 			})
 			.catch(error =>
 				this.addErrorToProduct(
