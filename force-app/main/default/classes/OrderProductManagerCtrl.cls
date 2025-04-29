@@ -53,6 +53,8 @@ public with sharing class OrderProductManagerCtrl {
 					Product2Id,
 					Product2.Name,
 					Product2.ProductCode,
+					Product2.Material__c,
+					Product2.Material__r.Name,
 					Product2.RecordTypeId,
 					Product2.RecordType.DeveloperName
 				FROM OrderItem
@@ -127,6 +129,8 @@ public with sharing class OrderProductManagerCtrl {
 					Product2Id,
 					Product2.Name,
 					Product2.ProductCode,
+					Product2.Material__c,
+					Product2.Material__r.Name,
 					Product2.RecordTypeId,
 					Product2.RecordType.DeveloperName
 				FROM OrderItem

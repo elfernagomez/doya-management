@@ -14,6 +14,8 @@ import NOTES_FIELD_LABEL
 	from "@salesforce/label/c.lineItemManager_notesFieldLabel";
 import ORDER_ITEM_BTN
 	from "@salesforce/label/c.lineItemManager_orderItemBtn";
+import MARK_AS_COMPLETED_BTN
+	from "@salesforce/label/c.lineItemManager_markAsCompletedBtn";
 
 import FIELD_MULTI_SELECTOR_DEFAULT_TITLE
 	from "@salesforce/label/c.fieldMultiSelector_defaultTitle";
@@ -31,7 +33,8 @@ export const lineItemManagerLabels = {
 	showItemsNotesBtn: SHOW_ITEMS_NOTES_BTN,
 	hideItemsNotesBtn: HIDE_ITEMS_NOTES_BTN,
 	notesFieldLabel: NOTES_FIELD_LABEL,
-	orderItemBtn: ORDER_ITEM_BTN
+	orderItemBtn: ORDER_ITEM_BTN,
+	markAsCompletedBtn: MARK_AS_COMPLETED_BTN
 };
 
 export const fieldMultiSelectorLabels = {

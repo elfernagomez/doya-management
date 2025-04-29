@@ -2,17 +2,25 @@
 	border-radius: var(--lwc-borderRadiusMedium);
 }
 
+.procedure-panel.details {
+	width: 14rem;
+}
+
 .procedure-panel header {
 	background-color: var(--lwc-brandDisabled);
 	border-radius: var(--lwc-borderRadiusMedium);
 }
 
-.procedure-panel header.complete {
+.procedure-panel .complete {
 	background-color: var(--lwc-brandPrimary);
 }
 
-.procedure-panel header.inProgress {
+.procedure-panel .inProgress {
 	background-color: var(--lwc-brandAccessibleActive);
+}
+
+.procedure-panel .isSelected {
+	outline: .20rem var(--slds-g-color-brand-base-10) solid;
 }
 
 .procedure-panel header .procedureField {
@@ -26,12 +34,8 @@
 	--lwc-colorTextLabel: transparent;
 }
 
-.procedure-panel {
-	max-width: 14rem;
-}
-
 .procedure-panel:after {
-	z-index: inherit !important;	
+	z-index: inherit !important;
 }
 
 .delete-panel {
@@ -41,19 +45,8 @@
 	min-width: 0;
 }
 
-.delete-panel lightning-button {
-	/* --lwc-lineHeightButton: 1.25rem; */
-}
-
 .status-panel {
 	width: 11rem;
-}
-
-.status-panel .status-panel-item {
-	/* top: 0;
-	right: 0;
-	bottom: 0;
-	left: 0; */
 }
 
 .status-panel .status-panel-item lightning-button {

@@ -63,6 +63,8 @@ public with sharing class DeliveryGroupManager {
 						Product2.Name,
 						Product2.ProductCode,
 						Product2.Finish__c,
+						Product2.Material__c,
+						Product2.Material__r.Name,
 						Product2.RecordTypeId,
 						Product2.RecordType.DeveloperName
 					FROM OrderProducts__r

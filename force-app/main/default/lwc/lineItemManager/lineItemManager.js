@@ -6,6 +6,9 @@ import { getRecords } from 'lightning/uiRecordApi';
 import { getProcedureFromRecord, getFieldNames } from "c/procedureConfiguration";
 import { createNewItem, applyProcedureOption } from "c/lineItemManagerStep";
 
+import detailsView from "./details.html";
+import compactView from "./compact.html";
+
 /**
  * @author Fernando Gomez
  * @since 3/28/2023
@@ -26,6 +29,23 @@ export default class LineItemManager extends LwcBase {
 	@api
 	title = 'Items';
 
+	@api
+	statusOptions = [];
+	
+	@api
+	variant = "details"; // details, compact
+
+	render() {
+		switch (this.variant) {
+			case "compact":
+				return compactView;
+			case "details":
+				return detailsView;
+			default:
+				return compactView;
+		}
+	}
+
 	/**
 	 * Add the specified changes to the item in the internal list.
 	 * The item is found by uniqueId. Set skiEvent to false if
@@ -35,11 +55,20 @@ export default class LineItemManager extends LwcBase {
 	 * @param {*} skipEvent
 	 */
 	@api
-	updateItem(id, changes, skipEvent = true) {
-		let index = this.items.findIndex(i => i.uniqueId == id);
-		if (index != -1)
+	updateItem(
+		uniqueId,
+		changes,
+		skipEvent = true,
+		updateUniqueId = false,
+		newUniqueId
+	) {
+		let index = this.items.findIndex(i => i.uniqueId == uniqueId);
+		if (index != -1) {
+			if (updateUniqueId)
+				changes.uniqueId = newUniqueId;
 			// skip the event
 			this.editItem(index, changes, skipEvent);
+		}
 	}
 
 	@track

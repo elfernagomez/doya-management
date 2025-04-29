@@ -5,6 +5,11 @@ import { getProcedureFromRecord } from "c/procedureConfiguration";
 import { lineItemManagerLabels } from "c/constants";
 import { selectStaff } from 'c/staffSelector';
 
+import detailsView from "./details.html";
+import compactView from "./compact.html";
+import fieldsView from "./fields.html";
+import styles from "./styles.css";
+
 export function applyProcedureOption(item, procedureOptions) {
 	if (item.procedureId && procedureOptions)
 		setProcedure(item, procedureOptions.find(p => p.value == item.procedureId));
@@ -29,6 +34,15 @@ export function setProcedure(item, procedure) {
 				}))
 			} : null;
 	}
+}
+
+export function applyStatusFlags(item) {
+	item.isPending = item.status == null ||
+		item.status == "New" ||
+		item.status == "Pending";
+	item.isInProgress = item.status == "In Progress";
+	item.isOnHold = item.status == "On Hold";
+	item.isComplete = item.status == "Completed";
 }
 
 export function cleanProcedureDependencies(item) {
@@ -61,6 +75,7 @@ export function createNewItem(
 		isMachineRequired: false,
 		machineSkills: null,
 		// status flags
+		status: "New",
 		isPending: false,
 		isInProgress: false,
 		isOnHold: false,
@@ -85,7 +100,8 @@ export function createNewItem(
 
 	if (procedureId)
 		applyProcedureOption(item, procedureOptions);
-
+	
+	applyStatusFlags(item);
 	return item;
 }
 
@@ -108,6 +124,8 @@ export function removeErrorFromItem(item) {
 }
 
 export default class LineItemManagerStep extends NavigationMixin(LwcBase) {
+	static stylesheets = [styles];
+
 	@api
 	get item() {
 		return this._item;
@@ -127,7 +145,16 @@ export default class LineItemManagerStep extends NavigationMixin(LwcBase) {
 	}
 
 	@api
-	variant = "view";
+	get statusOptions() {
+		return this._statusOptions;
+	}
+
+	set statusOptions(value) {
+		this._statusOptions = this.deepClone(value);
+	}
+
+	@api
+	variant = "details"; // details, compact
 
 	@api
 	get mode() {
@@ -145,21 +172,16 @@ export default class LineItemManagerStep extends NavigationMixin(LwcBase) {
 	trackChanges = false;
 
 	@track
-	_procedureOptions = {};
+	_procedureOptions = [];
+
+	@track
+	_statusOptions = [];
 
 	@track
 	_item;
 
 	_mode = "prod";
 	labels = lineItemManagerLabels;
-
-	get isView() {
-		return this.variant == "view";
-	}
-
-	get isEdit() {
-		return this.variant == "edit";
-	}
 
 	get isAdmin() {
 		return this._mode == "admin";
@@ -169,37 +191,161 @@ export default class LineItemManagerStep extends NavigationMixin(LwcBase) {
 		return this._mode == "prod";
 	}
 
-	get machineField() {
+	get baseField() {
 		return {
 			"order": 1,
-			"fieldLabel": "Machine",
-			"fieldApiName": "Machine__c",
-			"fieldTitle": "Machine (Machine__c)",
-			"isRequired": true,
+			"isRequired": false,
 			"isLabelDisabled": false,
 			"isRequiredDisabled": false,
 			"isText": false,
 			"isFromOptions": false,
-			"isOptionRestricted": false
+			"isOptionRestricted": false,
+			"isEditionAllowed": false
+		};
+	}
+	
+	get procedureField() {
+		return {
+			...this.baseField,
+			"fieldLabel": "Procedure",
+			"fieldApiName": "Procedure__c",
+			"fieldTitle": "Procedure (Procedure__c)",
+			"isRequired": true
 		};
 	}
 
-	get procedureClass() {
-		let statusClass = "";
+	get machineField() {
+		return {
+			...this.baseField,
+			"fieldLabel": "Machine",
+			"fieldApiName": "Machine__c",
+			"fieldTitle": "Machine (Machine__c)",
+			"isRequired": true
+		};
+	}
+
+	get statusField() {
+		return {
+			...this.baseField,
+			"fieldLabel": "Status",
+			"fieldApiName": "Status",
+			"fieldTitle": "Status",
+			"isRequired": true
+		};
+	}
+
+	get compledtedOnField() {
+		return {
+			...this.baseField,
+			"fieldLabel": "Comepleted On",
+			"fieldApiName": "CompletedOn__c",
+			"fieldTitle": "Comepleted On (CompletedOn__c)"
+		};
+	}
+
+	get compledtedByField() {
+		return {
+			...this.baseField,
+			"fieldLabel": "Comepleted By",
+			"fieldApiName": "CompletedBy__c",
+			"fieldTitle": "Comepleted By (CompletedBy__c)"
+		};
+	}
+
+	get startedOnField() {
+		return {
+			...this.baseField,
+			"fieldLabel": "Started On",
+			"fieldApiName": "StartedOn__c",
+			"fieldTitle": "Started On (StartedOn__c)"
+		};
+	}
+
+	get startedByField() {
+		return {
+			...this.baseField,
+			"fieldLabel": "Started By",
+			"fieldApiName": "StartedBy__c",
+			"fieldTitle": "Started By (StartedBy__c)"
+		};
+	}
+
+	get adminNotesField() {
+		return {
+			...this.baseField,
+			"fieldLabel": "Admin Notes",
+			"fieldApiName": "AdminNotes__c",
+			"fieldTitle": "Admin Notes (AdminNotes__c)"
+		};
+	}
+
+	get productionNotesField() {
+		return {
+			...this.baseField,
+			"fieldLabel": "Production Notes",
+			"fieldApiName": "ProductionNotes__c",
+			"fieldTitle": "Production Notes (ProductionNotes__c)",
+			"isEditionAllowed": true
+		};
+	}
+
+	get detailsProcedureClass() {
+		let statusClasses = [
+			"slds-var-p-left_small",
+			"slds-var-p-right_x-large"
+		];
 
 		if (this._item.isInProgress)
-			statusClass = "inProgress";
+			statusClasses.push(
+				"inProgress", 
+				"slds-var-p-vertical_medium");
 		else if (this._item.isComplete)
-			statusClass = "complete ";
+			statusClasses.push(
+				"complete",
+				"slds-var-p-vertical_small");
+		else
+			statusClasses.push("slds-var-p-vertical_medium");
 
-		return [
-			// "slds-media",
-			// "slds-media_center",
-			"slds-var-p-left_small",
-			"slds-var-p-right_x-large",
-			"slds-var-p-vertical_small",
-			statusClass
-		].join(" ");
+		return statusClasses.join(" ");
+	}
+
+	get compactProcedureClass() {
+		let statusClasses = [
+			"slds-button",
+			"slds-grid_align-center"
+		];
+
+		if (this._item.isInProgress)
+			statusClasses.push(
+				"inProgress",
+				"slds-text-color_inverse",
+				"slds-button_brand");
+		else if (this._item.isComplete)
+			statusClasses.push(
+				"complete",
+				"slds-text-color_inverse");
+		else
+			statusClasses.push(
+				"pending",
+				"slds-theme_shade");
+
+		if (this._item.isSelected)
+			statusClasses.push("isSelected");
+
+		return statusClasses.join(" ");
+	}
+
+	render() {
+		switch (this.variant) {
+			case "compact":
+				return compactView;
+			case "details":
+				return detailsView;
+			case "fields":
+				return fieldsView;
+			default:
+				return compactView;
+		}
 	}
 
 	handleEditProcedureClick() {
@@ -211,8 +357,12 @@ export default class LineItemManagerStep extends NavigationMixin(LwcBase) {
 	 * @param {*} event 
 	 */
 	handleProcedureFieldChange(event) {
-		cleanProcedureDependencies(this._item)
+		cleanProcedureDependencies(this._item);
 		this.processFieldChange(event.target.value, "procedureId", "string");
+	}
+
+	handleStatusFieldChange(event) {
+		this.processFieldChange(event.target.value, "status", "string");
 	}
 
 	/**
@@ -273,6 +423,16 @@ export default class LineItemManagerStep extends NavigationMixin(LwcBase) {
 		selectStaff();
 	}
 
+	handleOnItemClick() {
+		this.customEvent(
+			"itemselected",
+			this.getDetails(),
+			{
+				bubbles: true,
+				composed: true
+			});
+	}
+
 	/**
 	 * Process changes on inputs
 	 * @param {*} val
@@ -288,6 +448,10 @@ export default class LineItemManagerStep extends NavigationMixin(LwcBase) {
 			case "procedureId":
 				this.editItem(changes, true);
 				this.applyProcedure();
+				break;
+			case "status":
+				this.editItem(changes, true);
+				this.applyStatus();
 				break;
 			default:
 				this.editItem(changes);
@@ -305,6 +469,11 @@ export default class LineItemManagerStep extends NavigationMixin(LwcBase) {
 
 	applyProcedure() {
 		applyProcedureOption(this._item, this._procedureOptions);
+		this.customEvent("itemchange", this.getDetails());
+	}
+
+	applyStatus() {
+		applyStatusFlags(this._item);
 		this.customEvent("itemchange", this.getDetails());
 	}
 

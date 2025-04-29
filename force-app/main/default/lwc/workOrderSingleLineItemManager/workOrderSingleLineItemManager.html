@@ -1,0 +1,18 @@
+<template>
+<lightning-radio-group lwc:if={showModeOptions}
+	alternative-text="Mode"
+	options={modeOptions}
+	value={mode}
+	type="button"
+	variant="label-hidden"
+	onchange={handleModeChange}
+	class="slds-var-m-bottom_large"></lightning-radio-group>
+<c-line-item-manager-step lwc:if={item}
+	item={item}
+	preview-procedure-options={procedureOptions}
+	mode={mode}
+	variant={variant}
+	data-index={index}
+	procedure-options={procedureOptions}
+	status-options={statusOptions}></c-line-item-manager-step>
+</template>

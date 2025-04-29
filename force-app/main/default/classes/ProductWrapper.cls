@@ -41,6 +41,12 @@ public class ProductWrapper {
 	public Decimal discountAmount { get; set; }
 	
 	@AuraEnabled
+	public String materialId { get; set; }
+	
+	@AuraEnabled
+	public String materialName { get; set; }
+	
+	@AuraEnabled
 	public String productTypeId { get; set; }
 	
 	@AuraEnabled
@@ -68,6 +74,8 @@ public class ProductWrapper {
 		unitPrice = pbe.UnitPrice;
 		discountType = product.DiscountType__c;
 		discountAmount = product.DiscountAmount__c;
+		materialId = product.Material__c;
+		materialName = product.Material__r.Name;
 		productTypeId = product.RecordTypeId;
 		productTypeName = product.RecordType.DeveloperName;
 		isProduct = product.RecordType.DeveloperName == PRODUCT_RT_NAME;

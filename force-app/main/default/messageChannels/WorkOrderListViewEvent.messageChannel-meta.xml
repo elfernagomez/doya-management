@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningMessageChannel xmlns="http://soap.sforce.com/2006/04/metadata">
+    <isExposed>true</isExposed>
+    <lightningMessageFields>
+        <description>Id of the event thrown</description>
+        <fieldName>eventId</fieldName>
+    </lightningMessageFields>
+    <lightningMessageFields>
+        <description>Event Payload</description>
+        <fieldName>payload</fieldName>
+    </lightningMessageFields>
+    <masterLabel>WorkOrderListViewEvent</masterLabel>
+</LightningMessageChannel>

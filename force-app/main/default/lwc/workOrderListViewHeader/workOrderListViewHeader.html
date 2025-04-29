@@ -1,0 +1,17 @@
+<template>
+<c-page-header icon-name={iconName}
+	title={title}
+	subtitle={subtitle}
+	list-views={listViews}
+	selected-list-view={selectedListView}
+	actions={actions}
+	is-for-list-view=true
+	is-filter-list-open={isFilterListOpen}
+	onactionselect={handleOnActionSelect}
+	onlistviewbuttonclick={handleOnLisViewButtonClick}
+	onsearchtextchange={handleOnSearchTextChange}></c-page-header>
+<div class="slds-hide">
+	<c-time-difference date-time-value={lastUpdated}
+		ontimeagoupdate={handleOnTimeAgoUpdate}></c-time-difference>
+</div>
+</template>

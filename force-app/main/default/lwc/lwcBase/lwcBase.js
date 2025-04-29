@@ -146,11 +146,13 @@ export default class LwcBase extends LightningElement {
 	 * attributes of the component.
 	 * @param {*} evenName 
 	 * @param {*} eventDetail 
+	 * @param {*} eventOptions 
 	 */
 	@api
-	customEvent(evenName, eventDetail) {
+	customEvent(evenName, eventDetail, eventOptions = {}) {
 		this.dispatchEvent(new CustomEvent(evenName, {
-			detail: eventDetail
+			detail: eventDetail,
+			...eventOptions
 		}));
 	}
 	
@@ -268,6 +270,17 @@ export default class LwcBase extends LightningElement {
 			...Object.values(error?.body?.output?.fieldErrors || {})
 				.map(es => es.map(e => e.message))
 		].filter(e => e);
+	}
+
+	/**
+	 * It merges both object, bringing all the properties in
+	 * `srcObject` to `destObject`
+	 * @param {*} destObject 
+	 * @param {*} srcObject 
+	 * @param {*} keepReference 
+	 */
+	mergeObjects(destObject, srcObject) {
+		Object.keys(srcObject).forEach(k => destObject[k] = srcObject[k]);
 	}
 
 	// NOTE: Private Helper only from thin line on.

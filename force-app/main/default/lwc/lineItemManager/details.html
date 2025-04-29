@@ -47,24 +47,35 @@
 			<c-line-item-manager-step item={item}
 				preview-procedure-options={procedureOptions}
 				mode={mode}
+				variant={variant}
 				data-index={index}
 				procedure-options={procedureOptions}
+				status-options={statusOptions}
 				onitemchange={handleItemChange}
 				onitemdelete={handleItemDelete}></c-line-item-manager-step>
+		</lightning-layout-item>
+		<lightning-layout-item lwc:if={isAdmin}
+			class="slds-var-m-left_x-small
+				slds-var-m-bottom_x-small
+				slds-is-relative">
+			<lightning-button label={labels.addItemBtn}
+				icon-name="utility:add"
+				stretch="true"
+				onclick={handleAddItemClick}></lightning-button>
 		</lightning-layout-item>
 	</lightning-layout>
 	<template lwc:else>
 		<c-illustration variant="no-task"
 			image-size=""
 			message={labels.noItemsMsg}></c-illustration>
+		<div lwc:if={isAdmin}
+			class="slds-text-align_center">
+			<lightning-button label={labels.addItemBtn}
+				icon-name="utility:add"
+				variant="brand"
+				onclick={handleAddItemClick}></lightning-button>
+		</div>
 	</template>
-	<div lwc:if={isAdmin}
-		class="slds-var-m-top_medium">
-		<lightning-button label={labels.addItemBtn}
-			icon-name="utility:add"
-			stretch="true"
-			onclick={handleAddItemClick}></lightning-button>
-	</div>
 </div>
 </lightning-card>
 </template>

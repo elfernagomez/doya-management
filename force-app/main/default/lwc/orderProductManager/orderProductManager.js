@@ -1,5 +1,6 @@
 import InputBase from 'c/inputBase';
 import { api, track, wire } from "lwc";
+import { NavigationMixin } from "lightning/navigation";
 import { notifyRecordUpdateAvailable } from 'lightning/uiRecordApi';
 import {
 	getRecord,
@@ -19,6 +20,7 @@ import {
 	createGroupFromApexRecord,
 	DEFAULT_GROUP_NAME
 } from "c/deliveryGroupCard";
+import LightningConfirm from 'lightning/confirm';
 
 import getDeliveryGroups
 	from "@salesforce/apex/OrderProductManagerCtrl.getDeliveryGroups";
@@ -35,6 +37,8 @@ import ACCOUNT_NAME_FIELD from "@salesforce/schema/Order.Account.Name";
 
 import GROUP_OBJECT
 	from "@salesforce/schema/DeliveryGroup__c";
+import WORK_ORDER_OBJECT
+	from "@salesforce/schema/WorkOrder";
 
 import ITEM_OBJECT
 	from "@salesforce/schema/OrderItem";
@@ -49,6 +53,10 @@ import ITEM_PRODUCT_NAME_FIELD
 	from "@salesforce/schema/OrderItem.Product2.Name";
 import ITEM_PRODUCT_CODE_FIELD
 	from "@salesforce/schema/OrderItem.Product2.ProductCode";
+import ITEM_PRODUCT_MATERIAL_ID_FIELD
+	from "@salesforce/schema/OrderItem.Product2.Material__c";
+import ITEM_PRODUCT_MATERIAL_NAME_FIELD
+	from "@salesforce/schema/OrderItem.Product2.Material__r.Name";
 import ITEM_PRODUCT_RECORD_TYPE_ID_FIELD
 	from "@salesforce/schema/OrderItem.Product2.RecordTypeId";
 import ITEM_PRODUCT_RECORD_TYPE_NAME_FIELD
@@ -80,6 +88,17 @@ import ITEM_CREATED_DATE_FIELD
 /* import ITEM_FINISH_FIELD
 	from "@salesforce/schema/OrderItem.Finish__c"; */
 
+import WO_ACCOUNT_ID_FIELD from "@salesforce/schema/WorkOrder.AccountId";
+import WO_DUE_DATE_FIELD from "@salesforce/schema/WorkOrder.DueDate__c";
+import WO_WIDTH_FIELD from "@salesforce/schema/WorkOrder.Width__c";
+import WO_HEIGHT_FIELD from "@salesforce/schema/WorkOrder.Height__c";
+import WO_DEPTH_FIELD from "@salesforce/schema/WorkOrder.Depth__c";
+import WO_MATERIAL_ID_FIELD from "@salesforce/schema/WorkOrder.Material__c";
+import WO_ORDER_ID_FIELD from "@salesforce/schema/WorkOrder.Order__c";
+import WO_ORDER_PRODUCT_ID_FIELD from "@salesforce/schema/WorkOrder.OrderProduct__c";
+import WO_QUANTITY_FIELD from "@salesforce/schema/WorkOrder.Quantity__c";
+import WO_TITLE_FIELD from "@salesforce/schema/WorkOrder.Title__c";
+
 export function getFieldApiNames() {
 	return [
 		`${ITEM_OBJECT.objectApiName}.${ITEM_ID_FIELD.fieldApiName}`,
@@ -87,6 +106,8 @@ export function getFieldApiNames() {
 		`${ITEM_OBJECT.objectApiName}.${ITEM_PRODUCT_ID_FIELD.fieldApiName}`,
 		`${ITEM_OBJECT.objectApiName}.${ITEM_PRODUCT_NAME_FIELD.fieldApiName}`,
 		`${ITEM_OBJECT.objectApiName}.${ITEM_PRODUCT_CODE_FIELD.fieldApiName}`,
+		`${ITEM_OBJECT.objectApiName}.${ITEM_PRODUCT_MATERIAL_ID_FIELD.fieldApiName}`,
+		`${ITEM_OBJECT.objectApiName}.${ITEM_PRODUCT_MATERIAL_NAME_FIELD.fieldApiName}`,
 		`${ITEM_OBJECT.objectApiName}.${ITEM_PRODUCT_RECORD_TYPE_ID_FIELD.fieldApiName}`,
 		`${ITEM_OBJECT.objectApiName}.${ITEM_PRODUCT_RECORD_TYPE_NAME_FIELD.fieldApiName}`,
 		// `${ITEM_OBJECT.objectApiName}.${ITEM_FINISH_FIELD.fieldApiName}`,
@@ -112,6 +133,8 @@ export function convertFromRecord(r) {
 		productId: getFieldValue(r, ITEM_PRODUCT_ID_FIELD),
 		productName: getFieldValue(r, ITEM_PRODUCT_NAME_FIELD),
 		productCode: getFieldValue(r, ITEM_PRODUCT_CODE_FIELD),
+		materialId: getFieldValue(r, ITEM_PRODUCT_MATERIAL_ID_FIELD),
+		materialName: getFieldValue(r, ITEM_PRODUCT_MATERIAL_NAME_FIELD),
 		productTypeId: getFieldValue(r, ITEM_PRODUCT_RECORD_TYPE_ID_FIELD),
 		productTypeName: getFieldValue(r, ITEM_PRODUCT_RECORD_TYPE_NAME_FIELD),
 		// finish: getFieldValue(r, ITEM_FINISH_FIELD),
@@ -142,6 +165,8 @@ export function convertFromApexRecord(r) {
 		productId: r.Product2Id,
 		productName: r.Product2.Name,
 		productCode: r.Product2.ProductCode,
+		materialId: r.Product2.Material__c,
+		materialName: r.Product2.Material__r?.Name,
 		productTypeId: r.Product2.RecordTypeId,
 		productTypeName: r.Product2.RecordType?.DeveloperName,
 		unitType: r.UnitType__c,
@@ -168,7 +193,7 @@ export function convertFromApexRecord(r) {
  * @since 10/30.2022
  * @versino 1.0
  */
-export default class OrderProductManager extends InputBase {
+export default class OrderProductManager extends NavigationMixin(InputBase) {
 	@api
 	recordId;
 
@@ -222,6 +247,10 @@ export default class OrderProductManager extends InputBase {
 	}
 
 	get dueDate() {
+		return getFieldValue(this.order.data, DUE_DATE_FIELD);
+	}
+
+	get accountId() {
 		return getFieldValue(this.order.data, DUE_DATE_FIELD);
 	}
 
@@ -334,6 +363,22 @@ export default class OrderProductManager extends InputBase {
 
 	handleOnGroupDelete(event) {
 		this.deleteGroup(event.detail.recordId);
+	}
+
+	handleOnCreateWorkOrder(event) {
+		LightningConfirm.open({
+			label: `Confirm New Work Order`,
+			message: [
+				"A new Wok Order will be created for this product:",
+				`${event.detail.productName}.\nAre you sure you wish to proceed?`
+			].join("\n"),
+			variant: "header",
+			theme: "warning"
+		})
+		.then(result => {
+			if (result)
+				this.createNewWorkOrder(event.detail);
+		});
 	}
 
 	getDeliveryGroupsAndProducts() {
@@ -602,6 +647,27 @@ export default class OrderProductManager extends InputBase {
 					})));
 	}
 
+	createNewWorkOrder(product) {
+		createRecord({
+			apiName: WORK_ORDER_OBJECT.objectApiName,
+			fields: this.createWorkOrderRecord(product)
+		})
+		.then(result => {
+			this[NavigationMixin.Navigate]({
+				type: "standard__recordPage",
+				attributes: {
+					recordId: result.id,
+					actionName: "view"
+				},
+			});
+		})
+		.catch(error =>
+			this.toast("Error",
+				`Work Order was not created. There was a problem. ${error.body?.message}`,
+				"error",
+				"sticky"));
+	}
+
 	convertToRecord(product) {
 		let record = {};
 
@@ -637,7 +703,21 @@ export default class OrderProductManager extends InputBase {
 			}
 		}
 
-		console.log(JSON.stringify(record));
+		return record;
+	}
+
+	createWorkOrderRecord(product) {
+		let record = {};
+		record[WO_ACCOUNT_ID_FIELD.fieldApiName] = this.accountId;
+		record[WO_DUE_DATE_FIELD.fieldApiName] = this.dueDate;
+		record[WO_WIDTH_FIELD.fieldApiName] = product.width;
+		record[WO_HEIGHT_FIELD.fieldApiName] = product.height;
+		record[WO_DEPTH_FIELD.fieldApiName] = product.depth;
+		record[WO_MATERIAL_ID_FIELD.fieldApiName] = product.materialId;
+		record[WO_ORDER_ID_FIELD.fieldApiName] = this.recordId;
+		record[WO_ORDER_PRODUCT_ID_FIELD.fieldApiName] = product.uniqueId;
+		record[WO_QUANTITY_FIELD.fieldApiName] = product.qty;
+		record[WO_TITLE_FIELD.fieldApiName] = `${product.productName}`;
 		return record;
 	}
 

@@ -1,0 +1,7 @@
+.neutral-65 {
+	background-color: var(--slds-g-color-surface-2);
+}
+
+.full-height {
+	min-height: 100%;
+}

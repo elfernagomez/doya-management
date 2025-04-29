@@ -1,0 +1,29 @@
+<template>
+<div lwc:if={show}
+	class="slds-panel
+		slds-size_medium
+		slds-panel_docked
+		slds-panel_docked-right
+		slds-is-open
+		slds-is-absolute"
+	style="top:0;right:0;">
+	<div class="slds-panel__header">
+		<h2 class="slds-panel__header-title
+				slds-text-heading_small
+				slds-truncate"
+			title="Filters">Filters</h2>
+		<div class="slds-panel__header-actions">
+			<lightning-button-icon icon-name="utility:close"
+				title="Collapse Panel Header"
+				onclick={handleOnClosePanelClick}
+				class="slds-button
+					slds-button_icon
+					slds-button_icon-small
+					slds-panel__close"></lightning-button-icon>
+		</div>
+	</div>
+	<div class="slds-panel__body">
+		A panel body accepts any layout or component
+	</div>
+</div>
+</template>

@@ -1,0 +1,159 @@
+<template>
+<div lwc:if={isAdmin}
+	class="slds-is-relative admin">
+	<lightning-layout lwc:if={_item.procedureId}
+		multiple-rows="true">
+		<lightning-layout-item
+			class="slds-var-m-bottom_small
+				slds-var-m-right_xx-large">
+			<lightning-record-picker 
+				lwc:if={_item.isMachineNeeded}
+				label="Machine"
+				object-api-name="Asset"
+				placeholder="Search Machines..."
+				filter={_item.machineFilter}
+				value={_item.machineId}
+				data-field="machineId"
+				onchange={handleLookupFieldChange}
+				required
+				class="validate"></lightning-record-picker>
+		</lightning-layout-item>
+		<lightning-layout-item for:each={_item.productionFields}
+			for:item="field"
+			for:index="index"
+			key={field.order}
+			class="slds-var-m-bottom_small
+				slds-var-m-right_xx-large">
+			<c-production-field field={field}
+				record={_item.record}
+				mode="edit"
+				onchange={handleRecordFieldChange}></c-production-field>
+		</lightning-layout-item>
+		<lightning-layout-item
+			class="slds-var-m-bottom_small
+				slds-var-m-right_xx-large">
+			<c-production-field field={adminNotesField}
+				record={_item.record}
+				mode="edit"
+				onchange={handleRecordFieldChange}></c-production-field>
+		</lightning-layout-item>
+		<lightning-layout-item
+			class="slds-var-m-bottom_small
+				slds-var-m-right_xx-large">
+			<c-production-field field={productionNotesField}
+				record={_item.record}
+				mode="edit"
+				onchange={handleRecordFieldChange}></c-production-field>
+		</lightning-layout-item>
+	</lightning-layout>
+</div>
+<div lwc:if={isProd}
+	class="slds-is-relative admin">
+	<lightning-layout multiple-rows="true">
+		<lightning-layout-item 
+			class="slds-var-m-bottom_small
+				slds-var-m-right_xx-large">
+			<c-production-field field={procedureField}
+				record={_item.record}
+				mode="view"
+				></c-production-field>
+		</lightning-layout-item>
+		<lightning-layout-item lwc:if={_item.isMachineNeeded}
+			class="slds-var-m-bottom_small
+				slds-var-m-right_xx-large">
+			<c-production-field lwc:if={_item.isComplete}
+				field={machineField}
+				record={_item.record}
+				mode="view"
+				></c-production-field>
+			<lightning-record-picker lwc:else
+				label="Machine"
+				object-api-name="Asset"
+				placeholder="Search Machines..."
+				filter={_item.machineFilter}
+				value={_item.machineId}
+				data-field="machineId"
+				onchange={handleLookupFieldChange}
+				required
+				class="validate"></lightning-record-picker>
+		</lightning-layout-item>
+		<lightning-layout-item for:each={_item.productionFields}
+			for:item="field"
+			for:index="index"
+			key={field.order}
+			class="slds-var-m-bottom_small
+				slds-var-m-right_xx-large">
+			<c-production-field field={field}
+				record={_item.record}
+				mode="view"></c-production-field>
+		</lightning-layout-item>
+		<template lwc:if={_item.isInProgress}>
+			<lightning-layout-item
+				class="slds-var-m-bottom_small
+					slds-var-m-right_xx-large">
+				<c-production-field field={startedOnField}
+					record={_item.record}
+					mode="view"></c-production-field>
+			</lightning-layout-item>
+			<lightning-layout-item
+				class="slds-var-m-bottom_small
+					slds-var-m-right_xx-large">
+				<c-production-field field={startedByField}
+					record={_item.record}
+					mode="view"></c-production-field>
+			</lightning-layout-item>
+			<lightning-layout-item
+				class="slds-var-m-bottom_small
+					slds-var-m-right_xx-large">
+				<c-production-field field={productionNotesField}
+					record={_item.record}
+					mode="view"
+					is-edit-allowed-override=true></c-production-field>
+			</lightning-layout-item>
+			<lightning-layout-item lwc:if={_item.adminNotes}
+				class="slds-var-m-bottom_small
+					slds-var-m-right_xx-large">>
+				<c-production-field field={adminNotesField}
+					record={_item.record}
+					mode="view"></c-production-field>
+			</lightning-layout-item>
+		</template>
+		<template lwc:if={_item.isComplete}>
+			<lightning-layout-item
+				class="slds-var-m-bottom_small
+					slds-var-m-right_xx-large">
+				<c-production-field field={compledtedOnField}
+					record={_item.record}
+					mode="view"></c-production-field>
+			</lightning-layout-item>
+			<lightning-layout-item
+				class="slds-var-m-bottom_small
+					slds-var-m-right_xx-large">
+				<c-production-field field={compledtedByField}
+					record={_item.record}
+					mode="view"></c-production-field>
+			</lightning-layout-item>
+			<lightning-layout-item lwc:if={_item.adminNotes}
+				class="slds-var-m-bottom_small
+					slds-var-m-right_xx-large">
+				<c-production-field field={adminNotesField}
+					record={_item.record}
+					mode="view"></c-production-field>
+			</lightning-layout-item>
+			<lightning-layout-item
+				class="slds-var-m-bottom_small
+					slds-var-m-right_xx-large">
+				<c-production-field field={productionNotesField}
+					record={_item.record}
+					mode="view"></c-production-field>
+			</lightning-layout-item>
+		</template>
+	</lightning-layout>
+</div>
+<div lwc:if={_item.hasError}
+	class="slds-var-p-horizontal_small slds-var-p-vertical_xx-small">
+	<c-error-panel error-title={_item.errorMessage}
+		error-object={_item.errorObject}
+		variant="compact"></c-error-panel>
+</div>
+</template>

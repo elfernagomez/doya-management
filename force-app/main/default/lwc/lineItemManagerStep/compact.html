@@ -1,0 +1,28 @@
+<template>
+<div class="procedure-panel">
+<div class="slds-is-relative prod">
+	<button lwc:if={_item.isComplete}
+		class={compactProcedureClass}
+		type="button"
+		onclick={handleOnItemClick}
+		style="min-width:6rem;">
+		&nbsp;
+		<lightning-icon icon-name="utility:check"
+			size="x-small"
+			variant="inverse"></lightning-icon>
+		&nbsp;
+	</button>
+	<button lwc:else
+		class={compactProcedureClass}
+		type="button"
+		onclick={handleOnItemClick}	
+		style="min-width:6rem;">{_item.procedureName}</button>
+</div>
+</div>
+<div lwc:if={_item.hasError}
+	class="slds-var-p-horizontal_small slds-var-p-vertical_xx-small">
+	<c-error-panel error-title={_item.errorMessage}
+		error-object={_item.errorObject}
+		variant="compact"></c-error-panel>
+</div>
+</template>

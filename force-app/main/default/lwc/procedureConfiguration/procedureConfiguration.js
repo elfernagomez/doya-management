@@ -113,7 +113,7 @@ export default class ProcedureConfiguration extends LwcBase {
 		]
 	})
 	wiredCurrentRecord({ error, data }) {
-		if (data) {
+		if (data && createNewItem && getProcedureFromRecord) {
 			let proc = getProcedureFromRecord(data);
 			this.procedureName = proc.label;
 			this.colorCode = proc.colorCode;

@@ -1,0 +1,192 @@
+<template>
+<!-- heads -->
+<div class="slds-table
+		slds-table_cell-buffer
+		slds-is-relative">
+	<lightning-layout vertical-align="stretch"
+		class="slds-theme_shade slds-border_bottom">
+		<lightning-layout-item size="8">
+			<lightning-layout vertical-align="stretch">
+				<lightning-layout-item scope="col"
+					style={rowNumberColumnStyle}
+					class="slds-is-resizable
+						slds-is-sortable
+						slds-cell_action-mode">&nbsp;</lightning-layout-item>
+				<lightning-layout-item scope="col"
+					flexibility="no-flex"
+					style="width:32px;">
+					<div class="slds-th__action">
+						<div class="slds-checkbox">
+							<lightning-input type="checkbox"
+								variant="label-hidden"
+								checked={isAllSelected}
+								onchange={handleOnSelectAllChange}></lightning-input>
+						</div>
+					</div>
+				</lightning-layout-item>
+				<lightning-layout-item scope="col"
+					for:each={columns}
+					for:item="col"
+					for:index="i"
+					key={col.fieldName}
+					title={col.label}
+					style={col.style}
+					class={col.styleClass}>
+					<a role="button"
+						href="#"
+						data-field-name={col.fieldName}
+						onclick={handleOnColmunClick}
+						class="slds-th__action
+							slds-text-link_reset">
+						<span class="slds-assistive-text">Sort by: </span>
+						<div class="slds-grid
+								slds-grid_vertical-align-center
+								slds-has-flexi-truncate">
+							<b class="slds-truncate"
+								title={col.label}>{col.label}</b>
+							<lightning-icon lwc:if={col.isSortDesc}
+								icon-name="utility:arrowdown"
+								size="xx-small"
+								class="slds-is-sortable__icon"></lightning-icon>
+							<lightning-icon lwc:else
+								icon-name="utility:arrowup"
+								size="xx-small"
+								class="slds-is-sortable__icon"></lightning-icon>
+						</div>
+					</a>
+				</lightning-layout-item>
+			</lightning-layout>
+		</lightning-layout-item>
+		<lightning-layout-item size="4">
+			<lightning-layout vertical-align="stretch">
+				<lightning-layout-item scope="col"
+					class="slds-is-resizable
+						slds-is-sortable
+						slds-cell_action-mode">&nbsp;</lightning-layout-item>
+			</lightning-layout>
+		</lightning-layout-item>
+	</lightning-layout>
+	<template for:each={data}
+		for:item="row"
+		for:index="i">
+	<lightning-layout vertical-align="stretch"
+		key={row.uniqueId}
+		class="neutral-65
+			slds-border_bottom">
+		<lightning-layout-item size="8">
+			<lightning-layout vertical-align="center"
+				class="full-height">
+				<lightning-layout-item role="gridcell"
+					style={rowNumberColumnStyle}
+					class="slds-cell_action-mode neutral-65">
+					<div class="slds-var-p-vertical_xx-small
+							slds-var-p-horizontal_small
+							slds-text-align_center">{row.rowNumber}</div>
+				</lightning-layout-item>
+				<lightning-layout-item role="gridcell"
+					flexibility="no-flex"
+					style="width:32px;"
+					class="slds-text-align_right
+						slds-cell_action-mode">
+					<div class="slds-var-p-vertical_xx-small
+							slds-var-p-horizontal_small">
+						<div class="slds-checkbox">
+							<lightning-input type="checkbox"
+								variant="label-hidden"
+								value={row.isSelected}
+								checked={row.isSelected}
+								data-index={i}
+								onchange={handleOnSelectRowChange}></lightning-input>
+						</div>
+					</div>
+				</lightning-layout-item>
+				<lightning-layout-item role="gridcell"
+					for:each={row.columns}
+					for:item="col"
+					for:index="j"
+					key={col.key}
+					title={col.column.label}
+					style={col.column.style}
+					class="slds-cell_action-mode neutral-65">
+					<div class="slds-var-p-vertical_xx-small
+							slds-var-p-horizontal_small">
+						<c-output-field record={col.data}
+							field-name={col.column.fieldName}
+							field-type={col.column.fieldType}
+							maximum-fraction-digits={col.column.maxFrac}
+							minimum-fraction-digits={col.column.minFrac}
+							minimum-integer-digits={col.column.minInt}
+							type={col.column.type}></c-output-field>
+					</div>
+				</lightning-layout-item>
+			</lightning-layout>
+		</lightning-layout-item>
+		<lightning-layout-item size="4"
+			class="slds-theme_default">
+			<div class="slds-media
+					slds-media_center
+					slds-var-p-around_medium
+					full-height">
+				<div class="slds-media__body">
+					<c-work-order-line-item-manager
+						variant="compact"
+						data-index={i}
+						record-id={row.uniqueId}
+						onitemselected={handleOnLineItemSelected}
+						selected-item-id={row.selectedItemId}
+						></c-work-order-line-item-manager>
+				</div>
+				<div class="slds-media__figure
+						slds-media__figure_reverse">
+					<lightning-button-icon lwc:if={row.isOpen}
+						size="medium"
+						icon-name="utility:chevronup"
+						alternative-text="Close Details"
+						title="Close Details"
+						variant="bare"
+						data-index={i}
+						onclick={handleOnCloseRowClick}></lightning-button-icon>
+					<lightning-button-icon lwc:else
+						size="medium"
+						icon-name="utility:chevrondown"
+						alternative-text="Open Details"
+						title="Open Details"
+						variant="bare"
+						data-index={i}
+						onclick={handleOnOpenRowClick}></lightning-button-icon>
+				</div>
+			</div>
+		</lightning-layout-item>
+	</lightning-layout>
+	<div lwc:if={row.isOpen}
+		key={row.uniqueId}
+		class="slds-border_bottom">
+		<div lwc:if={row.selectedItemId}
+			class="slds-var-p-around_large">
+			<c-work-order-single-line-item-manager
+				variant="fields"
+				data-index={i}
+				record-id={row.selectedItemId}
+				></c-work-order-single-line-item-manager>
+		</div>
+		<lightning-layout lwc:else
+			horizontal-align="center">
+			<lightning-layout-item padding="around-medium">
+				<div class="slds-media slds-media_center">
+					<div class="slds-media__figure">
+						<lightning-icon icon-name="utility:button_choice"
+							size="x-small"></lightning-icon>
+					</div>
+					<p class="slds-text-color_weak">
+						No selection. Select an item
+						to view its details here.
+					</p>
+				</div>
+			</lightning-layout-item>
+			
+		</lightning-layout>
+	</div>
+	</template>
+		<lightning-spinner lwc:if={isLoading}></lightning-spinner>
+</div>
+</template>

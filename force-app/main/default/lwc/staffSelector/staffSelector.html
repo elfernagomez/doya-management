@@ -1,29 +1,79 @@
 <template>
-	<lightning-modal-header label="Enter PIN"></lightning-modal-header>
-	<lightning-modal-body>
+<div class="slds-is-relative">
+	<div lwc:if={isLoggedIn}
+		class="slds-var-m-vertical_xx-large">
+		<div class="slds-text-align_center
+				slds-var-m-bottom_small">
+			<span class="slds-avatar
+				slds-avatar_circle
+				slds-avatar_large">
+				<img lwc:if={currentStaff.photoUrl}
+					src={currentStaff.photoUrl} />
+			</span>
+		</div>
+		<div class="slds-text-align_center
+				slds-text-heading_medium
+				slds-var-m-bottom_x-small">
+			{currentStaff.fullName}
+		</div>
+		<div class="slds-text-align_center
+				slds-var-m-bottom_xx-large">
+			{currentStaff.position}
+		</div>
+		<div class="slds-text-align_center
+				slds-var-m-bottom_xx-large">
+			<lightning-button label="Logout"
+				variant="border-filled"
+				onclick={handleOnLogoutClick}></lightning-button>
+		</div>
+	</div>
+	<div lwc:else
+		class="slds-var-m-vertical_xx-large">
 		<lightning-layout horizontal-align="center"
-			class="slds-gutters_xx-small slds-var-m-bottom_large">
+			class="slds-var-m-bottom_large">
 			<lightning-layout-item>
 				<lightning-record-picker
-					label="Staff Member"
-					variant="label-hidden"
-					placeholder="Search Staff..."
-					object-api-name="Staff__c"></lightning-record-picker>
+					label="Find Staff"
+					placeholder="Find Staff..."
+					object-api-name="Staff__c"
+					filter={productFilter}
+					onchange={handleOnSelectedStaffChange}></lightning-record-picker>
 			</lightning-layout-item>
 		</lightning-layout>
-		<lightning-layout horizontal-align="center"
-			class="slds-gutters_xx-small">
-			<lightning-layout-item for:each={numbers}
-				for:index="index"
-				for:item="n"
-				key={n.key}
-				class="slds-col number-container">
-				<lightning-input type="password"
-					max-length="1"
-					variant="label-hidden"
-					class="number-input"></lightning-input>
-			</lightning-layout-item>
-		</lightning-layout>
-		<hr />
-	</lightning-modal-body>
+		<template lwc:if={showInputs}>
+			<div class="slds-text-align_center
+					slds-text-heading_medium
+					slds-var-m-bottom_xx-large">
+				Enter PIN
+			</div>
+			<lightning-layout horizontal-align="center"
+				class="slds-gutters_xx-small">
+				<lightning-layout-item for:each={numbers}
+					for:index="index"
+					for:item="n"
+					key={n.key}
+					class="slds-col number-container">
+					<div class="slds-form-element">
+						<div class="slds-form-element__control">
+							<input type="password"
+								maxlength="1"
+								value={n.value}
+								data-index={index}
+								class="number-input slds-input"
+								onkeyup={handleOnKeyUp} />
+						</div>
+					</div>
+				</lightning-layout-item>
+			</lightning-layout>
+		</template>
+		<div lwc:if={showPinIncorrectMessage}
+			class="slds-text-align_center
+				slds-text-heading_medium
+				slds-var-m-vertical_large
+				slds-text-color_error">
+			Incorrect PIN
+		</div>
+	</div>
+<lightning-spinner lwc:if={isLoading}></lightning-spinner>
+</div>
 </template>

@@ -1,0 +1,131 @@
+<template>
+<div class="slds-page-header slds-page-header_joined slds-page-header_bleed">
+	<div class="slds-page-header__row">
+		<div class="slds-page-header__col-title">
+			<div class="slds-media">
+				<div class="slds-media__figure">
+					<lightning-icon icon-name={iconName}></lightning-icon>
+				</div>
+				<div class="slds-media__body">
+					<div class="slds-page-header__name">
+						<div class="slds-page-header__name-title">
+							<h1>
+								<span>{title}</span>
+								<span lwc:if={selectedListView}
+									class="slds-page-header__title slds-truncate"
+									title={selectedListView.title}>
+									{selectedListView.label}
+								</span>
+							</h1>
+						</div>
+						<div class="slds-is-relative
+								slds-page-header__name-switcher">
+							<div class="slds-dropdown-trigger
+									slds-dropdown-trigger_click">
+								<lightning-button-icon
+									icon-name="utility:down"
+									variant="container"
+									size="small"></lightning-button-icon>
+							</div>
+							<div class="slds-popover
+									slds-popover_tooltip
+									slds-nubbin_bottom-left
+									slds-fall-into-ground"
+								role="tooltip"
+								style="position:absolute;
+									left:-12px;
+									top:-48px;
+									width:190px">
+								<div class="slds-popover__body">
+									Some helpful information.</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="slds-page-header__col-actions">
+			<div class="slds-page-header__controls">
+				<div class="slds-page-header__control">
+					<ul class="slds-button-group-list">
+						<li for:each={visibleActions}
+							for:index="index"
+							for:item="action"
+							key={action.name}>
+							<lightning-button label={action.label}
+								variant="neutral"
+								data-name={action.name}
+								onclick={handleOnActionButtonClick}></lightning-button>
+						</li>
+						<li lwc:if={invisibleActions}>
+							<lightning-button-menu
+								alternative-text="More Actions"
+								menu-alignment="right"
+								variant="border-filled"
+								onselect={handleOnActionSelect}>
+								<lightning-menu-item for:each={invisibleActions}
+									for:index="index"
+									for:item="action"
+									key={action.name}
+									value={action.name}
+									label={action.label}></lightning-menu-item>
+							</lightning-button-menu>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="slds-page-header__row">
+		<div class="slds-page-header__col-meta">
+			<p class="slds-page-header__meta-text">{subtitle}</p>
+		</div>
+		<div class="slds-page-header__col-controls">
+			<div class="slds-page-header__controls">
+				<div class="slds-page-header__control">
+					<lightning-input type="search"
+						value={searchText}
+						data-name="search"
+						placeholder="Search this list..."
+						variant="label-hidden"
+						onchange={handleOnSearchTextChange}
+						onfocus={handleOnSearchTextFocus}
+						onblur={handleOnSearchTextBlur}></lightning-input>
+				</div>
+				<div class="slds-page-header__control">
+					<lightning-button-icon
+						icon-name="utility:settings"
+						variant="border-filled"
+						data-name="settings"
+						title="List View Settings"
+						onclick={handleOnLisViewButtonClick}></lightning-button-icon>
+				</div>
+				<div class="slds-page-header__control">
+					<lightning-button-icon
+						icon-name="utility:refresh"
+						variant="border-filled"
+						data-name="refresh"
+						title="Edit List"
+						onclick={handleOnLisViewButtonClick}></lightning-button-icon>
+				</div>
+				<div class="slds-page-header__control">
+					<lightning-button-group>
+						<lightning-button-icon
+							icon-name="utility:chart"
+							variant="border-filled"
+							data-name="chart"
+							title="Charts"
+							onclick={handleOnLisViewButtonClick}></lightning-button-icon>
+						<lightning-button-icon
+							icon-name="utility:filterList"
+							variant={filterListButtonVariant}
+							data-name="filterList"
+							title="Filters"
+							onclick={handleOnLisViewButtonClick}></lightning-button-icon>
+					</lightning-button-group>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</template>

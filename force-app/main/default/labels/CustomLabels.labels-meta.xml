@@ -64,6 +64,13 @@
 		<value>Switch Order</value>
 	</labels>
 	<labels>
+		<fullName>lineItemManager_markAsCompletedBtn</fullName>
+		<language>en_US</language>
+		<protected>false</protected>
+		<shortDescription>lineItemManager_markAsCompletedBtn</shortDescription>
+		<value>Mark as Completed</value>
+	</labels>
+	<labels>
 		<fullName>fieldMultiSelector_defaultTitle</fullName>
 		<language>en_US</language>
 		<protected>false</protected>

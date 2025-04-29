@@ -1,0 +1,20 @@
+<!--
+@author Fernando Gomez
+@since 3/28/2023
+@versino 1.0
+-->
+<template>
+<div>
+	<c-line-item-manager lwc:if={isReady}
+		title="Steps"
+		details={details}
+		status-options={statusOptions}
+		selected-item-id={selectedItemId}
+		variant="compact"></c-line-item-manager>
+	<div lwc:if={isError}
+		class="slds-var-p-horizontal_small">
+		<c-error-panel error-title={errorTitle}
+			error-object={errorObject}></c-error-panel>
+	</div>
+</div>
+</template>

@@ -1,4 +1,52 @@
 <template>
-<lightning-formatted-rich-text
+<lightning-formatted-rich-text lwc:if={isRecord}
 	value={displayValue}></lightning-formatted-rich-text>
+<template lwc:elseif={displayValue}>
+	<lightning-formatted-address lwc:if={isAddress}
+		value={displayValue}></lightning-formatted-address>
+
+	<lightning-formatted-date-time lwc:if={isDateTime}
+		value={displayValue}></lightning-formatted-date-time>
+
+	<lightning-formatted-email lwc:if={isEmail}
+		value={displayValue}></lightning-formatted-email>
+
+	<lightning-formatted-location lwc:if={isLocation}
+		value={displayValue}></lightning-formatted-location>
+
+	<lightning-formatted-name lwc:if={isName}
+		value={displayValue}></lightning-formatted-name>
+	
+	<lightning-formatted-number lwc:if={isDecimal}
+		value={displayValue}
+		format-style="decimal"
+		maximum-fraction-digits={maximumFractionDigits}
+		minimum-fraction-digits={minimumFractionDigits}
+		minimum-integer-digits={minimumIntegerDigits}></lightning-formatted-number>
+
+	<lightning-formatted-number lwc:if={isCurrency}
+		value={displayValue}
+		format-style="currency"
+		currency-code="USD"></lightning-formatted-number>
+
+	<lightning-formatted-number lwc:if={isPercent}
+		value={displayValue}
+		format-style="percent"></lightning-formatted-number>
+
+	<lightning-formatted-phone lwc:if={isPhone}
+		value={displayValue}></lightning-formatted-phone>
+
+	<lightning-formatted-rich-text lwc:if={isRichText}
+		value={displayValue}></lightning-formatted-rich-text>
+
+	<lightning-formatted-text lwc:if={isText}
+		value={displayValue}></lightning-formatted-text>
+
+	<lightning-formatted-time lwc:if={isTime}
+		value={displayValue}></lightning-formatted-time>
+
+	<lightning-formatted-url lwc:if={isUrl}
+		value={displayValue}></lightning-formatted-url>
+</template>
+<template lwc:else>&nbsp;</template>
 </template>

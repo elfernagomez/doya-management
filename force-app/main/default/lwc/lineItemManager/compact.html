@@ -1,0 +1,32 @@
+<!--
+@author Fernando Gomez
+@since 3/28/2023
+@versino 1.0
+-->
+<template>
+<div class="slds-var-p-horizontal_small">
+	<lightning-layout lwc:if={hasItems}>
+		<lightning-layout-item for:each={items}
+			for:item="item"
+			for:index="index"
+			key={item.uniqueId}
+			class="slds-var-m-right_large
+				slds-var-m-vertical_xx-small
+				slds-is-relative">
+			<c-line-item-manager-step item={item}
+				preview-procedure-options={procedureOptions}
+				mode={mode}
+				variant={variant}
+				data-index={index}
+				procedure-options={procedureOptions}
+				status-options={statusOptions}
+				onitemchange={handleItemChange}
+				onitemdelete={handleItemDelete}></c-line-item-manager-step>
+		</lightning-layout-item>
+	</lightning-layout>
+	<div lwc:if={hasError}>
+		<c-error-panel error-title={errorTitle}
+			error-object={errorObject}></c-error-panel>
+	</div>
+</div>
+</template>

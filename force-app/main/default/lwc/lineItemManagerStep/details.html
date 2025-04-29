@@ -1,0 +1,213 @@
+<template>
+<div class="slds-theme_shade procedure-panel details">
+<div lwc:if={isAdmin}
+	class="slds-is-relative admin">
+	<header class={detailsProcedureClass}>
+		<div class="slds-media slds-media_center slds-var-p-bottom_large">
+			<div class="slds-media__figure">
+				<span class="slds-badge
+					slds-var-m-top_x-large">{_item.order}</span>
+			</div>
+			<div class="slds-media__body">
+				<lightning-combobox name="procedureId"
+					label={labels.procedureFieldLabel}
+					value={_item.procedureId}
+					options={_procedureOptions}
+					onchange={handleProcedureFieldChange}
+					class="procedureField validate"></lightning-combobox>
+			</div>
+		</div>
+	</header>
+	<div lwc:if={_item.procedureId}
+		class="slds-var-p-horizontal_x-large
+			slds-var-p-vertical_medium">
+		<div class="slds-var-m-bottom_small">
+			<lightning-combobox name="status"
+				label="Status"
+				value={_item.status}
+				options={_statusOptions}
+				onchange={handleStatusFieldChange}
+				required
+				class="procedureField validate"></lightning-combobox>
+		</div>
+		<div lwc:if={_item.isMachineNeeded}
+			class="slds-var-m-bottom_small">
+			<lightning-record-picker 
+				label="Machine"
+				object-api-name="Asset"
+				placeholder="Search Machines..."
+				filter={_item.machineFilter}
+				value={_item.machineId}
+				data-field="machineId"
+				onchange={handleLookupFieldChange}
+				required
+				class="validate"></lightning-record-picker>
+		</div>
+		<div for:each={_item.productionFields}
+			for:item="field"
+			for:index="index"
+			key={field.order}
+			class="slds-var-m-bottom_small">
+			<c-production-field field={field}
+				record={_item.record}
+				mode="edit"
+				onchange={handleRecordFieldChange}></c-production-field>
+		</div>
+		<div>
+			<lightning-textarea name="adminNotes"
+				label="Admin Notes"
+				value={_item.adminNotes}
+				data-field="adminNotes"
+				data-type="string"
+				data-src="item"
+				onchange={handleFlatFieldChange}
+				class="custom-input validate"></lightning-textarea>
+		</div>
+	</div>
+	<div class="slds-var-p-vertical_x-small
+			slds-var-p-horizontal_x-large
+			slds-text-align_center">
+		<div lwc:if={_item.isDeleting}>
+			<p class="slds-var-m-bottom_small">
+				Are you sure?
+			</p>
+			<div class="slds-var-m-bottom_xxx-small">
+				<lightning-button label="Yes, Delete"
+					variant="destructive"
+					onclick={handleConfirmDeleteClick}
+					></lightning-button>
+			</div>
+			<div class="slds-var-m-bottom_xxx-small">
+				<lightning-button label="No, Cancel"
+					variant="brand-outline"
+					onclick={handleCancelDeleteClick}
+					></lightning-button>
+			</div>
+		</div>
+		<lightning-button-icon lwc:else
+			alternative-text={labels.deleteItemBtn}
+			icon-name="utility:delete"
+			variant="border-filled"
+			size="medium"
+			onclick={handleDeleteClick}>
+			<label>{labels.deleteItemBtn}</label>
+		</lightning-button-icon>
+	</div>
+</div>
+<div lwc:if={isProd}
+	class="slds-is-relative prod">
+	<header class={detailsProcedureClass}>
+		<lightning-layout lwc:if={_item.isComplete}
+			vertical-align="center"
+			horizontal-align="center"
+			class="slds-var-p-vertical_small">
+			<lightning-layout-item padding="around-medium">
+				<lightning-icon icon-name="utility:check"
+					size="small"
+					variant="inverse"></lightning-icon>
+			</lightning-layout-item>
+			<!-- <div class="slds-media__body">
+				{_item.procedureName}
+			</div> -->
+		</lightning-layout>
+		<div lwc:else
+			class="slds-media slds-media_center slds-var-p-bottom_x-large">
+			<div class="slds-media__figure">
+				<span class="slds-badge
+					slds-var-m-top_x-large">{_item.order}</span>
+			</div>
+			<div class="slds-media__body">
+				<div class="slds-form-element procedureField">
+					<label class="slds-form-element__label">
+						{labels.procedureFieldLabel}
+					</label>
+					<div class="slds-form-element__control">
+						<span class="slds-input">{_item.procedureName}</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</header>
+	<div lwc:if={_item.procedureId}
+		class="slds-var-p-horizontal_x-large
+			slds-var-p-vertical_medium">
+		<div lwc:if={_item.isMachineNeeded}
+			class="slds-var-m-bottom_small">
+			<c-production-field lwc:if={_item.isComplete}
+				field={machineField}
+				record={_item.record}
+				mode="view"
+				></c-production-field>
+			<lightning-record-picker lwc:else
+				label="Machine"
+				object-api-name="Asset"
+				placeholder="Search Machines..."
+				filter={_item.machineFilter}
+				value={_item.machineId}
+				data-field="machineId"
+				onchange={handleLookupFieldChange}
+				required
+				class="validate"></lightning-record-picker>
+		</div>
+		<div for:each={_item.productionFields}
+			for:item="field"
+			for:index="index"
+			key={field.order}
+			class="slds-var-m-bottom_small">
+			<c-production-field field={field}
+				record={_item.record}
+				mode="view"
+				onchange={handleRecordFieldChange}></c-production-field>
+		</div>
+		<template lwc:if={_item.isInProgress}>
+			<div class="slds-var-m-bottom_small">
+				<c-production-field field={startedOnField}
+					record={_item.record}
+					mode="view"
+					onchange={handleRecordFieldChange}></c-production-field>
+			</div>
+			<div class="slds-var-m-bottom_small">
+				<c-production-field field={startedByField}
+					record={_item.record}
+					mode="view"
+					onchange={handleRecordFieldChange}></c-production-field>
+			</div>
+		</template>
+		<template lwc:if={_item.isComplete}>
+			<div class="slds-var-m-bottom_small">
+				<c-production-field field={compledtedOnField}
+					record={_item.record}
+					mode="view"
+					onchange={handleRecordFieldChange}></c-production-field>
+			</div>
+			<div class="slds-var-m-bottom_small">
+				<c-production-field field={compledtedByField}
+					record={_item.record}
+					mode="view"
+					onchange={handleRecordFieldChange}></c-production-field>
+			</div>
+		</template>
+		<div lwc:if={_item.adminNotes}
+			class="slds-var-m-bottom_small">
+			<c-production-field field={adminNotesField}
+				record={_item.record}
+				mode="view"
+				onchange={handleRecordFieldChange}></c-production-field>
+		</div>
+		<div class="slds-var-m-bottom_small">
+			<c-production-field field={productionNotesField}
+				record={_item.record}
+				mode="view"
+				is-edit-allowed-override=true
+				onchange={handleRecordFieldChange}></c-production-field>
+		</div>
+	</div>
+</div>
+<div lwc:if={_item.hasError}
+	class="slds-var-p-horizontal_small slds-var-p-vertical_xx-small">
+	<c-error-panel error-title={_item.errorMessage}
+		error-object={_item.errorObject}
+		variant="compact"></c-error-panel>
+</div>
+</div>
+</template>

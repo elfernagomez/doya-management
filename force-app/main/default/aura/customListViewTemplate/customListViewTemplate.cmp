@@ -1,0 +1,22 @@
+<aura:component implements="lightning:appHomeTemplate"
+	description="Custom List View Template">
+<ltng:require styles="{! $Resource.hideAppFlexipageHeader }"/>
+<aura:attribute name="header" type="Aura.Component[]" />
+<aura:attribute name="dataTable" type="Aura.Component[]" />
+<!-- <aura:attribute name="filterList" type="Aura.Component[]" /> -->
+<div class="dock-all"
+	style="min-height:15rem;">
+	<lightning:layout class="slds-grid_vertical height-full">
+		<lightning:layoutItem>{! v.header }</lightning:layoutItem>
+		<lightning:layoutItem flexibility="grow"
+			class="slds-scrollable_y
+				slds-border_right
+				slds-border_bottom
+				slds-border_left
+				slds-is-relative">
+			<div>{! v.dataTable }</div>
+			<!-- <div>{! v.filterList }</div> -->
+		</lightning:layoutItem>
+	</lightning:layout>
+</div>
+</aura:component>

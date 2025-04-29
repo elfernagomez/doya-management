@@ -12,7 +12,10 @@
 	</div>
 	<c-line-item-manager lwc:if={isReady}
 		title="Steps"
+		variant="details"
 		details={details}
+		status-options={statusOptions}
+		selected-item-id={selectedItemId}
 		onitemcreate={handleItemCreated}
 		onitemchange={handleItemChange}
 		onitemdelete={handleItemDelete}>

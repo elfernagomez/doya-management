@@ -324,6 +324,9 @@
 					</lightning-layout-item>
 				</lightning-layout>
 			</lightning-layout-item>
+			<lightning-layout-item>
+				
+			</lightning-layout-item>
 		</lightning-layout>
 		<c-error-panel lwc:if={_product.hasError}
 			error-title={_product.errorMessage}
@@ -362,13 +365,23 @@
 				</lightning-layout>
 			</div>
 		</div>
-		<lightning-button-icon lwc:else
-			icon-name="utility:delete"
-			title="Remove Product From Current Order"
-			variant="bare"
-			small="small"
-			disabled={_product.isDisabled}
-			onclick={handleOnDeleteProductClick}></lightning-button-icon>
+		<lightning-button-group lwc:else>
+			<lightning-button-icon
+				icon-name="utility:delete"
+				title="Remove Product From Current Order"
+				disabled={_product.isDisabled}
+				onclick={handleOnDeleteProductClick}></lightning-button-icon>
+
+			<lightning-button-menu alternative-text="Show menu"
+				onselect={handleOnMenuSelect}
+				menu-alignment="right">
+				<template lwc:if={_product.isNew}></template>
+				<lightning-menu-item lwc:else
+					value="createWorkOrder"
+					label="Create Work Order"
+					prefix-icon-name="utility:new"></lightning-menu-item>
+			</lightning-button-menu>
+		</lightning-button-group>
 	</div>
 </div>
 </template>

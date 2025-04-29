@@ -1,0 +1,10 @@
+<design:component label="Custom List View">
+	<flexipage:template>
+		<flexipage:region name="header"
+			label="Header"
+			defaultWidth="LARGE"></flexipage:region>
+		<flexipage:region name="dataTable"
+			label="Data Table"
+			defaultWidth="LARGE"></flexipage:region>
+	</flexipage:template>
+</design:component>

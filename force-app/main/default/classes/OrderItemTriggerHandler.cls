@@ -5,9 +5,12 @@
 */
 public without sharing class OrderItemTriggerHandler extends TriggerHandler {
 	private Map<Id, OrderItem> newOrderItemsMap;
+	private List<OrderItem> newOrderItems;
 
 	public OrderItemTriggerHandler() {
+		super();
 		newOrderItemsMap = getNewMap();
+		newOrderItems = getNew();
 	}
 
 	public override void beforeInsert() {
@@ -72,7 +75,7 @@ public without sharing class OrderItemTriggerHandler extends TriggerHandler {
 		Decimal unitPrice;
 
 		// we just need to grab the order ids
-		for (OrderItem oi : newOrderItemsMap.values()) {
+		for (OrderItem oi : newOrderItems) {
 			orderIds.add(oi.OrderId);
 			productIds.add(oi.Product2Id);
 		}
@@ -86,7 +89,7 @@ public without sharing class OrderItemTriggerHandler extends TriggerHandler {
 		}
 
 		productItems = new List<OrderItem>();
-		for (OrderItem oi : newOrderItemsMap.values()) {
+		for (OrderItem oi : newOrderItems) {
 			if (rtMap.get(oi.Product2Id) == 'Product') {
 				productItems.add(oi);
 			}

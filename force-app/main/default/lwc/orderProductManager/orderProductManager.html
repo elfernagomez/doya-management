@@ -65,7 +65,8 @@
 					onproductchange={handleOnProductChange}
 					onproductdelete={handleOnProductDelete}
 					onproductdragstart={handleOnProductDragStart}
-					onproductdragend={handleOnProductDragEnd}></c-product-manager>
+					onproductdragend={handleOnProductDragEnd}
+					oncreateworkorder={handleOnCreateWorkOrder}></c-product-manager>
 			</c-delivery-group-card>
 		</template>
 		<div lwc:else
@@ -85,7 +86,8 @@
 					onproductchange={handleOnProductChange}
 					onproductdelete={handleOnProductDelete}
 					onproductdragstart={handleOnProductDragStart}
-					onproductdragend={handleOnProductDragEnd}></c-product-manager>
+					onproductdragend={handleOnProductDragEnd}
+					oncreateworkorder={handleOnCreateWorkOrder}></c-product-manager>
 			</c-delivery-group-card>
 			<div lwc:if={group.isDropEnabled}
 				data-group-id={group.uniqueId}

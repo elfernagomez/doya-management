@@ -25,10 +25,11 @@ export default class ProductionField extends InputBase {
 
 	_record = {};
 	isEditing = false;
+	isFormReady = false;
 
 	get showEdit() {
-		return this.isEdit ||
-			this.field.isEditionAllowed && this.isEditing;
+		return this.isEdit == true ||
+			(this.isEditAllowed && this.isEditing == true);
 	}
 
 	get recordId() {
@@ -48,24 +49,28 @@ export default class ProductionField extends InputBase {
 	}
 
 	get isEditAllowed() {
-		return this.field.isEditionAllowed &&
-			(this.isEditAllowedOverride == null || this.isEditAllowedOverride == true);
+		return this.isFormReady &&
+			(this.field.isEditionAllowed == true ||
+			(this.isEditAllowedOverride != null &&
+				this.isEditAllowedOverride == true));
 	}
 
 	get viewModeContainerClass() {
-		return this.field.isEditionAllowed ?
+		return this.isEditAllowed ?
 			"slds-is-relative slds-var-p-right_medium" :
 			""
 	}
 
 	get editModeContainerClass() {
 		return this.showCloseEditButton ?
-			"slds-is-relative slds-var-p-right_medium" :
+			"slds-is-relative slds-var-p-right_x-large" :
 			""
 	}
 
 	get showCloseEditButton() {
-		return this.isView && this.isEditing;
+		return this.isFormReady &&
+			this.isView &&
+			this.isEditing;
 	}
 
 	handleRecordFieldChange(event) {
@@ -79,6 +84,10 @@ export default class ProductionField extends InputBase {
 
 	handleOnCloseEditClick() {
 		this.isEditing = false;
+	}
+
+	handleOnFormLoad() {
+		this.isFormReady = true;
 	}
 
 	setValue(v, doNotify) {

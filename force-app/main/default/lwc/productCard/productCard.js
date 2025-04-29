@@ -11,8 +11,14 @@ import PRODUCT_DEPTH_FIELD from "@salesforce/schema/Product2.Depth__c";
 import PRODUCT_WIDTH_FIELD from "@salesforce/schema/Product2.Width__c";
 import PRODUCT_HEIGHT_FIELD from "@salesforce/schema/Product2.Height__c";
 import PRODUCT_FINISH_FIELD from "@salesforce/schema/Product2.Finish__c";
-import PRODUCT_DISCOUNT_TYPE_FIELD from "@salesforce/schema/Product2.DiscountType__c";
-import PRODUCT_DISCOUNT_AMOUNT_FIELD from "@salesforce/schema/Product2.DiscountAmount__c";
+import PRODUCT_DISCOUNT_TYPE_FIELD
+	from "@salesforce/schema/Product2.DiscountType__c";
+import PRODUCT_DISCOUNT_AMOUNT_FIELD
+	from "@salesforce/schema/Product2.DiscountAmount__c";
+import PRODUCT_MATERIAL_ID_FIELD
+	from "@salesforce/schema/Product2.Material__c";
+import PRODUCT_MATERIAL_NAME_FIELD
+	from "@salesforce/schema/Product2.Material__r.Name";
 import RECORD_TYPE_ID_FIELD from "@salesforce/schema/Product2.RecordTypeId";
 import RECORD_TYPE_NAME_FIELD from "@salesforce/schema/Product2.RecordType.DeveloperName";
 import UNIT_TYPE_FIELD from "@salesforce/schema/Product2.QuantityUnitOfMeasure";
@@ -26,6 +32,8 @@ export function createNewProduct() {
 		productTypeId: null,
 		productTypeName: null,
 		groupId: null,
+		materialId: null,
+		materialName: null,
 		qty: 1,
 		unitType: "Each",
 		width: null,
@@ -64,6 +72,8 @@ export function getProductFromProductRecord(record) {
 		discountAmount: getFieldValue(record, PRODUCT_DISCOUNT_AMOUNT_FIELD),
 		productTypeId: getFieldValue(record, RECORD_TYPE_ID_FIELD),
 		productTypeName: getFieldValue(record, RECORD_TYPE_NAME_FIELD),
+		materialId: getFieldValue(record, PRODUCT_MATERIAL_ID_FIELD),
+		materialName: getFieldValue(record, PRODUCT_MATERIAL_NAME_FIELD),
 		isProduct: getFieldValue(r, ITEM_PRODUCT_RECORD_TYPE_NAME_FIELD) == "Product",
 		isDiscount: getFieldValue(r, ITEM_PRODUCT_RECORD_TYPE_NAME_FIELD) == "Discount",
 		isPercentage: getFieldValue(r, PRODUCT_DISCOUNT_TYPE_FIELD) == "Percentage",
@@ -293,6 +303,26 @@ export default class ProductCard extends InputBase {
 		const draggable = this.getComponent(".draggable");
 		draggable.removeAttribute("draggable");
 	} */
+
+	handleOnMenuSelect(event) {
+		switch (event.detail.value) {
+			case "createWorkOrder":
+				this.handleOnCreateWorkOrder();
+				break;
+			default:
+				break;
+		}
+	}
+
+	handleOnCreateWorkOrder() {
+		this.customEvent(
+			"createworkorder",
+			this._product,
+			{
+				composed: true,
+				bubbles: true
+			});
+	}
 
 	editProduct(changes) {
 		Object.assign(this._product, changes);

@@ -24,6 +24,8 @@ public with sharing class ProductManager {
 					Width__c,
 					Height__c,
 					QuantityUnitOfMeasure,
+					Material__c,
+					Material__r.Name,
 					RecordTypeId,
 					RecordType.DeveloperName
 				FROM Product2
