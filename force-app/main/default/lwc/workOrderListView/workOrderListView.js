@@ -2,149 +2,104 @@ import WorkOrderListViewEventBus from "c/workOrderListViewEventBus";
 import { NavigationMixin } from "lightning/navigation";
 import styles from "./styles.css";
 import { track, wire } from 'lwc';
+import { getRecords } from 'lightning/uiRecordApi';
 
 import getWorkOrderPage
 	from "@salesforce/apex/WorkOrderListViewCtrl.getWorkOrderPage";
+import getFieldDetailsFromFieldSet
+	from "@salesforce/apex/FieldSetManager.getFieldDetailsFromFieldSet";
+
+import WORK_ORDER_OBJECT from '@salesforce/schema/WorkOrder';
 
 export default class WorkOrderListView
 		extends NavigationMixin(WorkOrderListViewEventBus) {
 
 	static stylesheets = [styles];
 
-	isLoading = false;
-	isAllSelected = false;
-	wiredWorkOrderPageResult;
-	searchText = null;
-	sortBy = "DueDate__c";
-	isSortDesc = true;
-
-	baseColumnClasses = [
-		"slds-is-resizable",
-		"slds-is-sortable",
-		"slds-cell_action-mode"
-	];
-
-	baseStyleClass = this.baseColumnClasses.join(" ");
-
 	@track
-	columns = [{
-		label: "Work Order #",
-		fieldName: "workOrderNo",
-		type: "record",
-		style: "width:10%;",
-		isSortable: true,
-		sortByFieldName: "WorkOrderNumber",
-		isSorting: false,
-		isSortDesc: false,
-		styleClass: null
-	}, {
-		label: "Order #",
-		fieldName: "orderNo",
-		type: "record",
-		style: "width:10%;",
-		isSortable: true,
-		sortByFieldName: "Order__r.OrderNumber",
-		isSorting: false,
-		isSortDesc: false,
-		styleClass: null
-	}, {
-		label: "Order Product",
-		fieldName: "productName",
-		fieldType: "text",
-		type: "object",
-		style: "width:15%;",
-		isSortable: true,
-		sortByFieldName: "OrderProduct__r.Product2.Name",
-		isSorting: false,
-		isSortDesc: false,
-		styleClass: null
-	}, {
-		label: "Due Date",
-		fieldName: "dueDate",
-		fieldType: "datetime",
-		type: "object",
-		style: "width:10%;",
-		isSortable: true,
-		sortByFieldName: "DueDate__c",
-		isSorting: true,
-		isSortDesc: true,
-		styleClass: null
-	}, {
-		label: "Material",
-		fieldName: "materialName",
-		fieldType: "text",
-		type: "object",
-		style: "width:15%;",
-		isSortable: true,
-		sortByFieldName: "Material__r.Name",
-		isSorting: false,
-		isSortDesc: false,
-		styleClass: null
-	}, {
-		label: "Qty",
-		fieldName: "qty",
-		fieldType: "decimal",
-		minInt: 1,
-		minFrac: 1,
-		maxFrac: 1,
-		type: "object",
-		style: "width:5%;",
-		isSortable: true,
-		sortByFieldName: "Quantity__c",
-		isSorting: false,
-		isSortDesc: false,
-		styleClass: null
-	}, {
-		label: "Width",
-		fieldName: "width",
-		fieldType: "decimal",
-		minInt: 1,
-		minFrac: 2,
-		maxFrac: 2,
-		type: "object",
-		style: "width:10%;",
-		isSortable: true,
-		sortByFieldName: "Width__c",
-		isSorting: false,
-		isSortDesc: false,
-		styleClass: null
-	}, {
-		label: "Height",
-		fieldName: "height",
-		fieldType: "decimal",
-		minInt: 1,
-		minFrac: 2,
-		maxFrac: 2,
-		type: "object",
-		style: "width:10%;",
-		isSortable: true,
-		sortByFieldName: "Height__c",
-		isSorting: false,
-		isSortDesc: false,
-		styleClass: null
-	}, {
-		label: "Depth",
-		fieldName: "depth",
-		fieldType: "decimal",
-		minInt: 1,
-		minFrac: 2,
-		maxFrac: 2,
-		type: "object",
-		isSortable: true,
-		sortByFieldName: "Depth__c",
-		isSorting: false,
-		isSortDesc: false,
-		styleClass: null
-	}];
+	columns = [];
 
 	@track
 	data = [];
 
-	pageNumber = 0;
-	pageSize = 100;
-	filters = {};
-	cacheBust = new Date().toISOString();
-	rowNumberColumnStyle = "width:3.5rem;";
+	isLoading = false;
+	isAllSelected = false;
+	wiredWorkOrderPageResult;
+	wiredFieldDetailsResult;
+	getRecordsConfig;
+	searchText;
+	sortBy;
+	isSortDesc;
+	pageNumber;
+	pageSize;
+	filtersList;
+	cacheBust;
+
+	noColumnWidth = "3.5rem";
+	checkboxColumnWidth = "32px";
+	numericColumnWidth = "6rem";
+
+	baseHeaderClasses = [
+		"slds-is-resizable",
+		"slds-is-sortable",
+		"slds-cell_action-mode",
+		"slds-border_left"
+	];
+
+	baseCellClasses = [
+		"slds-cell_action-mode",
+		"neutral-65"
+	];
+
+	baseHeaderClass = this.baseHeaderClasses.join(" ");
+	baseCellClass = this.baseCellClasses.join(" ");
+
+	get objectApiName() {
+		return WORK_ORDER_OBJECT.objectApiName;
+	}
+
+	get rowNumberColumnStyle() {
+		return `width:${this.noColumnWidth};`;
+	}
+
+	get rowCheckboxColumnStyle() {
+		return `width:${this.checkboxColumnWidth};`;
+	}
+
+	get workOrderFields() {
+		const result = [`${this.objectApiName}.Id`];
+		this.columns.forEach(c => {
+			result.push(`${this.objectApiName}.${c.fieldName}`);
+			if (c.isLookup && c.relationshipName && c.relatedTo) {
+				result.push([
+					this.objectApiName,
+					c.relationshipName,
+					c.relatedTo.nameFieldApiName
+				].join("."));
+			}
+		});
+		return result;
+	}
+
+	@wire(getFieldDetailsFromFieldSet, {
+		objectName: WORK_ORDER_OBJECT.objectApiName,
+		fieldSetName: "WorkOrderListViewFields"
+	})
+	wireGetFieldDetailsFromFieldSet(result) {
+		const { error, data } = result;
+		this.wiredFieldDetailsResult = result;
+		if (data) {
+			this.columns = data.map(field => this.getField(field));
+			this.updateColumnsRefence();
+			this.reset();
+		} else if (error) {
+			this.isLoading = false;
+			this.addError(
+				["We encountered an issue while retrieving fielset information",
+					...this.getDmlErrors(error)].join(". "),
+				error);
+		}
+	}
 
 	@wire(getWorkOrderPage, {
 		searchText: "$searchText",
@@ -152,36 +107,61 @@ export default class WorkOrderListView
 		pageSize: "$pageSize",
 		sortBy: "$sortBy",
 		isSortDesc: "$isSortDesc",
-		filters: "$filters",
+		filtersList: "$filtersList",
 		cacheBust: "$cacheBust"
 	})
 	wiredWorkOrderPage(result) {
 		const { error, data } = result;
 		this.wiredWorkOrderPageResult = result;
 		if (data) {
-			this.isLoading = false;
+			const recordIds = data.map(r => r.Id);
+			const fields = this.workOrderFields;
+			this.removeError();
 
+			if (recordIds.length) {
+				this.getRecordsConfig = [{
+					recordIds,
+					fields
+				}];
+			} else {
+				this.isLoading = false;
+				this.data = [];
+				this.publishEvent(
+					"workOrderPageFetched",
+					[]);
+			}
+		} else if (error) {
+			this.isLoading = false;
+			this.addError(
+				["We encountered an issue while retrieving the work orders",
+					...this.getDmlErrors(error)].join(". "),
+				error);
+		}
+	}
+
+	@wire(getRecords, {
+		records: "$getRecordsConfig"
+	})
+	wiredRecords({ data, error }) {
+		if (data) {
 			if (this.pageNumber == 0)
 				this.data = [];
 
 			let order = this.data.length;
-			this.data.push(...data.map(record => {
-				const w = this.getFromRecord(record);
-				return {
-					rowNumber: ++order,
-					isSelected: false,
-					isOpen: false,
-					uniqueId: w.uniqueId,
-					selectedItemId: null,
-					record,
-					columns: this.columns.map(c => ({
-						key: `${c.fieldName}_${w.uniqueId}`,
-						column: c,
-						data: {[c.fieldName]: w[c.fieldName]}
-					}))
-				};
-			}));
-
+			this.data.push(...data.results.map(r => ({
+				rowNumber: ++order,
+				isSelected: false,
+				isOpen: false,
+				uniqueId: r.result.id,
+				selectedItemId: null,
+				data: r.result.fields,
+				columns: this.columns.map(c => ({
+					key: `${c.fieldName}_${r.result.id}`,
+					column: c
+				}))
+			})));
+			
+			this.isLoading = false;
 			this.publishEvent(
 				"workOrderPageFetched",
 				this.data.map(row => ({
@@ -189,14 +169,13 @@ export default class WorkOrderListView
 					uniqueId: row.uniqueId
 				})));
 		} else if (error) {
-			this.isLoading = false;
-			this.addError("Error retrieving Work Order", error);
+			this.error = error;
+			this.records = [];
 		}
 	}
 
 	connectedCallback() {
 		this.subscribeToEvents();
-		this.updateColumnsRefence();
 	}
 
 	disconnectedCallback() {
@@ -221,7 +200,7 @@ export default class WorkOrderListView
 	}
 
 	handleOnSelectRowChange(event) {
-		const index = parseInt(event.currentTarget.dataset.index);
+		const index = parseInt(event.currentTarget.dataset.index, 10);
 		const isSelected = event.target.checked;
 		this.editDataRow(
 			index,
@@ -232,7 +211,8 @@ export default class WorkOrderListView
 	}
 
 	handleOnOpenRowClick(event) {
-		const index = parseInt(event.currentTarget.dataset.index);
+		try {
+		const index = parseInt(event.currentTarget.dataset.index, 10);
 		const selectedItemId = this.autoSelect(index);
 		this.editDataRow(
 			index,
@@ -240,10 +220,13 @@ export default class WorkOrderListView
 				isOpen: true,
 				selectedItemId
 			});
+		} catch (e) {
+			console.error(e);
+		}
 	}
 
 	handleOnCloseRowClick(event) {
-		const index = parseInt(event.currentTarget.dataset.index);
+		const index = parseInt(event.currentTarget.dataset.index, 10);
 		this.editDataRow(
 			index,
 			{
@@ -252,7 +235,7 @@ export default class WorkOrderListView
 	}
 
 	handleOnLineItemSelected(event) {
-		const index = parseInt(event.currentTarget.dataset.index);
+		const index = parseInt(event.currentTarget.dataset.index, 10);
 		const selectedItemId = event.detail.item.uniqueId;
 		const isItemSelected = this.isItemSelected(index, selectedItemId);
 		this.editDataRow(
@@ -276,7 +259,7 @@ export default class WorkOrderListView
 					default:
 						break;
 				}
-			break;
+				break;
 			case "listViewButtonClicked":
 				switch (message.payload.actionName) {
 					case "refresh":
@@ -291,6 +274,9 @@ export default class WorkOrderListView
 				break;
 			case "searchAllChange":
 				this.handleOnSelectAllChange();
+				break;
+			case "filterFieldChanged":
+				this.handleFilterFieldChange(message.payload);
 				break;
 			default:
 				break;
@@ -312,57 +298,21 @@ export default class WorkOrderListView
 		});
 	}
 
-	getFromRecord(record) {
-		const orderUrl = `/lightning/r/WorkOrder/${record.Order__c}/view`;
-		const workOrderUrl = `/lightning/r/WorkOrder/${record.Id}/view`;
-
-		let item = {
-			//...createNewItem(),
-			uniqueId: record.Id,
-			salesforceId: record.Id,
-			orderNo: {
-				value: record.Order__c,
-				displayValue: `<a href="${orderUrl}">${record.Order__r?.OrderNumber}</a>`
-			},
-			workOrderNo: {
-				value: record.WorkOrderNumber,
-				displayValue: `<a href="${workOrderUrl}">${record.WorkOrderNumber}</a>`
-			},
-			productId: record.OrderProduct__r?.Product2Id,
-			productName: record.OrderProduct__r?.Product2?.Name,
-			materialId: record.Material__c,
-			materialName: record.Material__r?.Name,
-			dueDate: record.DueDate__c ?
-				new Date(record.DueDate__c) :
-				null,
-			title: record.Title__c,
-			width: record.Width__c,
-			height: record.Height__c,
-			depth: record.Depth__c,
-			qty: record.Quantity__c || 1,
-			record: {...record}
-		};
-	
-		return item;
+	handleFilterFieldChange(filtersList) {
+		this.filtersList = [...filtersList];
+		this.handleRefreshAction();
 	}
 
 	editDataRow(index, changes, updateDataRefence = true) {
 		const row = this.data[index];
 		this.mergeObjects(row, changes);
-
+		
 		if (updateDataRefence)
 			this.updateInnerRefence(index);
 	}
 
 	updateColumnsRefence() {
-		this.columns.forEach(c => {
-			const classes = [this.baseStyleClass];
-			if (c.isSorting)
-				classes.push("slds-is-sorted");
-			if (c.isSortDesc)
-				classes.push("slds-is-sorted_desc");
-			c.styleClass = classes.join(" ");
-		});
+		this.columns.forEach(c => (c.styles = this.getColumnStyle(c)));
 		this.columns = [...this.columns];
 	}
 
@@ -400,6 +350,16 @@ export default class WorkOrderListView
 		this.firstPage();
 	}
 
+	reset() {
+		this.searchText = null;
+		this.sortBy = "DueDate__c";
+		this.isSortDesc = true;
+		this.pageNumber = 0;
+		this.pageSize = 100;
+		this.filtersList = [];
+		this.getPage();
+	}
+
 	firstPage() {
 		this.pageNumber = 0;
 		this.getPage();
@@ -417,17 +377,16 @@ export default class WorkOrderListView
 		const row = this.data[index];
 		if (row.selectedItemId)
 			return row.selectedItemId;
-		else {
-			const selectedItem =
-				row.record.WorkOrderLineItems != null ?
-					(row.record.WorkOrderLineItems.find(
-						woli => woli.Status__c == "In Progress") ||
-					row.record.WorkOrderLineItems.find(
-						woli => woli.Status__c == "New") ||
-					row.record.WorkOrderLineItems[0]) :
-					null;
-			return selectedItem?.Id;
-		}
+		
+		const selectedItem =
+			row.WorkOrderLineItems != null ?
+				(row.WorkOrderLineItems.find(
+					woli => woli.Status__c == "In Progress") ||
+				row.WorkOrderLineItems.find(
+					woli => woli.Status__c == "New") ||
+				row.WorkOrderLineItems[0]) :
+				null;
+		return selectedItem?.Id;
 	}
 
 	isItemSelected(index, selectedItemId) {
@@ -437,5 +396,82 @@ export default class WorkOrderListView
 
 	calculateIsAllSelected() {
 		this.isAllSelected = this.data.every(row => row.isSelected);
+	}
+
+	getColumnStyle(column) {
+		const numw = this.numericColumnWidth;
+		const nonNumCount = this.columns.filter(c => !c.isNumeric).length;
+
+		let added = [
+			this.noColumnWidth,
+			this.checkboxColumnWidth,
+			...this.columns.filter(c => c.isNumeric).map(() => numw)
+		];
+
+		const baseStyles = 
+			column.isNumeric ?
+			[`width: ${numw}`] :
+			[`width: calc((100% - (${added.join(" + ")})) / ${nonNumCount})`];
+
+		// head
+		const headerStyle = [...baseStyles];
+		const headerClass = [...this.baseHeaderClasses];
+
+		if (column.isSorting)
+			headerClass.push("slds-is-sorted");
+
+		if (column.isSortDesc)
+			headerClass.push("slds-is-sorted_desc");
+
+		const header = {
+			style: headerStyle.join(";"),
+			class: headerClass.join(" ")
+		};
+
+		// cell
+		const cellStyle = [...baseStyles];
+		const cellClass = [];
+
+		if (column.isNumeric) {
+			cellStyle.push(`text-align: right`);
+			cellStyle.push(`padding-right: 1.5em`);
+		}
+
+		const cell = {
+			style: cellStyle.join(";"),
+			class: cellClass.join(" ")
+		};
+
+		return { header, cell };
+	}
+
+	getField(field) {
+		return ({
+			label: field.label,
+			isNameField: field.isNameField,
+			fieldName: field.apiName,
+			fieldType: field.type,
+			isNumeric: field.isNumeric,
+			isLookup: field.isLookup,
+			relationshipName: field.relationshipName,
+			relatedTo: field.isLookup ?
+				{
+					apiName: field.relatedToApiName,
+					nameFieldApiName: field.relatedToNameFieldApiName
+				} :
+				null,
+			minInt: 1,
+			minFrac: 2,
+			maxFrac: 2,
+			type: "record",
+			isSortable: true,
+			sortByFieldName: field.apiName,
+			isSorting: false,
+			isSortDesc: false,
+			styles: {
+				header: {},
+				cell: {}
+			}
+		});
 	}
 }

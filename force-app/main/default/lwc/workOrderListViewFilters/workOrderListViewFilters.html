@@ -23,7 +23,72 @@
 		</div>
 	</div>
 	<div class="slds-panel__body">
-		A panel body accepts any layout or component
+		<!-- <ul lwc:if={filtersList.length}
+			class="slds-has-dividers_around-space">
+			<li for:each={filtersList}
+				for:item="f"
+				for:index="i"
+				key={f.fieldApiName}
+				class="slds-item">
+				<c-field-value-pill
+					label={f.label}
+					value={f.value}
+					field-api-name={f.fieldApiName}
+					data-index={i}
+					variant="tile"
+					onremove={handleOnFilterRemoved}
+					class="slds-var-m-right_xx-small"></c-field-value-pill>
+			</li>
+		</ul> -->
+		<template lwc:if={filtersList.length}>
+			<div for:each={filtersList}
+				for:item="f"
+				for:index="i"
+				key={f.fieldApiName}
+				class="slds-var-m-bottom_small">
+				<c-field-value-pill
+					label={f.label}
+					value={f.value}
+					field-api-name={f.fieldApiName}
+					data-index={i}
+					variant="tile"
+					onremove={handleOnFilterRemoved}></c-field-value-pill>
+			</div>
+		</template>
+		<div lwc:else>
+			There are no filters yet.
+		</div>
+		<lightning-card title="Add Filters"
+			class="slds-var-p-horizontal_small">
+			<div class="slds-var-p-horizontal_small">
+				<lightning-record-edit-form lwc:if={showForm}
+					object-api-name={objectApiName}>
+					<div for:each={fields}
+						for:item="f"
+						for:index="i"
+						key={f.apiName}>
+						<lightning-input-field labe={f.label}
+							field-name={f.apiName}
+							data-field-name={f.apiName}
+							onchange={handleOnFilterFieldChange}></lightning-input-field>
+					</div>
+				</lightning-record-edit-form>
+			</div>
+			<div slot="footer">
+				<lightning-button label="Apply"
+					name="apply"
+					variant="brand"
+					disabled={isApplyButtonDisabled}
+					onclick={handleOnApplyFiltersClick}
+					class="slds-var-m-horizontal_xx-small"></lightning-button>
+				<lightning-button label="Apply &amp; Close"
+					name="applyAndClose"
+					variant="brand"
+					disabled={isApplyButtonDisabled}
+					onclick={handleOnApplyFiltersClick}
+					class="slds-var-m-horizontal_xx-small"></lightning-button>
+			</div>
+		</lightning-card>
 	</div>
 </div>
 </template>

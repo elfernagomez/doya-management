@@ -1,18 +1,15 @@
 import LwcBase from 'c/lwcBase';
 import { wire, track } from "lwc";
-import { getRecords } from 'lightning/uiRecordApi';
+import { getRecords, getFieldValue } from 'lightning/uiRecordApi';
+import staffLogin from "@salesforce/apex/StaffManager.staffLogin";
 
-import staffLogin
-	from "@salesforce/apex/StaffManager.staffLogin";
-
-import WORK_ORDER_LINE_ITEM_OBJECT from '@salesforce/schema/Staff__c';
 import PIN_FIELD from "@salesforce/schema/Staff__c.";
 
-export function selectStaff(handleOnStaffConfirmed) {
-	/* StaffSelector.open({
+/* export function selectStaff(handleOnStaffConfirmed) {
+	StaffSelector.open({
 		size: "small"
-	}); */
-}
+	});
+} */
 
 export default class StaffSelector extends LwcBase {
 	staffId;
@@ -64,7 +61,7 @@ export default class StaffSelector extends LwcBase {
 		if (data) {
 			this.pin = getFieldValue(data, PIN_FIELD);
 		} else if (error) {
-			console.log("error: ", error);
+			console.error("StaffSelector.wiredRecords", error);
 		}
 	}
 
@@ -74,7 +71,7 @@ export default class StaffSelector extends LwcBase {
 
 	handleOnKeyUp(event) {
 		const value = event.target.value || null;
-		const index = parseInt(event.currentTarget.dataset.index);
+		const index = parseInt(event.currentTarget.dataset.index, 10);
 		this.numbers[index].value = value;
 
 		this.removeError();
@@ -97,7 +94,6 @@ export default class StaffSelector extends LwcBase {
 
 	login() {
 		this.isLoading = true;
-		console.log(this.pin);
 		staffLogin({
 			staffId: this.staffId,
 			pin: this.pin
@@ -126,7 +122,7 @@ export default class StaffSelector extends LwcBase {
 	}
 
 	resetFields() {
-		this.numbers.forEach(n => n.value = null);
+		this.numbers.forEach(n => (n.value = null));
 		this.numbers = [...this.numbers];
 
 		const input = this.getComponent(".number-input");

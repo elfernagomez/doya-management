@@ -50,14 +50,13 @@ export default class IllustrationSvg extends LightningElement {
 	variant;
 
 	render() {
-		console.log(this.variant);
 		if (!variantMap[this.variant])
 			console.warn(
 				`Image for variant "${
 					this.variant}" not found. Supported variants: ${
 					Object.keys(variantMap)}`
 			);
-		console.log(variantMap[this.variant])
+		
 		return variantMap[this.variant] || Empty;
 	}
 }

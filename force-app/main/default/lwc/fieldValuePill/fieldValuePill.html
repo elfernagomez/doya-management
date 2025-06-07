@@ -1,0 +1,44 @@
+<template>
+<lightning-pill lwc:if={isPill}
+	label={displayValue}
+	onremove={handleOnRemoveClick}>
+	<!-- <lightning-icon lwc:if={iconName}
+		icon-name={iconName}
+		alternative-text={displayValue}></lightning-icon> -->
+	<span title={displayValue}
+		style={iconStyle}
+		class="slds-icon_container">
+		<img lwc:if={iconUrl}
+			src={iconUrl}
+			class="slds-icon" aria-hidden="true" />
+		<span class="slds-assistive-text">{displayValue}</span>
+	</span>
+</lightning-pill>
+<div lwc:if={isTile}
+	class="slds-media slds-box slds-box_x-small">
+	<div class="slds-media__figure">
+		<span lwc:if={iconUrl}
+			title={displayValue}
+			style={iconStyle}
+			class="slds-icon_container">
+			<img src={iconUrl}
+				class="slds-icon"
+				aria-hidden="true" />
+			<span class="slds-assistive-text">{displayValue}</span>
+		</span>
+	</div>
+	<div class="slds-media__body">
+		<p>{displayValue}</p>
+		<p lwc:if={label}
+			title={label}
+			class="slds-truncate">{label}</p>
+	</div>
+	<div class="slds-media__figure slds-media__figure_reverse">
+		<lightning-button-icon variant="bare"
+			size="small"
+			icon-name="utility:close"
+			title="Remove"
+			onclick={handleOnRemoveClick}></lightning-button-icon>
+	</div>
+</div>
+</template>

@@ -59,7 +59,7 @@ export default class WorkOrderSingleLineItemManager
 			this.procedureOptions = data.results.map(
 				result => getProcedureFromRecord(result.result));
 		} else if (error) {
-			console.log("error: ", error);
+			console.error("WorkOrderSingleLineItemManager.wiredRecords", error);
 		}
 	}
 
@@ -75,7 +75,7 @@ export default class WorkOrderSingleLineItemManager
 			
 			// create a one level record with all field values
 			this.fields.forEach(f =>
-				record[f] = getFieldValue(data, this.getFieldFullName(f)));
+				(record[f] = getFieldValue(data, this.getFieldFullName(f))));
 			
 			// we convert the record into an item
 			this.item = this.getFromRecord(record);

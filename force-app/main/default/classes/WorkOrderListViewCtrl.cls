@@ -25,12 +25,17 @@ public with sharing class WorkOrderListViewCtrl {
 		Integer pageSize,
 		String sortBy,
 		Boolean isSortDesc,
-		Map<String, String> filters
+		List<FilterWrapper> filtersList
 	) {
 		Integer offset;
 		String likeClause = null;
 		List<String> sortByFields;
 		String ascDesc;
+		List<FieldSetManager.FieldInfo> fields;
+		Set<String> fieldApiNames;
+		List<String> whereClause;
+		String fieldName;
+		String value;
 
 		try {
 			offset = pageNumber * pageSize;
@@ -53,39 +58,47 @@ public with sharing class WorkOrderListViewCtrl {
 					String.escapeSingleQuotes('CreatedDate DESC'));
 			}
 
-			return Database.query(
-				'SELECT ' +
-					'WorkOrderNumber, ' +
-					'DueDate__c, ' +
-					'Title__c, ' +
-					'Width__c, ' +
-					'Height__c, ' +
-					'Depth__c, ' +
-					'Quantity__c, ' +
-					'Material__c, ' +
-					'Material__r.Name, ' +
-					'Order__c, ' +
-					'Order__r.OrderNumber, ' +
-					'OrderProduct__r.UnitType__c, ' +
-					'OrderProduct__r.Product2Id, ' +
-					'OrderProduct__r.Product2.Name, ' +
-					'( ' +
-						'SELECT Id, Status ' +
-						'FROM WorkOrderLineItems ' +
-						'ORDER BY Order__c ' +
-					') ' +
-				'FROM WorkOrder ' +
-				(likeClause != null ?
-					('WHERE WorkOrderNumber LIKE :likeClause ' +
-					'OR Material__r.Name LIKE :likeClause ' +
+			whereClause = new List<String>();
+
+			if (likeClause != null) {
+				whereClause.add(
+					'(WorkOrderNumber LIKE :likeClause ' +
 					'OR Material__r.Name LIKE :likeClause ' + 
-					'OR OrderProduct__r.Product2.Name LIKE :likeClause ') :
+					'OR OrderProduct__r.Product2.Name LIKE :likeClause)');
+			}
+
+			// custom filters
+			if (filtersList != null && !filtersList.isEmpty()) {
+				for (FilterWrapper filterWrapper : filtersList) {
+					fieldName = String.escapeSingleQuotes(
+						filterWrapper.fieldApiName);
+					value = String.escapeSingleQuotes(
+						String.valueOf(filterWrapper.value));
+
+					if (filterWrapper.value instanceOf String) {
+						value = '\'' + value + '\'';
+					}
+
+					whereClause.add(
+						String.format(
+							'({0} = {1})',
+							new List<String> { fieldName, value }));
+				}
+			}
+
+			String query =
+				'SELECT Id ' +
+				'FROM WorkOrder ' +
+				(!whereClause.isEmpty() ?
+					('WHERE ' + String.join(whereClause, ' AND ') + ' ') :
 					'') +
 				'ORDER BY ' + String.join(sortByFields, ', ') + ' ' +
 				'LIMIT :pageSize ' +
-				'OFFSET :offset '
-			);
+				'OFFSET :offset ';
+			System.debug(query);
+			return Database.query(query);
 		} catch (Exception ex) {
+			System.debug(ex.getMessage() + '\n' + ex.getStackTraceString());
 			throw new AuraHandledException(ex.getMessage());
 		}
 	}
@@ -127,4 +140,12 @@ public with sharing class WorkOrderListViewCtrl {
 
 		}
 	} */
+
+	public class FilterWrapper {
+		@AuraEnabled
+		public String fieldApiName { get; set; }
+
+		@AuraEnabled
+		public Object value { get; set; }
+	}
 }

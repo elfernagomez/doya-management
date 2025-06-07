@@ -5,8 +5,6 @@ import {
 } from "lightning/uiRelatedListApi";
 import {
 	getFieldValue,
-	createRecord,
-	updateRecord,
 	deleteRecord
 } from 'lightning/uiRecordApi';
 import {
@@ -17,8 +15,6 @@ import {
 
 import detailsView from "./details.html";
 import compactView from "./compact.html";
-
-import WORK_ORDER_LINE_ITEM_OBJECT from '@salesforce/schema/WorkOrderLineItem';
 
 /**
  * @author Fernando Gomez
@@ -80,7 +76,7 @@ export default class WorkOrderLineItemManager extends WorkOrderLineItemManagerBa
 				
 				// create a one level record with all field values
 				this.fields.forEach(f =>
-					record[f] = getFieldValue(r, this.getFieldFullName(f)));
+					(record[f] = getFieldValue(r, this.getFieldFullName(f))));
 				
 				// we convert the record into an item
 				let item = this.getFromRecord(record);
@@ -117,9 +113,7 @@ export default class WorkOrderLineItemManager extends WorkOrderLineItemManagerBa
 	}
 
 	deleteItem(item) {
-		deleteRecord(item.uniqueId)
-			.then(result => {})
-			.catch(e => {});
+		deleteRecord(item.uniqueId);
 	}
 
 

@@ -9,6 +9,15 @@
       "env": {
         "node": true
       }
+    },
+    {
+      "files": ["*.js"],
+      "rules": {
+        "eqeqeq": "off"
+      },
+      "env": {
+        "node": true
+      }
     }
   ]
 }

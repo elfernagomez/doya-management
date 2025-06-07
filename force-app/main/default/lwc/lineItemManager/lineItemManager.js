@@ -4,7 +4,7 @@ import { lineItemManagerLabels } from "c/constants";
 import getAllProcedures from "@salesforce/apex/Procedure.getAll";
 import { getRecords } from 'lightning/uiRecordApi';
 import { getProcedureFromRecord, getFieldNames } from "c/procedureConfiguration";
-import { createNewItem, applyProcedureOption } from "c/lineItemManagerStep";
+import { createNewItem } from "c/lineItemManagerStep";
 
 import detailsView from "./details.html";
 import compactView from "./compact.html";
@@ -125,7 +125,7 @@ export default class LineItemManager extends LwcBase {
 			this.procedureOptions = data.results.map(
 				result => getProcedureFromRecord(result.result));
 		} else if (error) {
-			console.log("error: ", error);
+			console.error("LineItemManager.wiredRecords", error);
 		}
 	}
 
@@ -142,17 +142,17 @@ export default class LineItemManager extends LwcBase {
 	}
 
 	handleSwitchItemsOrderClick(event) {
-		let index = parseInt(event.currentTarget.dataset.index);
+		let index = parseInt(event.currentTarget.dataset.index, 10);
 		this.moveItemUp(index);
 	}
 
 	handleItemChange(event) {
-		let index = parseInt(event.target.dataset.index);
+		let index = parseInt(event.target.dataset.index, 10);
 		this.editItem(index, event.detail.item);
 	}
 
 	handleItemDelete(event) {
-		let index = parseInt(event.target.dataset.index);
+		let index = parseInt(event.target.dataset.index, 10);
 		this.deleteItem(index);
 	}
 
@@ -179,9 +179,10 @@ export default class LineItemManager extends LwcBase {
 		let item = this.items[index];
 		this.items.splice(index, 1);
 		this.customEvent("itemdelete", { item });
+		// eslint-disable-next-line @lwc/lwc/no-async-operation
 		setTimeout(() => {
 			// the order field of the next item must be adjusted...
-			let item = this.items[index];
+			item = this.items[index];
 			// the next now will ne in the same place as the deleted one
 			if (item)
 				this.editItem(index, { order: index + 1 });
@@ -217,6 +218,7 @@ export default class LineItemManager extends LwcBase {
 			// but we can't do it now since it
 			// will be confusing to the user...
 			// we wait a bit
+			// eslint-disable-next-line @lwc/lwc/no-async-operation
 			setTimeout(() => {
 				this.editItem(index - 1, { order: index });
 				this.editItem(index, { order: index + 1 });

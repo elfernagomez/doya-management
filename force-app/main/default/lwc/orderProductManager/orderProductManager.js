@@ -562,8 +562,7 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 				changes.isNew = false;
 				changes.uniqueId = prod.uniqueId;
 			}
-
-			console.log("after save: ");
+			
 			this.applyChangesToProduct(
 				product.groupId,
 				product.uniqueId,

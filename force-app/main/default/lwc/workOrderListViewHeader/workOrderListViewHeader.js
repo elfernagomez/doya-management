@@ -1,6 +1,5 @@
 import WorkOrderListViewEventBus from "c/workOrderListViewEventBus";
-import { api, wire } from 'lwc';
-import { getObjectInfo } from "lightning/uiObjectInfoApi";
+import { track } from 'lwc';
 
 import WORK_ORDER_OBJECT from '@salesforce/schema/WorkOrder';
 
@@ -13,8 +12,10 @@ export default class WorkOrderListViewHeader extends WorkOrderListViewEventBus {
 	title = "Work Orders";
 	listViews = [];
 	columns = [];
-	rowNumberColumnStyle = "width:3.5rem;";
 	isFilterListOpen = false;
+
+	@track
+	filtersList;
 
 	selectedListView = {
 		title: "All Work Orders",
@@ -30,13 +31,8 @@ export default class WorkOrderListViewHeader extends WorkOrderListViewEventBus {
 		return `${this.data.length} items • Updated ${this.timeAgo}`;
 	}
 	
-	@wire(getObjectInfo, {
-		objectApiName: WORK_ORDER_OBJECT
-	})
-	wiredObjectInfo({ error, data }) {
-		if (data) {
-			
-		}
+	get objectApiName() {
+		return WORK_ORDER_OBJECT.objectApiName;
 	}
 
 	connectedCallback() {
@@ -48,7 +44,6 @@ export default class WorkOrderListViewHeader extends WorkOrderListViewEventBus {
 	}
 
 	handleOnTimeAgoUpdate(event) {
-		console.log(`time difference :: ${event.detail.timeAgo}`);
 		this.timeAgo = event.detail.timeAgo;
 	}
 
@@ -75,6 +70,18 @@ export default class WorkOrderListViewHeader extends WorkOrderListViewEventBus {
 			"searchAllChange",
 			event.detail);
 	}
+	
+
+	handleOnFilterRemoved(event) {
+		const index = event.currentTarget.dataset.index;
+		this.publishEvent(
+			"filterFieldRemovedRequested",
+			this.filtersList[index]);
+	}
+
+	handleFilterFieldChanged(newFiltersList) {
+		this.filtersList = newFiltersList;
+	}
 
 	handleWorkOrderListViewEventMessage(message) {
 		console.log(`WorkOrderListViewHeader :: event received: ${message.eventId}`);
@@ -88,6 +95,9 @@ export default class WorkOrderListViewHeader extends WorkOrderListViewEventBus {
 				break;
 			case "filterListVisibilityUpdated":
 				this.isFilterListOpen = message.payload == true;
+				break;
+			case "filterFieldChanged":
+				this.handleFilterFieldChanged([...message.payload]);
 				break;
 			default:
 				break;

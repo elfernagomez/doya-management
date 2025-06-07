@@ -343,19 +343,15 @@ export default class Lookup extends LightningElement {
 	_getDefaultNameField() {
 		if (this.objectApiName.endsWith("__mdt"))
 			return "DeveloperName";
-		else
-			switch (this.objectApiName) {
-				case "Case":
-					return "CaseNumbe";
-				case "ContractLineItem":
-					return "LineItemNumber";
-				default:
-					return "Name";
-			}
-	}
 
-	_log(title, obj) {
-		console.log(title, JSON.stringify(obj));
+		switch (this.objectApiName) {
+			case "Case":
+				return "CaseNumbe";
+			case "ContractLineItem":
+				return "LineItemNumber";
+			default:
+				return "Name";
+		}
 	}
 
 	_deepClone(obj) {

@@ -1,15 +1,18 @@
-import { LightningElement, api, wire } from 'lwc';
-import { getObjectInfo } from "lightning/uiObjectInfoApi";
+import LwcBase from 'c/lwcBase';
+import { api } from 'lwc';
 
-export default class OutputField extends LightningElement {
+export default class OutputField extends LwcBase {
 	@api
 	record;
 
 	@api
-	fieldName = "Name";
+	fieldName;
 
 	@api
 	objectApiName;
+
+	@api
+	isNameField;
 
 	@api
 	type = "record"; // record, object
@@ -22,6 +25,12 @@ export default class OutputField extends LightningElement {
 	fieldType = "text"; // text, number, currentcy
 
 	@api
+	relationshipName;
+
+	@api
+	relatedTo;
+
+	@api
 	maximumFractionDigits;
 
 	@api
@@ -29,6 +38,14 @@ export default class OutputField extends LightningElement {
 
 	@api
 	minimumIntegerDigits;
+
+	get fields() {
+		return this.isRecord() ? [`${this.objectApiName}.${this.fieldName}`] : null;
+	}
+
+	get jsFieldType() {
+		return this.fieldType.toLowerCase();
+	}
 	
 	get isRecord() {
 		return this.type == "record";
@@ -39,75 +56,101 @@ export default class OutputField extends LightningElement {
 	}
 
 	get displayValue() {
+		let value;
 		switch (this.type) {
 			case "record":
-				return this.record[this.fieldName]?.displayValue ||
-					this.record[this.fieldName]?.value ||
-					"&nbsp;";
+				if (this.isLookup && this.relatedTo) {
+					const o = this.record[this.relationshipName];
+					if (o && o.displayValue && o.value) {
+						return `<a href="/lightning/r/${
+							this.relatedTo.apiName}/${
+							o.value.id}/view">${
+							o.displayValue}</a>`;
+					}
+				}
+
+				value = this.record[this.fieldName]?.displayValue ||
+					this.record[this.fieldName]?.value;
+				
+				if (this.isNameField && value && this.record.Id) {
+					return `<a href="/lightning/r/${
+						this.objectApiName}/${
+						this.record.Id?.value}/view">${
+						value}</a>`;
+				}
+
+				return value || "&nbsp;";
 			case "object":
 			default:
-				return this.record[this.fieldName];
+				value = this.record[this.fieldName];
+				return value;
 		}
+	}
+
+	get isCheck() {
+		return this.jsFieldType == "address";
 	}
 
 	get isAddress() {
-		return this.fieldType == "address";
+		return this.jsFieldType == "address";
 	}
 
 	get isDateTime() {
-		return this.fieldType == "datetime";
+		return this.jsFieldType == "date" ||
+			this.jsFieldType == "datetime";
 	}
 
 	get isEmail() {
-		return this.fieldType == "email";
+		return this.jsFieldType == "email";
 	}
 
 	get isLocation() {
-		return this.fieldType == "location";
+		return this.jsFieldType == "location";
 	}
 
 	get isName() {
-		return this.fieldType == "name";
+		return this.jsFieldType == "name";
 	}
 
 	get isDecimal() {
-		return this.fieldType == "decimal";
+		return this.jsFieldType == "decimal" ||
+			this.jsFieldType == "double" ||
+			this.jsFieldType == "integer" ||
+			this.jsFieldType == "long";
 	}
 
 	get isCurrency() {
-		return this.fieldType == "currency";
+		return this.jsFieldType == "currency";
 	}
 
 	get isPercent() {
-		return this.fieldType == "percent";
+		return this.jsFieldType == "percent";
 	}
 
 	get isPhone() {
-		return this.fieldType == "phone";
+		return this.jsFieldType == "phone";
 	}
 
 	get isRichText() {
-		return this.fieldType == "richtext";
+		return this.jsFieldType == "richtext" ||
+			this.jsFieldType == "textarearich";
 	}
 
 	get isText() {
-		return this.fieldType == "text";
+		return this.jsFieldType == "text" ||
+			this.jsFieldType == "string" ||
+			this.jsFieldType == "picklist";
 	}
 
 	get isTime() {
-		return this.fieldType == "time";
+		return this.jsFieldType == "time";
 	}
 
 	get isUrl() {
-		return this.fieldType == "url";
+		return this.jsFieldType == "url";
 	}
 
-	@wire(getObjectInfo, {
-		objectApiName: "$objectApiName"
-	})
-	wiredObjectInfo({ error, data}) {
-		if (data) {
-			this.logAsStringPretty(data);
-		}
+	get isLookup() {
+		return this.jsFieldType == "reference";
 	}
 }

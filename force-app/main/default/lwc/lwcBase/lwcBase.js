@@ -7,7 +7,6 @@ import { LightningElement, api } from 'lwc';
  */
 export default class LwcBase extends LightningElement {
 
-	
 	/**
 	 * Error reporting for components
 	 * @see c:errorPanel
@@ -243,7 +242,7 @@ export default class LwcBase extends LightningElement {
 	convertToType(val, type) {
 		switch (type) {
 			case "int":
-				return parseInt(val);
+				return parseInt(val, 10);
 			case "float":
 				return parseFloat(val);
 			case "bool":
@@ -280,7 +279,7 @@ export default class LwcBase extends LightningElement {
 	 * @param {*} keepReference 
 	 */
 	mergeObjects(destObject, srcObject) {
-		Object.keys(srcObject).forEach(k => destObject[k] = srcObject[k]);
+		Object.keys(srcObject).forEach(k => (destObject[k] = srcObject[k]));
 	}
 
 	// NOTE: Private Helper only from thin line on.
@@ -311,9 +310,9 @@ export default class LwcBase extends LightningElement {
 		// search in the left half of mid
 		if (arr[mid] > x)
 			return this._binarySearch(arr, x, start, mid - 1);
-		else
-			// If element at mid is smaller than x,
-			// search in the right half of mid
-			return this._binarySearch(arr, x, mid + 1, end);
+		
+		// If element at mid is smaller than x,
+		// search in the right half of mid
+		return this._binarySearch(arr, x, mid + 1, end);
 	}
 }

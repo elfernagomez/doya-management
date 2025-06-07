@@ -9,7 +9,23 @@
 	is-filter-list-open={isFilterListOpen}
 	onactionselect={handleOnActionSelect}
 	onlistviewbuttonclick={handleOnLisViewButtonClick}
-	onsearchtextchange={handleOnSearchTextChange}></c-page-header>
+	onsearchtextchange={handleOnSearchTextChange}>	
+	<div slot="extra"
+		class="slds-page-header__row">
+		<c-field-value-pill
+			for:each={filtersList}
+			for:item="f"
+			for:index="i"
+			key={f.fieldApiName}
+			label={f.label}
+			value={f.value}
+			field-api-name={f.fieldApiName}
+			data-index={i}
+			variant="pill"
+			onremove={handleOnFilterRemoved}
+			class="slds-var-m-right_xx-small"></c-field-value-pill>
+	</div>
+</c-page-header>
 <div class="slds-hide">
 	<c-time-difference date-time-value={lastUpdated}
 		ontimeagoupdate={handleOnTimeAgoUpdate}></c-time-difference>

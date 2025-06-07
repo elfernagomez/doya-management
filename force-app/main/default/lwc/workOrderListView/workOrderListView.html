@@ -1,5 +1,11 @@
 <template>
 <!-- heads -->
+<div lwc:if={isError}>
+	<c-error-panel error-title={errorTitle}
+		error-object={errorObject}
+		variant="confy"></c-error-panel>
+</div>
+<!-- heads -->
 <div class="slds-table
 		slds-table_cell-buffer
 		slds-is-relative">
@@ -14,7 +20,7 @@
 						slds-cell_action-mode">&nbsp;</lightning-layout-item>
 				<lightning-layout-item scope="col"
 					flexibility="no-flex"
-					style="width:32px;">
+					style={rowCheckboxColumnStyle}>
 					<div class="slds-th__action">
 						<div class="slds-checkbox">
 							<lightning-input type="checkbox"
@@ -30,8 +36,8 @@
 					for:index="i"
 					key={col.fieldName}
 					title={col.label}
-					style={col.style}
-					class={col.styleClass}>
+					style={col.styles.header.style}
+					class={col.styles.header.class}>
 					<a role="button"
 						href="#"
 						data-field-name={col.fieldName}
@@ -106,13 +112,17 @@
 					for:index="j"
 					key={col.key}
 					title={col.column.label}
-					style={col.column.style}
-					class="slds-cell_action-mode neutral-65">
+					style={col.column.styles.cell.style}
+					class={col.column.styles.cell.class}>
 					<div class="slds-var-p-vertical_xx-small
 							slds-var-p-horizontal_small">
-						<c-output-field record={col.data}
+						<c-output-field record={row.data}
+							object-api-name={objectApiName}
+							is-name-field={col.column.isNameField}
 							field-name={col.column.fieldName}
 							field-type={col.column.fieldType}
+							relationship-name={col.column.relationshipName}
+							related-to={col.column.relatedTo}
 							maximum-fraction-digits={col.column.maxFrac}
 							minimum-fraction-digits={col.column.minFrac}
 							minimum-integer-digits={col.column.minInt}
@@ -187,6 +197,6 @@
 		</lightning-layout>
 	</div>
 	</template>
-		<lightning-spinner lwc:if={isLoading}></lightning-spinner>
+	<lightning-spinner lwc:if={isLoading}></lightning-spinner>
 </div>
 </template>
