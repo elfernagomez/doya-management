@@ -10,14 +10,22 @@ import compactView from "./compact.html";
 import fieldsView from "./fields.html";
 import styles from "./styles.css";
 
+export const STATUS_COMPLETED = "Completed";
+export const STATUS_IN_PROGRESS = "In Progress";
+export const STATUS_NEW = "New";
+export const STATUS_PENDING = "Pending";
+export const STATUS_ON_HOLD = "On Hold";
+
 export function applyProcedureOption(item, procedureOptions) {
-	if (item.procedureId && procedureOptions)
+	if (item.procedureId && procedureOptions) {
 		setProcedure(item, procedureOptions.find(p => p.value == item.procedureId));
+	}
 }
 
 export function applyProcedureRecord(item, procedureRecord) {
-	if (procedureRecord)
-		setProcedure(item, getProcedureFromRecord(procedureRecord))
+	if (procedureRecord) {
+		setProcedure(item, getProcedureFromRecord(procedureRecord));
+	}
 }
 
 export function setProcedure(item, procedure) {
@@ -38,11 +46,11 @@ export function setProcedure(item, procedure) {
 
 export function applyStatusFlags(item) {
 	item.isPending = item.status == null ||
-		item.status == "New" ||
+		item.status == STATUS_NEW ||
 		item.status == "Pending";
-	item.isInProgress = item.status == "In Progress";
-	item.isOnHold = item.status == "On Hold";
-	item.isComplete = item.status == "Completed";
+	item.isInProgress = item.status == STATUS_IN_PROGRESS;
+	item.isOnHold = item.status == STATUS_ON_HOLD;
+	item.isComplete = item.status == STATUS_COMPLETED;
 }
 
 export function cleanProcedureDependencies(item) {
@@ -75,7 +83,7 @@ export function createNewItem(
 		isMachineRequired: false,
 		machineSkills: null,
 		// status flags
-		status: "New",
+		status: STATUS_NEW,
 		isPending: false,
 		isInProgress: false,
 		isOnHold: false,
@@ -98,8 +106,9 @@ export function createNewItem(
 		productionFields: []
 	};
 
-	if (procedureId)
+	if (procedureId) {
 		applyProcedureOption(item, procedureOptions);
+	}
 	
 	applyStatusFlags(item);
 	return item;
@@ -133,6 +142,9 @@ export default class LineItemManagerStep extends NavigationMixin(LwcBase) {
 
 	set item(value) {
 		this._item = this.deepClone(value);
+		if (this._item.isInProgress) {
+			this.isDetailActionsOpen = true;
+		}
 	}
 
 	@api
@@ -171,6 +183,9 @@ export default class LineItemManagerStep extends NavigationMixin(LwcBase) {
 	@api
 	trackChanges = false;
 
+	@api
+	isReadOnly = false;
+
 	@track
 	_procedureOptions = [];
 
@@ -182,6 +197,7 @@ export default class LineItemManagerStep extends NavigationMixin(LwcBase) {
 
 	_mode = "prod";
 	labels = lineItemManagerLabels;
+	isDetailActionsOpen = false;
 
 	get isAdmin() {
 		return this._mode == "admin";
@@ -304,7 +320,11 @@ export default class LineItemManagerStep extends NavigationMixin(LwcBase) {
 				"complete",
 				"slds-var-p-vertical_small");
 		else
-			statusClasses.push("slds-var-p-vertical_medium");
+			statusClasses.push(
+				"slds-var-p-vertical_medium");
+
+		if (this._item.isSelected)
+			statusClasses.push("isSelected");
 
 		return statusClasses.join(" ");
 	}
@@ -333,6 +353,31 @@ export default class LineItemManagerStep extends NavigationMixin(LwcBase) {
 			statusClasses.push("isSelected");
 
 		return statusClasses.join(" ");
+	}
+
+	get detailsProcedurePanelClass() {
+		let statusClasses = [
+			"slds-theme_shade",
+			"procedure-panel",
+			"details"
+		];
+
+		if (this._item.isInProgress)
+			statusClasses.push("inProgress");
+		else if (this._item.isComplete)
+			statusClasses.push("complete");
+		/* else
+			statusClasses.push(
+				"slds-var-p-vertical_medium"); */
+
+		if (this._item.isSelected)
+			statusClasses.push("isSelected");
+
+		return statusClasses.join(" ");
+	}
+
+	get showDetailsActionsPanel() {
+		return !this.isReadOnly;
 	}
 
 	render() {
@@ -433,6 +478,32 @@ export default class LineItemManagerStep extends NavigationMixin(LwcBase) {
 			});
 	}
 
+	handleOnDetailsActionToggleClick() {
+		this.isDetailActionsOpen = !this.isDetailActionsOpen;
+	}
+
+	handleOnCompleteStepClick() {
+		this.isDetailActionsOpen = false;
+		this.customEvent(
+			"itemcomeplete",
+			this.getDetails(),
+			{
+				bubbles: true,
+				composed: true
+			});
+	}
+
+	handleOnSetAsCurrentStepClick() {
+		this.isDetailActionsOpen = false;
+		this.customEvent(
+			"iteminprogress",
+			this.getDetails(),
+			{
+				bubbles: true,
+				composed: true
+			});
+	}
+
 	/**
 	 * Process changes on inputs
 	 * @param {*} val
@@ -461,7 +532,7 @@ export default class LineItemManagerStep extends NavigationMixin(LwcBase) {
 
 	editItem(changes, skipEvent = false) {
 		Object.keys(changes)
-			.forEach(k => this._item[k] = changes[k]);
+			.forEach(k => (this._item[k] = changes[k]));
 
 		if (!skipEvent)
 			this.customEvent("itemchange", this.getDetails());

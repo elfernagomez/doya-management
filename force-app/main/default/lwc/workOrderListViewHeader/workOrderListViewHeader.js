@@ -12,10 +12,14 @@ export default class WorkOrderListViewHeader extends WorkOrderListViewEventBus {
 	title = "Work Orders";
 	listViews = [];
 	columns = [];
+	selectedItems = [];
 	isFilterListOpen = false;
 
 	@track
 	filtersList;
+
+	@track
+	statusOptions;
 
 	selectedListView = {
 		title: "All Work Orders",
@@ -33,6 +37,22 @@ export default class WorkOrderListViewHeader extends WorkOrderListViewEventBus {
 	
 	get objectApiName() {
 		return WORK_ORDER_OBJECT.objectApiName;
+	}
+
+	get showSelectionActions() {
+		return this.selectedItems.length > 0;
+	}
+
+	get showCompleteStepSelectionActions() {
+		return this.selectedItems.find(item => item.isInProgress);
+	}
+
+	get showSetAsCurrentStepSelectionActions() {
+		return this.selectedItems.find(item => !item.isInProgress);
+	}
+
+	get selectedStatuses() {
+		return this.statusOptions?.filter(o => o.isSelected) || [];
 	}
 
 	connectedCallback() {
@@ -70,7 +90,6 @@ export default class WorkOrderListViewHeader extends WorkOrderListViewEventBus {
 			"searchAllChange",
 			event.detail);
 	}
-	
 
 	handleOnFilterRemoved(event) {
 		const index = event.currentTarget.dataset.index;
@@ -79,25 +98,70 @@ export default class WorkOrderListViewHeader extends WorkOrderListViewEventBus {
 			this.filtersList[index]);
 	}
 
-	handleFilterFieldChanged(newFiltersList) {
+	handleOnFilterFieldChanged(newFiltersList) {
 		this.filtersList = newFiltersList;
+	}
+
+	handleStatusOptionsExternalChange(statusOptions) {
+		this.statusOptions = statusOptions;
+	}
+
+	handleOnStatusRemoved(event) {
+		const statusOptions = structuredClone(this.statusOptions);
+		let option = statusOptions.find(o => o.key == event.target.dataset.key);
+		option.isSelected = false;
+		this.publishEvent("statusOptionsChanged", statusOptions);
+	}
+
+	handleOnColumnsUpdated(columns) {
+		this.columns = columns;
+	}
+
+	handleOnWorkOrderPageFetched(data) {
+		this.data = data;
+		this.lastUpdated = new Date();
+	}
+
+	handleOnFilterListVisibilityUpdated(isFilterListOpen) {
+		this.isFilterListOpen = isFilterListOpen;
+	}
+
+	handleOnItemSelectionChanged(selectedItems) {
+		this.selectedItems = selectedItems;
+	}
+
+	handleOnSetAllAsCurrentStepClick() {
+		this.publishEvent("setAllAsCurrentStepRequested");
+	}
+
+	handleOnCompleteAllStepsClick() {
+		this.publishEvent("completeAllStepsRequested");
+	}
+
+	handleOnDeselectAllClick() {
+		this.publishEvent("deselectAllItemsRequested");
 	}
 
 	handleWorkOrderListViewEventMessage(message) {
 		console.log(`WorkOrderListViewHeader :: event received: ${message.eventId}`);
 		switch (message.eventId) {
 			case "columnsUpdated":
-				this.columns = [...message.payload];
+				this.handleOnColumnsUpdated([...message.payload]);
 				break;
 			case "workOrderPageFetched":
-				this.data = [...message.payload];
-				this.lastUpdated = new Date();
+				this.handleOnWorkOrderPageFetched([...message.payload]);
 				break;
 			case "filterListVisibilityUpdated":
-				this.isFilterListOpen = message.payload == true;
+				this.handleOnFilterListVisibilityUpdated(message.payload == true);
 				break;
 			case "filterFieldChanged":
-				this.handleFilterFieldChanged([...message.payload]);
+				this.handleOnFilterFieldChanged([...message.payload]);
+				break;
+			case "statusOptionsChanged":
+				this.handleStatusOptionsExternalChange([...message.payload]);
+				break;
+			case "itemSelectionChanged":
+				this.handleOnItemSelectionChanged([...message.payload]);
 				break;
 			default:
 				break;

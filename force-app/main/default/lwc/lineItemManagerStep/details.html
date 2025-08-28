@@ -1,5 +1,5 @@
 <template>
-<div class="slds-theme_shade procedure-panel details">
+<div class={detailsProcedurePanelClass}>
 <div lwc:if={isAdmin}
 	class="slds-is-relative admin">
 	<header class={detailsProcedureClass}>
@@ -130,7 +130,7 @@
 	</header>
 	<div lwc:if={_item.procedureId}
 		class="slds-var-p-horizontal_x-large
-			slds-var-p-vertical_medium">
+			slds-var-p-top_medium">
 		<div lwc:if={_item.isMachineNeeded}
 			class="slds-var-m-bottom_small">
 			<c-production-field lwc:if={_item.isComplete}
@@ -194,12 +194,54 @@
 				mode="view"
 				onchange={handleRecordFieldChange}></c-production-field>
 		</div>
-		<div class="slds-var-m-bottom_small">
+		<div class="slds-var-p-bottom_small">
 			<c-production-field field={productionNotesField}
 				record={_item.record}
 				mode="view"
 				is-edit-allowed-override=true
 				onchange={handleRecordFieldChange}></c-production-field>
+		</div>
+		<div lwc:if={showDetailsActionsPanel}
+			class="slds-border_top">
+			<div lwc:if={isDetailActionsOpen}
+				class="slds-var-p-vertical_small">
+				<lightning-button lwc:if={_item.isInProgress}
+					label="Complete Step"
+					name="completeStep"
+					alternative-text="Complete Step"
+					variant="brand"
+					stretch="true"
+					onclick={handleOnCompleteStepClick}></lightning-button>
+				<lightning-button lwc:else
+					label="Set As Current Step"
+					name="setAsCurrentStep"
+					alternative-text="Set As Current Step"
+					variant="brand-outline"
+					stretch="true"
+					onclick={handleOnSetAsCurrentStepClick}></lightning-button>
+			</div>
+			<button lwc:if={isDetailActionsOpen}
+				onclick={handleOnDetailsActionToggleClick}
+				class="slds-button
+					slds-button_neutral
+					slds-button_stretch
+					actions-button">
+				<lightning-icon icon-name="utility:chevronup"
+					size="xx-small"
+					class="slds-button__icon
+						slds-button__icon_left"
+						></lightning-icon>&nbsp;</button>
+			<button lwc:else
+				onclick={handleOnDetailsActionToggleClick}
+				class="slds-button
+					slds-button_neutral
+					slds-button_stretch
+					actions-button">
+				<lightning-icon icon-name="utility:chevrondown"
+					size="xx-small"
+					class="slds-button__icon
+						slds-button__icon_left"
+						></lightning-icon>&nbsp;</button>
 		</div>
 	</div>
 </div>

@@ -1,6 +1,7 @@
 <template>
-<div class="procedure-panel">
-<div class="slds-is-relative prod">
+<div class="procedure-panel compact">
+<div role="group"
+	class="slds-is-relative slds-button-group prod">
 	<button lwc:if={_item.isComplete}
 		class={compactProcedureClass}
 		type="button"
@@ -15,7 +16,7 @@
 	<button lwc:else
 		class={compactProcedureClass}
 		type="button"
-		onclick={handleOnItemClick}	
+		onclick={handleOnItemClick}
 		style="min-width:6rem;">{_item.procedureName}</button>
 </div>
 </div>

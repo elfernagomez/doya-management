@@ -4,16 +4,8 @@
 @versino 1.0
 -->
 <template>
-<lightning-card title={title}>
-<lightning-radio-group slot="actions"
-	name="modeRadioGroup"
-	alternative-text="Mode"
-	options={modeOptions}
-	value={mode}
-	type="button"
-	variant="label-hidden"
-	onchange={handleModeChange}></lightning-radio-group>
-<div class="slds-var-p-horizontal_small">
+<lightning-card hide-header="true">
+<div class="slds-scrollable_x slds-var-p-horizontal_small">
 	<div lwc:if={hasError}>
 		<c-error-panel error-title={errorTitle}
 			error-object={errorObject}></c-error-panel>

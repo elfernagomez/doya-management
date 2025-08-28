@@ -12,18 +12,67 @@
 	onsearchtextchange={handleOnSearchTextChange}>	
 	<div slot="extra"
 		class="slds-page-header__row">
-		<c-field-value-pill
-			for:each={filtersList}
-			for:item="f"
-			for:index="i"
-			key={f.fieldApiName}
-			label={f.label}
-			value={f.value}
-			field-api-name={f.fieldApiName}
-			data-index={i}
-			variant="pill"
-			onremove={handleOnFilterRemoved}
-			class="slds-var-m-right_xx-small"></c-field-value-pill>
+		<!-- <div lwc:if={statusOptions}
+			class="slds-page-header__col-meta compact-buttons">
+			<c-checkbox-group
+				options={statusOptions}
+				onchange={handleStatusOptionsLocalChange}></c-checkbox-group>
+		</div> -->
+		<div class="slds-page-header__col-meta">
+			<c-field-value-pill
+				for:each={selectedStatuses}
+				for:item="o"
+				for:index="i"
+				key={o.key}
+				label={o.label}
+				value={o.value}
+				field-api-name="Status"
+				data-key={o.key}
+				variant="pill"
+				onremove={handleOnStatusRemoved}
+				class="slds-var-m-right_xx-small"></c-field-value-pill>
+
+			<c-field-value-pill
+				for:each={filtersList}
+				for:item="f"
+				for:index="i"
+				key={f.fieldApiName}
+				label={f.label}
+				value={f.value}
+				field-api-name={f.fieldApiName}
+				data-index={i}
+				variant="pill"
+				onremove={handleOnFilterRemoved}
+				class="slds-var-m-right_xx-small"></c-field-value-pill>
+		</div>
+		<div lwc:if={showSelectionActions}
+			class="slds-page-header__col-controls">
+			<div class="slds-page-header__controls">
+				<div lwc:if={showSetAsCurrentStepSelectionActions}
+					class="slds-page-header__control">
+					<lightning-button label="Set As Current Step"
+						name="setAsCurrentStep"
+						alternative-text="Set All As Current Step"
+						variant="brand-outline"
+						onclick={handleOnSetAllAsCurrentStepClick}></lightning-button>
+				</div>
+				<div lwc:if={showCompleteStepSelectionActions}
+					class="slds-page-header__control">
+					<lightning-button label="Complete All Steps"
+						name="completeStep"
+						alternative-text="Complete All Steps"
+						variant="brand"
+						onclick={handleOnCompleteAllStepsClick}></lightning-button>
+				</div>
+				<div class="slds-page-header__control">
+					<lightning-button label="Deselect All"
+						name="deselectAll"
+						variant="base"
+						alternative-text="Deselect All"
+						onclick={handleOnDeselectAllClick}></lightning-button>
+				</div>
+			</div>
+		</div>
 	</div>
 </c-page-header>
 <div class="slds-hide">

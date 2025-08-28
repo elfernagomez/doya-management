@@ -1,0 +1,9 @@
+.compact-buttons {
+    /* Reduce SLDS button padding and font size using SLDS hooks */
+    --slds-c-button-spacing-inline-start: 0;
+    --slds-c-button-spacing-inline-end: 0;
+    --slds-c-button-spacing-block-start: 0;
+    --slds-c-button-spacing-block-end: 0;
+    --slds-c-button-line-height: 1.7;
+    --slds-c-button-font-size: 0.85rem;
+}

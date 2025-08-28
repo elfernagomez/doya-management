@@ -31,6 +31,9 @@ export default class LineItemManager extends LwcBase {
 
 	@api
 	statusOptions = [];
+
+	@api
+	mode = "prod";
 	
 	@api
 	variant = "details"; // details, compact
@@ -86,24 +89,25 @@ export default class LineItemManager extends LwcBase {
 	parentRecordId;
 	labels = lineItemManagerLabels;
 	locals = { };
-	mode = "prod";
 
 	get hasItems() {
 		return this.items != null && this.items.length > 0;
 	}
 
-	get modeOptions() {
-		return [{
-			label: "Admin",
-			value: "admin"
-		}, {
-			label: "Production",
-			value: "prod"
-		}];
-	}
-
 	get isAdmin() {
 		return this.mode == "admin";
+	}
+
+	get showDetailActions() {
+		return !this.isReadOnly && this.selectedItem != null;
+	}
+
+	get isSelectedItemInProgress() {
+		return this.selectedItem?.isInProgress;
+	}
+
+	get selectedItem() {
+		return this.items.find(item => item.isSelected);
 	}
 
 	@wire(getAllProcedures)
@@ -129,10 +133,6 @@ export default class LineItemManager extends LwcBase {
 		}
 	}
 
-	handleModeChange(event) {
-		this.mode = event.target.value;
-	}
-
 	/**
 	 * Triggered when Add button is clicke (both)
 	 * @param {*} event
@@ -154,6 +154,30 @@ export default class LineItemManager extends LwcBase {
 	handleItemDelete(event) {
 		let index = parseInt(event.target.dataset.index, 10);
 		this.deleteItem(index);
+	}
+
+	handleOnCompleteStepClick() {
+		this.customEvent(
+			"itemcomeplete",
+			{
+				item: this.selectedItem
+			},
+			{
+				bubbles: true,
+				composed: true
+			});
+	}
+
+	handleOnSetAsCurrentStepClick() {
+		this.customEvent(
+			"iteminprogress",
+			{
+				item: this.selectedItem
+			},
+			{
+				bubbles: true,
+				composed: true
+			});
 	}
 
 	addNewItem() {

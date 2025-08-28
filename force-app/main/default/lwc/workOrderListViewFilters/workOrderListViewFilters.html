@@ -58,6 +58,28 @@
 		<div lwc:else>
 			There are no filters yet.
 		</div>
+		<lightning-card title="Status"
+			class="slds-var-p-horizontal_small">
+			<lightning-layout multiple-rows="true"
+				class="slds-var-p-horizontal_small">
+				<lightning-layout-item for:each={statusOptions}
+					for:item="option"
+					key={option.value}
+					class="slds-box
+						slds-box_xx-small
+						slds-theme_shade
+						slds-var-m-right_small
+						slds-var-m-bottom_small">
+					<lightning-input type="checkbox"
+						name={option.key}
+						data-key={option.key}
+						label={option.label}
+						value={option.isSelected}
+						checked={option.isSelected}
+						onchange={handleStatusOptionsLocalChange}></lightning-input>
+				</lightning-layout-item>
+			</lightning-layout>
+		</lightning-card>
 		<lightning-card title="Add Filters"
 			class="slds-var-p-horizontal_small">
 			<div class="slds-var-p-horizontal_small">

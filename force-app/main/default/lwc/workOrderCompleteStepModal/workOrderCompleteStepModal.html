@@ -1,0 +1,126 @@
+<template>
+<lightning-modal-header label="Complete Step"></lightning-modal-header>
+<lightning-modal-body>
+	<c-scoped-notification>
+		<p>Review and confirm the following actions. {shouldMarkWorkOrderAsCompleted}</p>
+	</c-scoped-notification>
+	<lightning-layout lwc:if={isActionCompleteStep}
+		horizontal-align="center"
+		class="slds-var-m-top_large">
+		<lightning-layout-item class="slds-col">
+			<div class="slds-text-align_center">
+				<p class="slds-text-heading_small">Current Step</p>
+				<p class="slds-form-element__label slds-m-bottom_none">
+					This step will be marked as <b>Completed</b></p>
+			</div>
+			<div class="slds-var-m-top_small">
+				<c-work-order-single-line-item-manager
+					record-id={currentItem.uniqueId}
+					is-read-only=true></c-work-order-single-line-item-manager>
+			</div>
+		</lightning-layout-item>
+		<lightning-layout-item lwc:if={nextItem}
+			padding="horizontal-large"
+			class="slds-col
+				slds-var-m-top_xx-large
+				slds-var-p-top_xx-large
+				slds-text-align_center">
+			<lightning-icon icon-name="utility:forward"></lightning-icon>
+		</lightning-layout-item>
+		<lightning-layout-item lwc:if={nextItem}
+			class="slds-col">
+			<div class="slds-text-align_center">
+				<p class="slds-text-heading_small">Next Step</p>
+				<p class="slds-form-element__label slds-m-bottom_none">
+					This step will be started (marked as <b>In Progress</b>)</p>
+			</div>
+			<div class="slds-var-m-top_small">
+				<c-work-order-single-line-item-manager
+					record-id={nextItem.uniqueId}
+					is-read-only=true></c-work-order-single-line-item-manager>
+			</div>
+		</lightning-layout-item>
+		<lightning-layout-item lwc:if={showMarkWorkOrderAsCompleted}
+			padding="horizontal-large"
+			class="slds-col
+				slds-var-m-top_xx-large
+				slds-var-p-top_xx-large
+				slds-text-align_center">
+			<lightning-icon icon-name="utility:forward"></lightning-icon>
+		</lightning-layout-item>
+		<lightning-layout-item lwc:if={showMarkWorkOrderAsCompleted}
+			class="slds-col">
+			<div class="slds-text-align_center">
+				<p class="slds-text-heading_small">
+					Work Order
+				</p>
+				<p class="slds-form-element__label slds-m-bottom_none">
+					Since this is the last step,<br/>
+					Should we mark this work order as <b>Completed</b>?
+				</p>
+			</div>
+			<div class="slds-var-m-top_large slds-text-align_center">
+				<div>
+					<lightning-input type="checkbox"
+						label="Yes, proceed to Complete Work Order"
+						value={completeWorkOrder}
+						checked={completeWorkOrder}
+						name="completeWorkOrder"
+						variant="label-hidden"
+						onchange={handleOnCompleteWorkOrderChange}></lightning-input>
+				</div>
+				<p class="slds-text-heading_small">
+					Mark the work order as Completed
+				</p>
+			</div>
+		</lightning-layout-item>
+	</lightning-layout>
+	<lightning-layout lwc:if={isActionSetAsCurrentStep}
+		horizontal-align="center"
+		class="slds-var-m-top_large">
+		<lightning-layout-item class="slds-col">
+			<div class="slds-text-align_center">
+				<p class="slds-text-heading_small">Current Step</p>
+				<p class="slds-form-element__label slds-m-bottom_none">
+					This step will be marked as <b>In Progress</b></p>
+			</div>
+			<div class="slds-var-m-top_small">
+				<c-work-order-single-line-item-manager
+					record-id={currentItem.uniqueId}
+					is-read-only=true></c-work-order-single-line-item-manager>
+			</div>
+		</lightning-layout-item>
+		<lightning-layout-item lwc:if={nextItem}
+			padding="horizontal-large"
+			class="slds-col
+				slds-var-m-top_xx-large
+				slds-var-p-top_xx-large
+				slds-text-align_center">
+			<lightning-icon icon-name="utility:forward"></lightning-icon>
+		</lightning-layout-item>
+		<lightning-layout-item lwc:if={nextItem}
+			class="slds-col">
+			<div class="slds-text-align_center">
+				<p class="slds-text-heading_small">Next Step</p>
+				<p class="slds-form-element__label slds-m-bottom_none">
+					This step will be marked as <b>Pending</b></p>
+			</div>
+			<div class="slds-var-m-top_small">
+				<c-work-order-single-line-item-manager
+					record-id={nextItem.uniqueId}
+					is-read-only=true></c-work-order-single-line-item-manager>
+			</div>
+		</lightning-layout-item>
+	</lightning-layout>
+</lightning-modal-body>
+<lightning-modal-footer>
+	<lightning-button variant="neutral"
+		label="Cancel"
+		onclick={handleOnCancelClick}></lightning-button>
+
+	<lightning-button variant="brand"
+		label="Confirm"
+		onclick={handleOnCompleteClick}
+		class="slds-m-left_small"></lightning-button>
+</lightning-modal-footer>
+</template>

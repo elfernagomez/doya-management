@@ -1,0 +1,32 @@
+<template>
+<fieldset class={fieldsetClass}>
+	<legend lwc:if={label}
+		class="slds-form-element__legend
+			slds-form-element__label">{label}</legend>
+	<div class="slds-form-element__control">
+		<div class="slds-checkbox_button-group">
+			<span for:each={checkboxes}
+				for:item="chk"
+				for:index="i"
+				key={chk.key}
+				class="slds-button slds-checkbox_button">
+				<input type="checkbox"
+					aria-describedby="error_01"
+					id={chk.key}
+					value={chk.value}
+					data-key={chk.key}
+					checked={chk.isSelected}
+					name={chk.key}
+					onchange={handleOnChange} />
+				<label class="slds-checkbox_button__label"
+					for={chk.key}>
+					<span class="slds-checkbox_faux">{chk.label}</span>
+				</label>
+			</span>
+		</div>
+		<div lwc:if={isError}
+			id="error_01"
+			class="slds-form-element__help">{errorTitle}</div>
+	</div>
+</fieldset>
+</template>

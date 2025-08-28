@@ -1,5 +1,5 @@
 import LwcBase from 'c/lwcBase';
-import { api, wire } from 'lwc';
+import { api, wire, track } from 'lwc';
 import { getObjectInfo } from 'lightning/uiObjectInfoApi';
 
 import getRecordDisplayData
@@ -28,6 +28,8 @@ export default class FieldValuePill extends LwcBase {
 	_value;
 	recordId;
 	data;
+
+	@track
 	objectData;
 
 	get isPill() {
@@ -59,6 +61,10 @@ export default class FieldValuePill extends LwcBase {
 
 	get iconUrl() {
 		return this.objectData?.themeInfo.iconUrl;
+	}
+
+	get showIcon() {
+		return this.iconUrl != null;
 	}
 
 	get iconStyle() {

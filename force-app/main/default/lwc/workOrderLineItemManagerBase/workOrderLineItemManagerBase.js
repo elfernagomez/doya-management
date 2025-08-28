@@ -18,6 +18,9 @@ import {
 	getPicklistValues
 } from "lightning/uiObjectInfoApi";
 
+import updateWorkOrderLineItems
+	from "@salesforce/apex/WorkOrderLineItemManagerCtrl.updateWorkOrderLineItems";
+
 import WORK_ORDER_LINE_ITEM_OBJECT from '@salesforce/schema/WorkOrderLineItem';
 
 import WO_LINE_ITEM_STATUS_FIELD
@@ -42,10 +45,23 @@ export default class WorkOrderLineItemManagerBase extends LwcBase {
 	@api
 	variant = "details";
 
+	mode = "prod";
 	isReady = false;
 	fields = [];
 	fieldApiNames = [];
 	statusOptions = [];
+
+	get modeOptions() {
+		return [{
+			label: "Admin",
+			value: "admin",
+			isChecked: this.mode == "admin"
+		}, {
+			label: "Production",
+			value: "prod",
+			isChecked: this.mode == "prod"
+		}];
+	}
 
 	@wire(getObjectInfo, {
 		objectApiName: WORK_ORDER_LINE_ITEM_OBJECT
@@ -81,14 +97,20 @@ export default class WorkOrderLineItemManagerBase extends LwcBase {
 		fieldApiName: WO_LINE_ITEM_STATUS_FIELD
 	})
 	wiredStatusPicklistValues({ data }) {
-		if (data)
+		if (data) {
 			this.statusOptions = data.values;
+		}
 	}
 
 	handleItemChange(event) {
 		let item = event.detail.item;
-		if (this.isItemReadyToSave(item))
+		if (this.isItemReadyToSave(item)) {
 			this.saveItem(item);
+		}
+	}
+
+	handleOnModeSelect(event) {
+		this.mode = event.detail.value;
 	}
 
 	isItemReadyToSave(item) {
@@ -113,12 +135,29 @@ export default class WorkOrderLineItemManagerBase extends LwcBase {
 			updateRecord({
 				fields
 			})
-			.then(result => {})
 			.catch(error => this.addErrorToItem(item, "Item was not saved", error));
 		}
 	}
+	
+	saveItems(items, onComepleteHandler) {
+		const workOrderLineItems = items.map(item => {
+			this.removeErrorFromItem(item);
+			return this.convertToRecord(item);
+		});
+		
+		updateWorkOrderLineItems({
+			workOrderLineItems
+		})
+		.then(result => {
+			if (onComepleteHandler) {
+				onComepleteHandler(result);
+			}
+		})
+		.catch(error => items.forEach(item =>
+			this.addErrorToItem(item, "Items was not saved", error)));
+	}
 
-	updateItem(item, updateUniqueId = false, newUniqueId = null) {
+	updateItem() {
 		// to override
 	}
 

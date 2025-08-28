@@ -1,4 +1,5 @@
 import { LightningElement, api } from 'lwc';
+import StaffSelectorModal from 'c/staffSelectorModal'
 
 /**
  * Base component with common functions
@@ -6,6 +7,12 @@ import { LightningElement, api } from 'lwc';
  * @version 1.0
  */
 export default class LwcBase extends LightningElement {
+
+	checkStaff() {
+		StaffSelectorModal.open({
+			size: "small"
+		});
+	}
 
 	/**
 	 * Error reporting for components

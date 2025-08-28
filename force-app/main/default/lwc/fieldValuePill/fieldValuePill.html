@@ -5,20 +5,25 @@
 	<!-- <lightning-icon lwc:if={iconName}
 		icon-name={iconName}
 		alternative-text={displayValue}></lightning-icon> -->
-	<span title={displayValue}
-		style={iconStyle}
-		class="slds-icon_container">
-		<img lwc:if={iconUrl}
-			src={iconUrl}
-			class="slds-icon" aria-hidden="true" />
-		<span class="slds-assistive-text">{displayValue}</span>
-	</span>
+	<!-- <template lwc:if={showIcon}> -->
+		<span title={displayValue}
+			style={iconStyle}
+			class="slds-icon_container">
+			<img lwc:if={showIcon}
+				src={iconUrl}
+				class="slds-icon" aria-hidden="true" />
+			<lightning-icon lwc:else
+				icon-name="standard:text"
+				size="xx-small"></lightning-icon>
+			<span class="slds-assistive-text">{displayValue}</span>
+		</span>
+	<!-- </template> -->
 </lightning-pill>
 <div lwc:if={isTile}
 	class="slds-media slds-box slds-box_x-small">
-	<div class="slds-media__figure">
-		<span lwc:if={iconUrl}
-			title={displayValue}
+	<div lwc:if={iconUrl}
+		class="slds-media__figure">
+		<span title={displayValue}
 			style={iconStyle}
 			class="slds-icon_container">
 			<img src={iconUrl}
@@ -31,7 +36,7 @@
 		<p>{displayValue}</p>
 		<p lwc:if={label}
 			title={label}
-			class="slds-truncate">{label}</p>
+			class="slds-truncate slds-text-color_weak">{label}</p>
 	</div>
 	<div class="slds-media__figure slds-media__figure_reverse">
 		<lightning-button-icon variant="bare"

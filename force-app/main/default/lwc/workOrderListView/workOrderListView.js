@@ -1,8 +1,10 @@
 import WorkOrderListViewEventBus from "c/workOrderListViewEventBus";
 import { NavigationMixin } from "lightning/navigation";
+import LightningConfirm from 'lightning/confirm';
 import styles from "./styles.css";
 import { track, wire } from 'lwc';
 import { getRecords } from 'lightning/uiRecordApi';
+import { workOrderListViewLabels } from 'c/constants';
 
 import getWorkOrderPage
 	from "@salesforce/apex/WorkOrderListViewCtrl.getWorkOrderPage";
@@ -33,11 +35,16 @@ export default class WorkOrderListView
 	pageNumber;
 	pageSize;
 	filtersList;
+	selectedStatuses;
 	cacheBust;
 
 	noColumnWidth = "3.5rem";
 	checkboxColumnWidth = "32px";
 	numericColumnWidth = "6rem";
+
+	labels = {
+		...workOrderListViewLabels
+	};
 
 	baseHeaderClasses = [
 		"slds-is-resizable",
@@ -108,6 +115,7 @@ export default class WorkOrderListView
 		sortBy: "$sortBy",
 		isSortDesc: "$isSortDesc",
 		filtersList: "$filtersList",
+		selectedStatuses: "$selectedStatuses",
 		cacheBust: "$cacheBust"
 	})
 	wiredWorkOrderPage(result) {
@@ -211,7 +219,6 @@ export default class WorkOrderListView
 	}
 
 	handleOnOpenRowClick(event) {
-		try {
 		const index = parseInt(event.currentTarget.dataset.index, 10);
 		const selectedItemId = this.autoSelect(index);
 		this.editDataRow(
@@ -220,9 +227,6 @@ export default class WorkOrderListView
 				isOpen: true,
 				selectedItemId
 			});
-		} catch (e) {
-			console.error(e);
-		}
 	}
 
 	handleOnCloseRowClick(event) {
@@ -234,18 +238,64 @@ export default class WorkOrderListView
 			});
 	}
 
-	handleOnLineItemSelected(event) {
-		const index = parseInt(event.currentTarget.dataset.index, 10);
-		const selectedItemId = event.detail.item.uniqueId;
-		const isItemSelected = this.isItemSelected(index, selectedItemId);
-		this.editDataRow(
-			index,
-			{
-				selectedItemId:
-					isItemSelected ?
-						null :
-						selectedItemId
+	handleOnLineItemSelected() {
+		const selectedItems = [];
+		this.getAllComponents("c-work-order-line-item-manager")
+			.forEach((c, i) => {
+				const s = c.selectedItem;
+				const row = this.data[i];
+				if (s) {
+					selectedItems.push(s);
+					row.selectedItemId = s.uniqueId;
+				} else {
+					row.selectedItemId = null;
+				}
 			});
+		this.publishEvent(
+			"itemSelectionChanged",
+			selectedItems);
+	}
+
+	handleOnDeselectAllItemsRequested() {
+		this.getAllComponents("c-work-order-line-item-manager")
+			.forEach(c => (c.selectedItemId = null));
+		this.handleOnLineItemSelected();
+	}
+
+	handleOnSetAllAsCurrentStepRequested() {
+		LightningConfirm.open({
+			message: this.labels.setAllAsCurrentStepMessage,
+			variant: "header",
+			label: this.labels.setAllAsCurrentStepTitle,
+			// setting theme would have no effect
+		}).then(result => {
+			if (result) {
+				this.getAllComponents("c-work-order-line-item-manager")
+					.forEach(c => {
+						if (c.selectedItemId) {
+							c.setAsCurrentStep(c.selectedItemId);
+						}
+					});
+			}
+		});
+	}
+
+	handleOnCompleteAllStepsRequested() {
+		LightningConfirm.open({
+			message: this.labels.completeAllStepsMessage,
+			variant: "header",
+			label: this.labels.completeAllStepsTitle,
+			// setting theme would have no effect
+		}).then(result => {
+			if (result) {
+				this.getAllComponents("c-work-order-line-item-manager")
+					.forEach(c => {
+						if (c.selectedItemId) {
+							c.setAsCompletedStep(c.selectedItemId);
+						}
+					});
+			}
+		});
 	}
 
 	handleWorkOrderListViewEventMessage(message) {
@@ -276,7 +326,19 @@ export default class WorkOrderListView
 				this.handleOnSelectAllChange();
 				break;
 			case "filterFieldChanged":
-				this.handleFilterFieldChange(message.payload);
+				this.handleFilterFieldChange([...message.payload]);
+				break;
+			case "statusOptionsChanged":
+				this.handleStatusOptionsChange([...message.payload]);
+				break;
+			case "deselectAllItemsRequested":
+				this.handleOnDeselectAllItemsRequested();
+				break;
+			case "setAllAsCurrentStepRequested":
+				this.handleOnSetAllAsCurrentStepRequested();
+				break;
+			case "completeAllStepsRequested":
+				this.handleOnCompleteAllStepsRequested();
 				break;
 			default:
 				break;
@@ -299,7 +361,15 @@ export default class WorkOrderListView
 	}
 
 	handleFilterFieldChange(filtersList) {
-		this.filtersList = [...filtersList];
+		this.filtersList = filtersList;
+		this.handleRefreshAction();
+	}
+
+	handleStatusOptionsChange(selectedStatuses) {
+		this.selectedStatuses =
+			selectedStatuses
+				.filter(o => o.isSelected)
+				.map(o => o.value);
 		this.handleRefreshAction();
 	}
 
@@ -357,6 +427,7 @@ export default class WorkOrderListView
 		this.pageNumber = 0;
 		this.pageSize = 100;
 		this.filtersList = [];
+		this.selectedStatuses = [];
 		this.getPage();
 	}
 
@@ -377,7 +448,11 @@ export default class WorkOrderListView
 		const row = this.data[index];
 		if (row.selectedItemId)
 			return row.selectedItemId;
-		
+		/* 
+		// TODO: Finish auto selection...
+		// any In Progress step,
+		// or the first Pending step,
+		// or the last Completed step.
 		const selectedItem =
 			row.WorkOrderLineItems != null ?
 				(row.WorkOrderLineItems.find(
@@ -387,6 +462,8 @@ export default class WorkOrderListView
 				row.WorkOrderLineItems[0]) :
 				null;
 		return selectedItem?.Id;
+		*/
+		return null;
 	}
 
 	isItemSelected(index, selectedItemId) {

@@ -3,7 +3,7 @@ import { wire, track } from "lwc";
 import { getRecords, getFieldValue } from 'lightning/uiRecordApi';
 import staffLogin from "@salesforce/apex/StaffManager.staffLogin";
 
-import PIN_FIELD from "@salesforce/schema/Staff__c.";
+import PIN_FIELD from "@salesforce/schema/Staff__c.PIN__c";
 
 /* export function selectStaff(handleOnStaffConfirmed) {
 	StaffSelector.open({

@@ -26,6 +26,9 @@ export default class WorkOrderSingleLineItemManager
 	@api
 	showModeOptions = false;
 
+	@api
+	isReadOnly = false;
+
 	mode = "prod";
 	wiredProcedureParameter;
 	procedureOptions = [];

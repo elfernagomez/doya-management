@@ -5,7 +5,8 @@
 -->
 <template>
 <div class="slds-var-p-horizontal_small">
-	<lightning-layout lwc:if={hasItems}>
+	<lightning-layout lwc:if={hasItems}
+		multiple-rows="true">
 		<lightning-layout-item for:each={items}
 			for:item="item"
 			for:index="index"
@@ -23,6 +24,23 @@
 				onitemchange={handleItemChange}
 				onitemdelete={handleItemDelete}></c-line-item-manager-step>
 		</lightning-layout-item>
+		<!-- <lightning-layout-item lwc:if={showDetailActions}
+			alignment-bump="left">
+			<lightning-button lwc:if={isSelectedItemInProgress}
+				label="Complete Step"
+				name="completeStep"
+				alternative-text="Complete Step"
+				variant="brand"
+				stretch="true"
+				onclick={handleOnCompleteStepClick}></lightning-button>
+			<lightning-button lwc:else
+				label="Set As Current Step"
+				name="setAsCurrentStep"
+				alternative-text="Set As Current Step"
+				variant="outline"
+				stretch="true"
+				onclick={handleOnSetAsCurrentStepClick}></lightning-button>
+		</lightning-layout-item> -->
 	</lightning-layout>
 	<div lwc:if={hasError}>
 		<c-error-panel error-title={errorTitle}

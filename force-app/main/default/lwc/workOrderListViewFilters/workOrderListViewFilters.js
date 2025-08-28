@@ -1,10 +1,14 @@
 import WorkOrderListViewEventBus from "c/workOrderListViewEventBus";
 import { track, wire } from 'lwc';
 
+import { getObjectInfo } from 'lightning/uiObjectInfoApi';
+import { getPicklistValues } from 'lightning/uiObjectInfoApi';
+
 import getFieldDetailsFromFieldSet
 	from "@salesforce/apex/FieldSetManager.getFieldDetailsFromFieldSet";
 
 import WORK_ORDER_OBJECT from '@salesforce/schema/WorkOrder';
+import STATUS_FIELD from '@salesforce/schema/WorkOrder.Status';
 
 export default class WorkOrderListViewFilters extends WorkOrderListViewEventBus {
 	show = false;
@@ -20,12 +24,41 @@ export default class WorkOrderListViewFilters extends WorkOrderListViewEventBus 
 	@track
 	filtersList = [];
 
+	@track
+	statusOptions = [];
+
 	get objectApiName() {
 		return WORK_ORDER_OBJECT.objectApiName;
 	}
 
 	get isApplyButtonDisabled() {
 		return Object.keys(this.newFilters).length === 0;
+	}
+
+	// 1. Get object metadata to retrieve recordTypeId
+	@wire(getObjectInfo, {
+		objectApiName: WORK_ORDER_OBJECT
+	})
+	objectInfo;
+
+	// 2. Get active picklist values for the Status field
+	@wire(getPicklistValues, {
+		recordTypeId: '$objectInfo.data.defaultRecordTypeId',
+		fieldApiName: STATUS_FIELD
+	})
+	wiredStatusValues({ error, data }) {
+		if (data) {
+			// Only active values are returned by getPicklistValues
+			// Example: [{ label: 'New', value: 'New' }, ...]
+			this.statusOptions = data.values.map(
+				v => ({
+					isSelected: false,
+					key: crypto.randomUUID(),
+					...v,
+				}));
+		} else if (error) {
+			this.addError("Error retrieving Work Order Active statuses", error);
+		}
 	}
 
 	@wire(getFieldDetailsFromFieldSet, {
@@ -39,7 +72,7 @@ export default class WorkOrderListViewFilters extends WorkOrderListViewEventBus 
 			this.fields = data;
 		} else if (error) {
 			this.isLoading = false;
-			this.addError("Error retrieving Work Order", error);
+			this.addError("Error retrieving Work Order Fields", error);
 		}
 	}
 
@@ -65,6 +98,9 @@ export default class WorkOrderListViewFilters extends WorkOrderListViewEventBus 
 				break;
 			case "filterFieldRemovedRequested":
 				this.handleOnFilterFieldRemovedRequested(message.payload);
+				break;
+			case "statusOptionsChanged":
+				this.handleStatusOptionsExternalChange([...message.payload]);
 				break;
 			default:
 				break;
@@ -114,6 +150,17 @@ export default class WorkOrderListViewFilters extends WorkOrderListViewEventBus 
 		const filterField = this.filtersList[index];
 		this.filtersList = this.filtersList.filter(f => f.key != filterField.key);
 		this.publishEvent("filterFieldChanged", this.filtersList);
+	}
+
+	handleStatusOptionsLocalChange(event) {
+		const statusOptions = structuredClone(this.statusOptions);
+		let option = statusOptions.find(o => o.key == event.target.dataset.key);
+		option.isSelected = event.target.checked;
+		this.publishEvent("statusOptionsChanged", statusOptions);
+	}
+
+	handleStatusOptionsExternalChange(statusOptions) {
+		this.statusOptions = statusOptions;
 	}
 
 	applyFilters(closeAfterApply) {

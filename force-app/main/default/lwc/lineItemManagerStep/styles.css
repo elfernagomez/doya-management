@@ -19,7 +19,8 @@
 	background-color: var(--lwc-brandAccessibleActive);
 }
 
-.procedure-panel .isSelected {
+.procedure-panel.compact .isSelected,
+.procedure-panel.details.isSelected {
 	outline: .20rem var(--slds-g-color-brand-base-10) solid;
 }
 
@@ -51,4 +52,11 @@
 
 .status-panel .status-panel-item lightning-button {
 	--lwc-lineHeightButton: 1.5rem;
+}
+
+.actions-button:not(:hover),
+.actions-button:not(:active) {
+	/* --lwc-lineHeightButton: 1.2rem; */
+	background-color: transparent !important;
+	border: none !important;
 }

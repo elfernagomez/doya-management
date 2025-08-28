@@ -83,12 +83,40 @@
 		<protected>false</protected>
 		<shortDescription>procedureExtraFieldsSelector_title</shortDescription>
 		<value>Procedure Settings</value>
-	</labels>	
+	</labels>
 	<labels>
 		<fullName>fieldMultiSelector_allowEditHelp</fullName>
 		<language>en_US</language>
 		<protected>false</protected>
 		<shortDescription>fieldMultiSelector_allowEditHelp</shortDescription>
 		<value>Allow operation to edit while working. If this is not checked, only Admins can edit this fields</value>
+	</labels>
+	<labels>
+		<fullName>WorkOrderListView_setAllAsCurrentStepTitle</fullName>
+		<language>en_US</language>
+		<protected>false</protected>
+		<shortDescription>WorkOrderListView_setAllAsCurrentStepTitle</shortDescription>
+		<value>Confirm Set All Selected Items as Current Step?</value>
+	</labels>
+	<labels>
+		<fullName>WorkOrderListView_setAllAsCurrentStepMessage</fullName>
+		<language>en_US</language>
+		<protected>false</protected>
+		<shortDescription>WorkOrderListView_setAllAsCurrentStepMessage</shortDescription>
+		<value>All Selected Items will be marked as In Progress. Prior steps will be marked as Completed. Future steps will be marked as Pending. Are you sure?</value>
+	</labels>
+	<labels>
+		<fullName>WorkOrderListView_completeAllStepsTitle</fullName>
+		<language>en_US</language>
+		<protected>false</protected>
+		<shortDescription>WorkOrderListView_setAllAsCurrentStepTitle</shortDescription>
+		<value>Confirm Complete All Selected Items?</value>
+	</labels>
+	<labels>
+		<fullName>WorkOrderListView_completeAllStepsMessage</fullName>
+		<language>en_US</language>
+		<protected>false</protected>
+		<shortDescription>WorkOrderListView_setAllAsCurrentStepMessage</shortDescription>
+		<value>All Selected Items will be marked as Completed. Prior steps will be marked as Completed. The next step will be marked as In Progress, and future steps will be marked as Pending. Are you sure?</value>
 	</labels>
 </CustomLabels>

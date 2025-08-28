@@ -25,6 +25,15 @@ import FIELD_MULTI_SELECTOR_ALLOW_EDIT_HELP_TEXT
 import PROCEDURE_EXTRA_FIELDS_SELECTOR_TITLE
 	from "@salesforce/label/c.procedureExtraFieldsSelector_title";
 
+import WORK_ORDER_LIST_VIEW_SET_ALL_AS_CURRENT_STEP_TITLE
+	from "@salesforce/label/c.WorkOrderListView_setAllAsCurrentStepTitle";
+import WORK_ORDER_LISTVIEW_SET_ALL_AS_CURRENT_STEP_MESSAGE
+	from "@salesforce/label/c.WorkOrderListView_setAllAsCurrentStepMessage";
+import WORK_ORDER_LIST_VIEW_COMPLETE_ALL_STEPS_TITLE
+	from "@salesforce/label/c.WorkOrderListView_completeAllStepsTitle";
+import WORK_ORDER_LIST_VIEW_COMPLETE_ALL_STEPS_MESSAGE
+	from "@salesforce/label/c.WorkOrderListView_completeAllStepsMessage";
+
 export const lineItemManagerLabels = {
 	noItemsMsg: NO_ITEMS_MSG,
 	addItemBtn: ADD_ITEM_BTN,
@@ -44,4 +53,11 @@ export const fieldMultiSelectorLabels = {
 
 export const procedureConfigurationLabels = {
 	title: PROCEDURE_EXTRA_FIELDS_SELECTOR_TITLE
+};
+
+export const workOrderListViewLabels = {
+	setAllAsCurrentStepMessage: WORK_ORDER_LISTVIEW_SET_ALL_AS_CURRENT_STEP_MESSAGE,
+	setAllAsCurrentStepTitle: WORK_ORDER_LIST_VIEW_SET_ALL_AS_CURRENT_STEP_TITLE,
+	completeAllStepsTitle: WORK_ORDER_LIST_VIEW_COMPLETE_ALL_STEPS_TITLE,
+	completeAllStepsMessage: WORK_ORDER_LIST_VIEW_COMPLETE_ALL_STEPS_MESSAGE,
 };

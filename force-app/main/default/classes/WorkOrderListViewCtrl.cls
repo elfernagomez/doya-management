@@ -25,7 +25,8 @@ public with sharing class WorkOrderListViewCtrl {
 		Integer pageSize,
 		String sortBy,
 		Boolean isSortDesc,
-		List<FilterWrapper> filtersList
+		List<FilterWrapper> filtersList,
+		List<String> selectedStatuses
 	) {
 		Integer offset;
 		String likeClause = null;
@@ -65,6 +66,11 @@ public with sharing class WorkOrderListViewCtrl {
 					'(WorkOrderNumber LIKE :likeClause ' +
 					'OR Material__r.Name LIKE :likeClause ' + 
 					'OR OrderProduct__r.Product2.Name LIKE :likeClause)');
+			}
+
+			// status filter
+			if (selectedStatuses != null && !selectedStatuses.isEmpty()) {
+				whereClause.add('Status IN :selectedStatuses');
 			}
 
 			// custom filters

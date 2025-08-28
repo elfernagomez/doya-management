@@ -5,12 +5,17 @@
 -->
 <template>
 <div>
-	<c-line-item-manager lwc:if={isReady}
-		title="Steps"
-		details={details}
-		status-options={statusOptions}
-		selected-item-id={selectedItemId}
-		variant="compact"></c-line-item-manager>
+	<div>
+		<c-line-item-manager lwc:if={isReady}
+			title="Steps"
+			details={details}
+			status-options={statusOptions}
+			selected-item-id={selectedItemId}
+			variant="compact"
+			onitemselected={handleOnItemSelected}
+			onitemcomeplete={handleOnItemComplete}
+			oniteminprogress={handleOnItemInProgress}></c-line-item-manager>
+	</div>
 	<div lwc:if={isError}
 		class="slds-var-p-horizontal_small">
 		<c-error-panel error-title={errorTitle}
