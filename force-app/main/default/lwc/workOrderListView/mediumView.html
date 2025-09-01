@@ -1,0 +1,186 @@
+<template>
+<!-- heads -->
+<div lwc:if={isError}>
+	<c-error-panel error-title={errorTitle}
+		error-object={errorObject}
+		variant="confy"></c-error-panel>
+</div>
+<!-- heads -->
+<div class="">
+<template for:each={data}
+	for:item="row"
+	for:index="i">
+<div key={row.uniqueId}
+	class="slds-box
+		slds-theme_shade
+		slds-var-m-bottom_small
+		slds-p-around_none">
+	<div class="slds-page-header">
+		<div class="slds-page-header__row">
+			<div class="slds-page-header__col-title">
+				<div class="slds-media">
+					<div class="slds-media__figure">
+						<lightning-icon icon-name={iconName}
+							alternative-text="Work Order"></lightning-icon>
+					</div>
+					<div class="slds-media__body">
+						<template for:each={row.mediumTopColumns}
+							for:item="col"
+							for:index="j">
+							<span lwc:if={j} key={col.key}></span>
+							<div lwc:else
+								key={col.key}
+								class="slds-page-header__name">
+								<div class="slds-page-header__name-title">
+									<h1><span class="slds-truncate
+											slds-page-header__title">
+									<c-output-field record={row.data}
+										object-api-name={objectApiName}
+										is-name-field={col.column.isNameField}
+										field-name={col.column.fieldName}
+										field-type={col.column.fieldType}
+										relationship-name={col.column.relationshipName}
+										related-to={col.column.relatedTo}
+										maximum-fraction-digits={col.column.maxFrac}
+										minimum-fraction-digits={col.column.minFrac}
+										minimum-integer-digits={col.column.minInt}
+										type={col.column.type}></c-output-field>
+									</span></h1>
+								</div>
+							</div>
+						</template>
+						<p class="slds-page-header__name-meta">
+							<template for:each={row.mediumTopColumns}
+								for:item="col"
+								for:index="j">
+								<c-output-field lwc:if={j}
+									key={col.key}
+									record={row.data}
+									object-api-name={objectApiName}
+									is-name-field={col.column.isNameField}
+									field-name={col.column.fieldName}
+									field-type={col.column.fieldType}
+									relationship-name={col.column.relationshipName}
+									related-to={col.column.relatedTo}
+									maximum-fraction-digits={col.column.maxFrac}
+									minimum-fraction-digits={col.column.minFrac}
+									minimum-integer-digits={col.column.minInt}
+									type={col.column.type}></c-output-field>
+								<template lwc:if={j}>
+									<span lwc:if={col.isNotLast}
+										key={col.key}>&nbsp;&middot;&nbsp;</span>
+								</template>
+							</template>
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="slds-var-p-horizontal_large slds-var-p-bottom_large">
+		<lightning-layout vertical-align="stretch"
+			multiple-rows="true"
+			class="slds-box
+				slds-box_x-small
+				slds-theme_default">
+			<lightning-layout-item size="5">
+				<lightning-layout multiple-rows="true">
+					<lightning-layout-item
+						for:each={row.mediumBottomColumns}
+						for:item="col"
+						for:index="j"
+						key={col.key}
+						title={col.column.label}
+						size="2"
+						style={col.column.styles.cell.style}
+						class={col.column.styles.cell.class}>
+						<div class="slds-form-element">
+							<label class="slds-form-element__label">
+								{col.column.label}&nbsp;</label>
+							<div class="slds-form-element__control">
+								<c-output-field record={row.data}
+									object-api-name={objectApiName}
+									is-name-field={col.column.isNameField}
+									field-name={col.column.fieldName}
+									field-type={col.column.fieldType}
+									relationship-name={col.column.relationshipName}
+									related-to={col.column.relatedTo}
+									maximum-fraction-digits={col.column.maxFrac}
+									minimum-fraction-digits={col.column.minFrac}
+									minimum-integer-digits={col.column.minInt}
+									type={col.column.type}></c-output-field>
+							</div>
+						</div>
+					</lightning-layout-item>
+				</lightning-layout>
+			</lightning-layout-item>
+			<lightning-layout-item size="7"
+				class="slds-border_left">
+				<div class="slds-media
+						slds-media_center
+						slds-var-p-around_medium
+						full-height">
+					<div class="slds-media__body">
+						<c-work-order-line-item-manager
+							variant="compact"
+							data-index={i}
+							record-id={row.uniqueId}
+							onitemselected={handleOnLineItemSelected}
+							selected-item-id={row.selectedItemId}
+							></c-work-order-line-item-manager>
+					</div>
+					<div class="slds-media__figure
+							slds-media__figure_reverse">
+						<lightning-button-icon lwc:if={row.isOpen}
+							size="medium"
+							icon-name="utility:chevronup"
+							alternative-text="Close Details"
+							title="Close Details"
+							variant="bare"
+							data-index={i}
+							onclick={handleOnCloseRowClick}></lightning-button-icon>
+						<lightning-button-icon lwc:else
+							size="medium"
+							icon-name="utility:chevrondown"
+							alternative-text="Open Details"
+							title="Open Details"
+							variant="bare"
+							data-index={i}
+							onclick={handleOnOpenRowClick}></lightning-button-icon>
+					</div>
+				</div>
+			</lightning-layout-item>
+			<lightning-layout-item lwc:if={row.isOpen}
+				size="12"
+				class="slds-border_top">
+				<div lwc:if={row.selectedItemId}
+					class="slds-var-m-top_large">
+					<c-work-order-single-line-item-manager
+						variant="fields"
+						data-index={i}
+						record-id={row.selectedItemId}
+						></c-work-order-single-line-item-manager>
+				</div>
+				<lightning-layout lwc:else
+					horizontal-align="center">
+					<lightning-layout-item padding="around-medium">
+						<div class="slds-media slds-media_center">
+							<div class="slds-media__figure">
+								<lightning-icon icon-name="utility:button_choice"
+									size="x-small"></lightning-icon>
+							</div>
+							<p class="slds-text-color_weak">
+								No selection. Select an item
+								to view its details here.
+							</p>
+						</div>
+					</lightning-layout-item>
+				</lightning-layout>
+			</lightning-layout-item>
+		</lightning-layout>
+	</div>
+</div>
+</template>
+<lightning-spinner lwc:if={isLoading}></lightning-spinner>
+</div>
+</template>

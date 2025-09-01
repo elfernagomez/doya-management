@@ -1,10 +1,10 @@
 import LwcBase from 'c/lwcBase';
-import { wire } from 'lwc';
+import { api, wire } from 'lwc';
 import {
 	publish,
 	subscribe,
 	unsubscribe,
-	APPLICATION_SCOPE,
+	PAGE_SCOPE,
 	MessageContext,
 } from 'lightning/messageService';
 
@@ -15,7 +15,19 @@ export default class WorkOrderListViewEventBus extends LwcBase {
 	@wire(MessageContext)
 	messageContext;
 
+	@api
+	size = "large";
+
+	iconName = "standard:work_order";
 	subscription = null;
+
+	get isSizeMedium() {
+		return this.size == "medium";
+	}
+
+	get isSizeLarge() {
+		return this.size == "large";
+	}
 
 	publishEvent(eventId, payload) {
 		publish(
@@ -35,7 +47,7 @@ export default class WorkOrderListViewEventBus extends LwcBase {
 					workOrderListViewEvent,
 					message => this.handleWorkOrderListViewEventMessage(message),
 					{
-						scope: APPLICATION_SCOPE
+						scope: PAGE_SCOPE
 					});
 		}
 	}

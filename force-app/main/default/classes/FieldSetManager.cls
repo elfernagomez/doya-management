@@ -18,12 +18,19 @@ public with sharing class FieldSetManager {
 	 * @throws AuraHandledException if the object or field set is invalid.
 	 */
 	@AuraEnabled(cacheable=true)
-	public static List<FieldInfo> getFieldDetailsFromFieldSet(
+	public static Map<String, List<FieldInfo>> getFieldDetailsFromFieldSet(
 		String objectName,
-		String fieldSetName
+		List<String> fieldSetNames
 	) {
+		Map<String, List<FieldInfo>> result;
 		try {
-			return getFieldDetails(objectName, fieldSetName);
+			result = new Map<String, List<FieldInfo>>();
+			for (String fieldSetName : fieldSetNames) {
+				result.put(
+					fieldSetName,
+					getFieldDetails(objectName, fieldSetName));
+			}
+			return result;
 		} catch (Exception ex) {
 			throw new AuraHandledException(ex.getMessage());
 		}

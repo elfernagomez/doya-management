@@ -1,6 +1,9 @@
 import WorkOrderListViewEventBus from "c/workOrderListViewEventBus";
 import { track } from 'lwc';
 
+import largeView from './largeView.html';
+import mediumView from './mediumView.html';
+
 import WORK_ORDER_OBJECT from '@salesforce/schema/WorkOrder';
 
 export default class WorkOrderListViewHeader extends WorkOrderListViewEventBus {
@@ -8,7 +11,6 @@ export default class WorkOrderListViewHeader extends WorkOrderListViewEventBus {
 	lastUpdated = new Date();
 	timeAgo = "?";
 
-	iconName = "standard:work_order";
 	title = "Work Orders";
 	listViews = [];
 	columns = [];
@@ -61,6 +63,10 @@ export default class WorkOrderListViewHeader extends WorkOrderListViewEventBus {
 
 	disconnectedCallback() {
 		this.unsubscribeFromEvents();
+	}
+	
+	render() {
+		return this.isSizeMedium ? mediumView : largeView;
 	}
 
 	handleOnTimeAgoUpdate(event) {

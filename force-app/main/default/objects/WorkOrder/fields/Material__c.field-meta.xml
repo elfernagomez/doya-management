@@ -4,7 +4,7 @@
     <deleteConstraint>SetNull</deleteConstraint>
     <externalId>false</externalId>
     <label>Material</label>
-    <referenceTo>Inventory_Item__c</referenceTo>
+    <referenceTo>InventoryItem__c</referenceTo>
     <relationshipLabel>Work Orders Materials</relationshipLabel>
     <relationshipName>Work_Order_Materials</relationshipName>
     <required>false</required>

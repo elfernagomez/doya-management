@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Dimensions__c</fullName>
+    <externalId>false</externalId>
+    <formula>&quot;&lt;span&gt;&quot; &amp;
+IF(
+  NOT(ISBLANK(Width__c)),
+  &quot;&lt;span style=&apos;font-family:monospace; font-size:1em;&apos;&gt;W&lt;/span&gt;&quot; &amp;
+  &quot;&lt;span style=&apos;margin-left:0.15em;&apos;&gt;&quot; &amp; TEXT(Width__c) &amp; &quot;&lt;/span&gt;&quot;,
+  &quot;&quot;
+) &amp;
+IF(
+  NOT(ISBLANK(Width__c)) &amp;&amp; (NOT(ISBLANK(Height__c)) || NOT(ISBLANK(Depth__c))),
+  &quot;&lt;span style=&apos;font-family:monospace; font-size:1em; margin:0 0.5em;&apos;&gt;&amp;times;&lt;/span&gt;&quot;,
+  &quot;&quot;
+) &amp;
+IF(
+  NOT(ISBLANK(Height__c)),
+  &quot;&lt;span style=&apos;font-family:monospace; font-size:1em;&apos;&gt;H&lt;/span&gt;&quot; &amp;
+  &quot;&lt;span style=&apos;margin-left:0.15em;&apos;&gt;&quot; &amp; TEXT(Height__c) &amp; &quot;&lt;/span&gt;&quot;,
+  &quot;&quot;
+) &amp;
+IF(
+  NOT(ISBLANK(Height__c)) &amp;&amp; NOT(ISBLANK(Depth__c)),
+  &quot;&lt;span style=&apos;font-family:monospace; font-size:1em; margin:0 0.5em;&apos;&gt;&amp;times;&lt;/span&gt;&quot;,
+  &quot;&quot;
+) &amp;
+IF(
+  NOT(ISBLANK(Depth__c)),
+  &quot;&lt;span style=&apos;font-family:monospace; font-size:1em;&apos;&gt;D&lt;/span&gt;&quot; &amp;
+  &quot;&lt;span style=&apos;margin-left:0.15em;&apos;&gt;&quot; &amp; TEXT(Depth__c) &amp; &quot;&lt;/span&gt;&quot;,
+  &quot;&quot;
+) &amp;
+&quot;&lt;/span&gt;&quot;</formula>
+    <label>Dimensions</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

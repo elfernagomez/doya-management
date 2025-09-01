@@ -8,7 +8,7 @@ export default class ProductionField extends InputBase {
 	@api
 	get record() {
 		return this._record;
-	};
+	}
 
 	set record(v) {
 		this._record = { ...v };

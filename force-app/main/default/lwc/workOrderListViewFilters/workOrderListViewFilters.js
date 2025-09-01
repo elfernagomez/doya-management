@@ -4,6 +4,9 @@ import { track, wire } from 'lwc';
 import { getObjectInfo } from 'lightning/uiObjectInfoApi';
 import { getPicklistValues } from 'lightning/uiObjectInfoApi';
 
+import largeView from './largeView.html';
+import mediumView from './mediumView.html';
+
 import getFieldDetailsFromFieldSet
 	from "@salesforce/apex/FieldSetManager.getFieldDetailsFromFieldSet";
 
@@ -34,6 +37,16 @@ export default class WorkOrderListViewFilters extends WorkOrderListViewEventBus 
 	get isApplyButtonDisabled() {
 		return Object.keys(this.newFilters).length === 0;
 	}
+	
+	get fieldSetNames() {
+		return [
+			"WorkOrderListViewFilterFields"
+		];
+	}
+	
+	render() {
+		return this.isSizeMedium ? mediumView : largeView;
+	}
 
 	// 1. Get object metadata to retrieve recordTypeId
 	@wire(getObjectInfo, {
@@ -63,13 +76,13 @@ export default class WorkOrderListViewFilters extends WorkOrderListViewEventBus 
 
 	@wire(getFieldDetailsFromFieldSet, {
 		objectName: WORK_ORDER_OBJECT.objectApiName,
-		fieldSetName: "WorkOrderListViewFilterFields"
+		fieldSetNames: "$fieldSetNames"
 	})
 	wireGetFieldDetailsFromFieldSet(result) {
 		const { error, data } = result;
 		this.wiredFieldDetailsResult = result;
 		if (data) {
-			this.fields = data;
+			this.fields = data.WorkOrderListViewFilterFields;
 		} else if (error) {
 			this.isLoading = false;
 			this.addError("Error retrieving Work Order Fields", error);

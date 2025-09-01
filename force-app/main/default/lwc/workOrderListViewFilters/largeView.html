@@ -23,23 +23,6 @@
 		</div>
 	</div>
 	<div class="slds-panel__body">
-		<!-- <ul lwc:if={filtersList.length}
-			class="slds-has-dividers_around-space">
-			<li for:each={filtersList}
-				for:item="f"
-				for:index="i"
-				key={f.fieldApiName}
-				class="slds-item">
-				<c-field-value-pill
-					label={f.label}
-					value={f.value}
-					field-api-name={f.fieldApiName}
-					data-index={i}
-					variant="tile"
-					onremove={handleOnFilterRemoved}
-					class="slds-var-m-right_xx-small"></c-field-value-pill>
-			</li>
-		</ul> -->
 		<template lwc:if={filtersList.length}>
 			<div for:each={filtersList}
 				for:item="f"
@@ -80,7 +63,8 @@
 				</lightning-layout-item>
 			</lightning-layout>
 		</lightning-card>
-		<lightning-card title="Add Filters"
+		<lightning-card lwc:if={fields}
+			title="Add Filters"
 			class="slds-var-p-horizontal_small">
 			<div class="slds-var-p-horizontal_small">
 				<lightning-record-edit-form lwc:if={showForm}

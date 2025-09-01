@@ -2,9 +2,12 @@ import WorkOrderListViewEventBus from "c/workOrderListViewEventBus";
 import { NavigationMixin } from "lightning/navigation";
 import LightningConfirm from 'lightning/confirm';
 import styles from "./styles.css";
-import { track, wire } from 'lwc';
+import { api, track, wire } from 'lwc';
 import { getRecords } from 'lightning/uiRecordApi';
 import { workOrderListViewLabels } from 'c/constants';
+
+import largeView from './largeView.html';
+import mediumView from './mediumView.html';
 
 import getWorkOrderPage
 	from "@salesforce/apex/WorkOrderListViewCtrl.getWorkOrderPage";
@@ -22,18 +25,30 @@ export default class WorkOrderListView
 	columns = [];
 
 	@track
+	mediumTopColumns = [];
+
+	@track
+	mediumBottomColumns = [];
+
+	@track
 	data = [];
+
+	@api
+	orderId = null;
 
 	isLoading = false;
 	isAllSelected = false;
 	wiredWorkOrderPageResult;
 	wiredFieldDetailsResult;
+	wiredMeiumTopFieldDetailsResult;
+	wiredMediumBottomFieldDetailsResult;
 	getRecordsConfig;
 	searchText;
 	sortBy;
 	isSortDesc;
 	pageNumber;
 	pageSize;
+	fixFiltersList;
 	filtersList;
 	selectedStatuses;
 	cacheBust;
@@ -41,6 +56,7 @@ export default class WorkOrderListView
 	noColumnWidth = "3.5rem";
 	checkboxColumnWidth = "32px";
 	numericColumnWidth = "6rem";
+	numericMediumBottomColumnWidth = "4.5rem";
 
 	labels = {
 		...workOrderListViewLabels
@@ -88,15 +104,35 @@ export default class WorkOrderListView
 		return result;
 	}
 
+	get fieldSetNames() {
+		return [
+			"WorkOrderListViewMediumTopFields",
+			"WorkOrderListViewMediumBottomFields",
+			"WorkOrderListViewFields"
+		];
+	}
+
+	render() {
+		return this.isSizeMedium ? mediumView : largeView;
+	}
+
 	@wire(getFieldDetailsFromFieldSet, {
 		objectName: WORK_ORDER_OBJECT.objectApiName,
-		fieldSetName: "WorkOrderListViewFields"
+		fieldSetNames: "$fieldSetNames"
 	})
-	wireGetFieldDetailsFromFieldSet(result) {
+	wireGetFieldDetailsFromLargeFieldSet(result) {
 		const { error, data } = result;
 		this.wiredFieldDetailsResult = result;
 		if (data) {
-			this.columns = data.map(field => this.getField(field));
+			this.columns =
+				data.WorkOrderListViewFields
+					.map(field => this.getField(field));
+			this.mediumTopColumns =
+				data.WorkOrderListViewMediumTopFields
+					.map(field => this.getField(field));
+			this.mediumBottomColumns =
+				data.WorkOrderListViewMediumBottomFields
+					.map(field => this.getField(field));
 			this.updateColumnsRefence();
 			this.reset();
 		} else if (error) {
@@ -109,6 +145,7 @@ export default class WorkOrderListView
 	}
 
 	@wire(getWorkOrderPage, {
+		orderId: "$orderId",
 		searchText: "$searchText",
 		pageNumber: "$pageNumber",
 		pageSize: "$pageSize",
@@ -122,6 +159,7 @@ export default class WorkOrderListView
 		const { error, data } = result;
 		this.wiredWorkOrderPageResult = result;
 		if (data) {
+			console.log("WorkOrderListView :: Work orders fecthed");
 			const recordIds = data.map(r => r.Id);
 			const fields = this.workOrderFields;
 			this.removeError();
@@ -152,18 +190,29 @@ export default class WorkOrderListView
 	})
 	wiredRecords({ data, error }) {
 		if (data) {
-			if (this.pageNumber == 0)
+			if (this.pageNumber == 0) {
 				this.data = [];
+			}
 
 			let order = this.data.length;
+			const topColumnCount = this.mediumTopColumns.length;
+
 			this.data.push(...data.results.map(r => ({
 				rowNumber: ++order,
-				isSelected: false,
 				isOpen: false,
 				uniqueId: r.result.id,
 				selectedItemId: null,
 				data: r.result.fields,
 				columns: this.columns.map(c => ({
+					key: `${c.fieldName}_${r.result.id}`,
+					column: c
+				})),
+				mediumTopColumns: this.mediumTopColumns.map((c, i) => ({
+					key: `${c.fieldName}_${r.result.id}`,
+					column: c,
+					isNotLast: (i + 1) < topColumnCount
+				})),
+				mediumBottomColumns: this.mediumBottomColumns.map((c, i) => ({
 					key: `${c.fieldName}_${r.result.id}`,
 					column: c
 				}))
@@ -377,13 +426,23 @@ export default class WorkOrderListView
 		const row = this.data[index];
 		this.mergeObjects(row, changes);
 		
-		if (updateDataRefence)
+		if (updateDataRefence) {
 			this.updateInnerRefence(index);
+		}
 	}
 
 	updateColumnsRefence() {
-		this.columns.forEach(c => (c.styles = this.getColumnStyle(c)));
+		this.columns.forEach(
+			c => (c.styles = this.getColumnStyle(c)));
 		this.columns = [...this.columns];
+
+		this.mediumTopColumns.forEach(
+			c => (c.styles = this.getMediumTopColumnStyle(c)));
+		this.mediumTopColumns = [...this.mediumTopColumns];
+
+		this.mediumBottomColumns.forEach(
+			c => (c.styles = this.getMediumBottomColumnStyle(c)));
+		this.mediumBottomColumns = [...this.mediumBottomColumns];
 	}
 
 	updateDataRefence() {
@@ -520,6 +579,38 @@ export default class WorkOrderListView
 		};
 
 		return { header, cell };
+	}
+
+	getMediumTopColumnStyle(column) {
+		return { cell: "" };
+	}
+
+	getMediumBottomColumnStyle(column) {
+		const numw = this.numericMediumBottomColumnWidth;
+		const nonNumCount =
+			this.mediumBottomColumns.filter(
+				c => !c.isNumeric).length;
+
+		let added = [
+			...this.mediumBottomColumns.filter(
+				c => c.isNumeric).map(() => numw)
+		];
+
+		const baseStyles = 
+			column.isNumeric ?
+			[`width: ${numw}`] :
+			[`width: calc((100% - (${added.join(" + ")})) / ${nonNumCount})`];
+
+		// cell
+		const cellStyle = [...baseStyles];
+		const cellClass = [];
+
+		const cell = {
+			style: cellStyle.join(";"),
+			class: cellClass.join(" ")
+		};
+
+		return { cell };
 	}
 
 	getField(field) {

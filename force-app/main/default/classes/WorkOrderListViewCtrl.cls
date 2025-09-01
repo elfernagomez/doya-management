@@ -14,12 +14,21 @@ public with sharing class WorkOrderListViewCtrl {
 	}
 
 	/**
+	 * Gets a page of Work Orders
+	 * @param orderId
+	 * @param searchText
 	 * @param pageNumber
 	 * @param pageSize
-	 * @param filters
+	 * @param sortBy
+	 * @param isSortDesc
+	 * @param filtersList
+	 * @param selectedStatuses
+	 * @return List<WorkOrder>
+	 * @throws AuraHandledException
 	 */
 	@AuraEnabled(cacheable=true)
 	public static List<WorkOrder> getWorkOrderPage(
+		String orderId,
 		String searchText,
 		Integer pageNumber,
 		Integer pageSize,
@@ -60,6 +69,11 @@ public with sharing class WorkOrderListViewCtrl {
 			}
 
 			whereClause = new List<String>();
+
+			// we may or may not have an orderId filter
+			if (String.isNotBlank(orderId)) {
+				whereClause.add('Order__c = :orderId');
+			}
 
 			if (likeClause != null) {
 				whereClause.add(

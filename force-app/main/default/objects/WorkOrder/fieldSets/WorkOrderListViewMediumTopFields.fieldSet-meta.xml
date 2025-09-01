@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FieldSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>WorkOrderListViewMediumTopFields</fullName>
+    <description>Used in the Work Order List View (medium view, top) lightning web component. These are the fields that will be part of the main data table (/lightning/n/Work_Orders).</description>
+    <displayedFields>
+        <field>WorkOrderNumber</field>
+        <isFieldManaged>false</isFieldManaged>
+        <isRequired>false</isRequired>
+    </displayedFields>
+    <displayedFields>
+        <field>Product_Name__c</field>
+        <isFieldManaged>false</isFieldManaged>
+        <isRequired>false</isRequired>
+    </displayedFields>
+    <displayedFields>
+        <field>DueDate__c</field>
+        <isFieldManaged>false</isFieldManaged>
+        <isRequired>false</isRequired>
+    </displayedFields>
+    <label>Work Order List View Medium Top Fields</label>
+</FieldSet>
