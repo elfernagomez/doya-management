@@ -21,7 +21,8 @@
 	<div lwc:if={_item.procedureId}
 		class="slds-var-p-horizontal_x-large
 			slds-var-p-vertical_medium">
-		<div class="slds-var-m-bottom_small">
+		<div lwc:if={showStatusOptions}
+			class="slds-var-m-bottom_small">
 			<lightning-combobox name="status"
 				label="Status"
 				value={_item.status}
@@ -51,6 +52,7 @@
 			<c-production-field field={field}
 				record={_item.record}
 				mode="edit"
+				object-api-name={objectApiName}
 				onchange={handleRecordFieldChange}></c-production-field>
 		</div>
 		<div>
@@ -137,6 +139,7 @@
 				field={machineField}
 				record={_item.record}
 				mode="view"
+				object-api-name={objectApiName}
 				></c-production-field>
 			<lightning-record-picker lwc:else
 				label="Machine"
@@ -157,6 +160,7 @@
 			<c-production-field field={field}
 				record={_item.record}
 				mode="view"
+				object-api-name={objectApiName}
 				onchange={handleRecordFieldChange}></c-production-field>
 		</div>
 		<template lwc:if={_item.isInProgress}>
@@ -164,12 +168,14 @@
 				<c-production-field field={startedOnField}
 					record={_item.record}
 					mode="view"
+					object-api-name={objectApiName}
 					onchange={handleRecordFieldChange}></c-production-field>
 			</div>
 			<div class="slds-var-m-bottom_small">
 				<c-production-field field={startedByField}
 					record={_item.record}
 					mode="view"
+					object-api-name={objectApiName}
 					onchange={handleRecordFieldChange}></c-production-field>
 			</div>
 		</template>
@@ -178,12 +184,14 @@
 				<c-production-field field={compledtedOnField}
 					record={_item.record}
 					mode="view"
+					object-api-name={objectApiName}
 					onchange={handleRecordFieldChange}></c-production-field>
 			</div>
 			<div class="slds-var-m-bottom_small">
 				<c-production-field field={compledtedByField}
 					record={_item.record}
 					mode="view"
+					object-api-name={objectApiName}
 					onchange={handleRecordFieldChange}></c-production-field>
 			</div>
 		</template>
@@ -192,12 +200,14 @@
 			<c-production-field field={adminNotesField}
 				record={_item.record}
 				mode="view"
+				object-api-name={objectApiName}
 				onchange={handleRecordFieldChange}></c-production-field>
 		</div>
 		<div class="slds-var-p-bottom_small">
 			<c-production-field field={productionNotesField}
 				record={_item.record}
 				mode="view"
+				object-api-name={objectApiName}
 				is-edit-allowed-override=true
 				onchange={handleRecordFieldChange}></c-production-field>
 		</div>

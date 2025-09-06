@@ -60,7 +60,7 @@ import ITEM_PRODUCT_MATERIAL_NAME_FIELD
 import ITEM_PRODUCT_RECORD_TYPE_ID_FIELD
 	from "@salesforce/schema/OrderItem.Product2.RecordTypeId";
 import ITEM_PRODUCT_RECORD_TYPE_NAME_FIELD
-	from "@salesforce/schema/OrderItem.Product2.RecordType.Name";
+	from "@salesforce/schema/OrderItem.Product2.RecordType.DeveloperName";
 import ITEM_QTY_FIELD
 	from "@salesforce/schema/OrderItem.Quantity";
 import ITEM_UNIT_TYPE_FIELD
@@ -142,17 +142,17 @@ export function convertFromRecord(r) {
 		qty: getFieldValue(r, ITEM_QTY_FIELD),
 		depth: getFieldValue(r, ITEM_DEPTH_FIELD),
 		width: getFieldValue(r, ITEM_WIDTH_FIELD),
-		height: getFieldValue(r, ITEM_HEIGHT_FIELD),		
+		height: getFieldValue(r, ITEM_HEIGHT_FIELD),
 		discountType: getFieldValue(r, ITEM_DISCOUNT_TYPE_FIELD),
 		discountAmount: getFieldValue(r, ITEM_DISCOUNT_AMOUNT_FIELD),
 		unitPrice: getFieldValue(r, ITEM_BASE_PRICE_FIELD),
 		listPrice: getFieldValue(r, ITEM_UNIT_PRICE_FIELD),
 		totalPrice: getFieldValue(r, ITEM_TOTAL_PRICE_FIELD),
 		createdDate: new Date(getFieldValue(r, ITEM_CREATED_DATE_FIELD)),
-		isProduct: getFieldValue(r, ITEM_DISCOUNT_TYPE_FIELD) == "Product",
-		isDiscount: getFieldValue(r, ITEM_DISCOUNT_TYPE_FIELD) == "Discount",
-		isPercentage: getFieldValue(r, PRODUCT_DISCOUNT_TYPE_FIELD) == "Percentage",
-		isFixed: getFieldValue(r, PRODUCT_DISCOUNT_TYPE_FIELD) == "Fixed Amount",
+		isProduct: getFieldValue(r, ITEM_PRODUCT_RECORD_TYPE_NAME_FIELD) == "Product",
+		isDiscount: getFieldValue(r, ITEM_PRODUCT_RECORD_TYPE_NAME_FIELD) == "Discount",
+		isPercentage: getFieldValue(r, ITEM_DISCOUNT_TYPE_FIELD) == "Percentage",
+		isFixed: getFieldValue(r, ITEM_DISCOUNT_TYPE_FIELD) == "Fixed Amount",
 		isNew: false
 	};
 }

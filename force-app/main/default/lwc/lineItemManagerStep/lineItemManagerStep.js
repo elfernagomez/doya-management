@@ -23,7 +23,7 @@ export function applyProcedureOption(item, procedureOptions) {
 }
 
 export function applyProcedureRecord(item, procedureRecord) {
-	if (procedureRecord) {
+	if (procedureRecord && getProcedureFromRecord) {
 		setProcedure(item, getProcedureFromRecord(procedureRecord));
 	}
 }
@@ -377,7 +377,11 @@ export default class LineItemManagerStep extends NavigationMixin(LwcBase) {
 	}
 
 	get showDetailsActionsPanel() {
-		return !this.isReadOnly;
+		return !this.isReadOnly && this.showStatusOptions;
+	}
+
+	get showStatusOptions() {
+		return this._statusOptions?.length > 0;
 	}
 
 	render() {

@@ -7,6 +7,6 @@
     <referenceTo>Procedure__c</referenceTo>
     <relationshipName>ProcedureWorkOrderLineItems</relationshipName>
     <required>false</required>
-    <trackTrending>false</trackTrending>
+    <trackHistory>false</trackHistory>
     <type>Lookup</type>
 </CustomField>

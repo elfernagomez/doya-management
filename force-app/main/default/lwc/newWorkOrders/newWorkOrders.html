@@ -1,26 +1,63 @@
 <template>
 <lightning-quick-action-panel header="Create Work Orders">
-	<div>
-		<lightning-layout for:each={productGroups}
-			for:item="product"
-			for:index="index"
-			key={product.uniqueId}
-			class="slds-gutters slds-var-m-bottom_xx-small">
-			<lightning-layout-item size="9"
-				class="slds-col">
+	<div class="slds-theme_shade
+			slds-border_bottom
+			slds-var-m-bottom_large">
+		<lightning-layout>
+			<lightning-layout-item
+				class="slds-var-p-horizontal_large
+					slds-var-p-vertical_small
+					slds-cell_action-mode">
+				<lightning-input type="checkbox"
+					variant="label-hidden"
+					value={selectAll}
+					checked={selectAll}
+					onclick={handleOnSelectedAllClick}></lightning-input>
+			</lightning-layout-item>
+			<lightning-layout-item flexibility="grow"
+				class="slds-var-p-horizontal_large
+					slds-var-p-vertical_small
+					slds-border_left">
+				<b class="slds-truncate">Order Products</b>
+			</lightning-layout-item>
+		</lightning-layout>
+	</div>
+	<div for:each={productGroups}
+		for:item="product"
+		for:index="index"
+		key={product.uniqueId}
+		class="slds-var-m-bottom_medium">
+		<lightning-layout>
+			<lightning-layout-item
+				padding="horizontal-small">
+				<lightning-input type="checkbox"
+					variant="label-hidden"
+					value={product.isSelected}
+					data-unique-id={product.uniqueId}
+					checked={product.isSelected}
+					onclick={handleOnProductSelectedClick}></lightning-input>
+			</lightning-layout-item>
+			<lightning-layout-item flexibility="grow"
+				padding="horizontal-small">
 				<c-product-card product={product}
 					mode="view"
 					variant="row"
 					hide-unit-price=true
 					hide-totals=true></c-product-card>
 			</lightning-layout-item>
-			<lightning-layout-item size="3"
-				class="slds-col">
-				<lightning-record-picker label="Sop"
+			<lightning-layout-item padding="horizontal-small">
+				<lightning-record-picker label="Select SOP"
 					variant="label-hidden"
 					placeholder="Add Sop..."
 					value={product.sopId}
-					object-api-name="SOP__c"></lightning-record-picker>
+					object-api-name="SOP__c"
+					disabled={product.isSopDisabled}></lightning-record-picker>
+				<div lwc:if={product.workOrders.length}
+					class="slds-var-m-top_xx-small">
+					<c-badge><span
+						slot="body">{product.workOrders.length} work order(s)</span>
+					</c-badge>
+				</div>
 			</lightning-layout-item>
 		</lightning-layout>
 	</div>
@@ -31,7 +68,8 @@
 
 		<lightning-button
 			variant="brand"
-			label="Create Items"
+			label="Create Work Orders"
+			disabled={isCreateItemsButtonDisabled}
 			class="slds-m-left_x-small"></lightning-button>
 	</div>
 </lightning-quick-action-panel>

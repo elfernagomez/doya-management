@@ -6,7 +6,7 @@
     <label>Order</label>
     <referenceTo>Order</referenceTo>
     <relationshipLabel>Work Orders</relationshipLabel>
-    <relationshipName>Work_Orders</relationshipName>
+    <relationshipName>WorkOrders</relationshipName>
     <required>false</required>
     <trackHistory>false</trackHistory>
     <type>Lookup</type>

@@ -7,7 +7,6 @@ import {
 	updateRecord,
 	notifyRecordUpdateAvailable
 } from 'lightning/uiRecordApi';
-import { createNewItem } from "c/lineItemManagerStep";
 
 import PROCEDURE_OBJECT
 	from '@salesforce/schema/Procedure__c';
@@ -24,6 +23,8 @@ import MACHINE_SKILLS_FIELD from
 	"@salesforce/schema/Procedure__c.MachineSkills__c";
 import PRODUCTION_FIELDS_JSON_FIELD from
 	"@salesforce/schema/Procedure__c.ProductionFieldsJson__c";
+
+export const STATUS_NEW = "New";
 
 export function getFieldNames() {
 	return [
@@ -113,12 +114,12 @@ export default class ProcedureConfiguration extends LwcBase {
 		]
 	})
 	wiredCurrentRecord({ error, data }) {
-		if (data && createNewItem && getProcedureFromRecord) {
+		if (data && getProcedureFromRecord) {
 			let proc = getProcedureFromRecord(data);
 			this.procedureName = proc.label;
 			this.colorCode = proc.colorCode;
-			let template = createNewItem(1, this.recordId, [proc]);
 
+			/* let template = createNewItem(1, this.recordId, [proc]);
 			this.previewItems = [{
 				...template,
 				isPending: true
@@ -132,7 +133,7 @@ export default class ProcedureConfiguration extends LwcBase {
 				order: 3,
 				isComplete: true,
 				notes: "Shorter notes this time."
-			}];
+			}]; */
 		} else if (error) {
 			console.error(error);
 		}

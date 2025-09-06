@@ -38,6 +38,9 @@ export default class LineItemManager extends LwcBase {
 	@api
 	variant = "details"; // details, compact
 
+	@api
+	objectApiName = "WorkOrderLineItem";
+
 	render() {
 		switch (this.variant) {
 			case "compact":

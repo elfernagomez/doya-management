@@ -4,13 +4,47 @@
 @versino 1.0
 -->
 <template>
-<c-line-item-manager lwc:if={isReady}
-	title="Tasks"
-	details={details}>
-</c-line-item-manager>
-
-<!-- <template lwc:if={isLoading}>
-	<lightning-spinner variant="brand"
-		alternative-text="Loading..."></lightning-spinner>
-</template> -->
+<lightning-card title="Steps">
+	<lightning-button-group slot="actions">
+		<!-- <lightning-radio-group name="modeRadioGroup"
+			alternative-text="Mode"
+			options={modeOptions}
+			value={mode}
+			type="button"
+			variant="label-hidden"
+			onchange={handleModeChange}></lightning-radio-group> -->
+		<!-- <lightning-button label="Complete Step"
+			name="completeStep"
+			alternative-text="Complete Step"
+			variant="brand"
+			onclick={handleOnCompleteStepClick}></lightning-button> -->
+		<lightning-button-menu menu-alignment="right"
+			onselect={handleOnModeSelect}>
+			<lightning-menu-item for:each={modeOptions}
+				for:item="modeOption"
+				for:index="index"
+				checked={modeOption.isChecked}
+				key={modeOption.value}
+				value={modeOption.value}
+				label={modeOption.label}></lightning-menu-item>
+		</lightning-button-menu>
+	</lightning-button-group>
+	<div lwc:if={isError}
+		class="slds-var-p-horizontal_small">
+		<c-error-panel error-title={errorTitle}
+			error-object={errorObject}></c-error-panel>
+	</div>
+	<c-line-item-manager lwc:if={isReady}
+		title="Steps"
+		mode={mode}
+		variant="details"
+		details={details}
+		object-api-name={objectApiName}
+		onitemchange={handleItemChange}
+		onitemdelete={handleItemDelete}></c-line-item-manager>
+	<!-- <template lwc:if={isLoading}>
+		<lightning-spinner variant="brand"
+			alternative-text="Loading..."></lightning-spinner>
+	</template> -->
+</lightning-card>
 </template>

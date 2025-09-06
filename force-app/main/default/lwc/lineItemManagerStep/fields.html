@@ -27,6 +27,7 @@
 			<c-production-field field={field}
 				record={_item.record}
 				mode="edit"
+				object-api-name={objectApiName}
 				onchange={handleRecordFieldChange}></c-production-field>
 		</lightning-layout-item>
 		<lightning-layout-item
@@ -35,6 +36,7 @@
 			<c-production-field field={adminNotesField}
 				record={_item.record}
 				mode="edit"
+				object-api-name={objectApiName}
 				onchange={handleRecordFieldChange}></c-production-field>
 		</lightning-layout-item>
 		<lightning-layout-item
@@ -43,6 +45,7 @@
 			<c-production-field field={productionNotesField}
 				record={_item.record}
 				mode="edit"
+				object-api-name={objectApiName}
 				onchange={handleRecordFieldChange}></c-production-field>
 		</lightning-layout-item>
 	</lightning-layout>
@@ -56,7 +59,7 @@
 			<c-production-field field={procedureField}
 				record={_item.record}
 				mode="view"
-				></c-production-field>
+				object-api-name={objectApiName}></c-production-field>
 		</lightning-layout-item>
 		<lightning-layout-item lwc:if={_item.isMachineNeeded}
 			class="slds-var-m-bottom_small
@@ -65,7 +68,7 @@
 				field={machineField}
 				record={_item.record}
 				mode="view"
-				></c-production-field>
+				object-api-name={objectApiName}></c-production-field>
 			<lightning-record-picker lwc:else
 				label="Machine"
 				object-api-name="Asset"
@@ -85,7 +88,8 @@
 				slds-var-m-right_xx-large">
 			<c-production-field field={field}
 				record={_item.record}
-				mode="view"></c-production-field>
+				mode="view"
+				object-api-name={objectApiName}></c-production-field>
 		</lightning-layout-item>
 		<template lwc:if={_item.isInProgress}>
 			<lightning-layout-item
@@ -93,14 +97,16 @@
 					slds-var-m-right_xx-large">
 				<c-production-field field={startedOnField}
 					record={_item.record}
-					mode="view"></c-production-field>
+					mode="view"
+					object-api-name={objectApiName}></c-production-field>
 			</lightning-layout-item>
 			<lightning-layout-item
 				class="slds-var-m-bottom_small
 					slds-var-m-right_xx-large">
 				<c-production-field field={startedByField}
 					record={_item.record}
-					mode="view"></c-production-field>
+					mode="view"
+					object-api-name={objectApiName}></c-production-field>
 			</lightning-layout-item>
 			<lightning-layout-item
 				class="slds-var-m-bottom_small
@@ -108,6 +114,7 @@
 				<c-production-field field={productionNotesField}
 					record={_item.record}
 					mode="view"
+					object-api-name={objectApiName}
 					is-edit-allowed-override=true></c-production-field>
 			</lightning-layout-item>
 			<lightning-layout-item lwc:if={_item.adminNotes}
@@ -115,7 +122,8 @@
 					slds-var-m-right_xx-large">
 				<c-production-field field={adminNotesField}
 					record={_item.record}
-					mode="view"></c-production-field>
+					mode="view"
+					object-api-name={objectApiName}></c-production-field>
 			</lightning-layout-item>
 		</template>
 		<template lwc:if={_item.isComplete}>
@@ -124,28 +132,32 @@
 					slds-var-m-right_xx-large">
 				<c-production-field field={compledtedOnField}
 					record={_item.record}
-					mode="view"></c-production-field>
+					mode="view"
+					object-api-name={objectApiName}></c-production-field>
 			</lightning-layout-item>
 			<lightning-layout-item
 				class="slds-var-m-bottom_small
 					slds-var-m-right_xx-large">
 				<c-production-field field={compledtedByField}
 					record={_item.record}
-					mode="view"></c-production-field>
+					mode="view"
+					object-api-name={objectApiName}></c-production-field>
 			</lightning-layout-item>
 			<lightning-layout-item lwc:if={_item.adminNotes}
 				class="slds-var-m-bottom_small
 					slds-var-m-right_xx-large">
 				<c-production-field field={adminNotesField}
 					record={_item.record}
-					mode="view"></c-production-field>
+					mode="view"
+					object-api-name={objectApiName}></c-production-field>
 			</lightning-layout-item>
 			<lightning-layout-item
 				class="slds-var-m-bottom_small
 					slds-var-m-right_xx-large">
 				<c-production-field field={productionNotesField}
 					record={_item.record}
-					mode="view"></c-production-field>
+					mode="view"
+					object-api-name={objectApiName}></c-production-field>
 			</lightning-layout-item>
 		</template>
 	</lightning-layout>

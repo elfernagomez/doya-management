@@ -5,7 +5,8 @@
 -->
 <template>
 <lightning-card hide-header="true">
-<div class="slds-scrollable_x slds-var-p-horizontal_small">
+<div class="slds-scrollable_x slds-var-p-horizontal_small"
+	style="min-height: 30rem;">
 	<div lwc:if={hasError}>
 		<c-error-panel error-title={errorTitle}
 			error-object={errorObject}></c-error-panel>
@@ -43,6 +44,7 @@
 				data-index={index}
 				procedure-options={procedureOptions}
 				status-options={statusOptions}
+				object-api-name={objectApiName}
 				onitemchange={handleItemChange}
 				onitemdelete={handleItemDelete}></c-line-item-manager-step>
 		</lightning-layout-item>
