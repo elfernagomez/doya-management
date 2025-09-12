@@ -34,6 +34,11 @@ import WORK_ORDER_LIST_VIEW_COMPLETE_ALL_STEPS_TITLE
 import WORK_ORDER_LIST_VIEW_COMPLETE_ALL_STEPS_MESSAGE
 	from "@salesforce/label/c.WorkOrderListView_completeAllStepsMessage";
 
+import ORDER_PRODUCT_PARTS_SELECTION_MODAL_PARTS_AVAILABLE_TITLE
+	from "@salesforce/label/c.OrderProductPartsSelectionModal_partsAvailableTitle";
+import ORDER_PRODUCT_PARTS_SELECTION_MODAL_PARTS_AVAILABLE_MESSAGE
+	from "@salesforce/label/c.OrderProductPartsSelectionModal_partsAvailableMessage";
+
 export const lineItemManagerLabels = {
 	noItemsMsg: NO_ITEMS_MSG,
 	addItemBtn: ADD_ITEM_BTN,
@@ -60,4 +65,9 @@ export const workOrderListViewLabels = {
 	setAllAsCurrentStepTitle: WORK_ORDER_LIST_VIEW_SET_ALL_AS_CURRENT_STEP_TITLE,
 	completeAllStepsTitle: WORK_ORDER_LIST_VIEW_COMPLETE_ALL_STEPS_TITLE,
 	completeAllStepsMessage: WORK_ORDER_LIST_VIEW_COMPLETE_ALL_STEPS_MESSAGE,
+};
+
+export const orderProductPartsSelectionModalLabels = {
+	title: ORDER_PRODUCT_PARTS_SELECTION_MODAL_PARTS_AVAILABLE_TITLE,
+	message: ORDER_PRODUCT_PARTS_SELECTION_MODAL_PARTS_AVAILABLE_MESSAGE
 };

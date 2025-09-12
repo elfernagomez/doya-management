@@ -50,6 +50,8 @@ public with sharing class OrderProductManagerCtrl {
 					UnitType__c,
 					OrderId,
 					PricebookEntryId,
+					ParentOrderProduct__c,
+					ParentOrderProduct__r.Product2.Name
 					Product2Id,
 					Product2.Name,
 					Product2.ProductCode,
@@ -126,6 +128,8 @@ public with sharing class OrderProductManagerCtrl {
 					UnitType__c,
 					OrderId,
 					PricebookEntryId,
+					ParentOrderProduct__c,
+					ParentOrderProduct__r.Product2.Name
 					Product2Id,
 					Product2.Name,
 					Product2.ProductCode,

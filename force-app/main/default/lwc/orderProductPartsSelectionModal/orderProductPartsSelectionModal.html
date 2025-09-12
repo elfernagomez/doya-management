@@ -1,0 +1,84 @@
+<template>
+<lightning-modal-header label={labels.title}></lightning-modal-header>
+<lightning-modal-body>
+<div>
+	<ul class="slds-has-dividers_bottom-space">
+		<li class="slds-item
+				slds-media
+				slds-media_center
+				slds-theme_shade">
+			<div class="slds-media__figure">
+				<lightning-input type="checkbox"
+					variant="label-hidden"
+					checked={isProductSelected}
+					disabled></lightning-input>
+			</div>
+			<div class="slds-media__body">
+				<b>Product</b>
+			</div>
+		</li>
+		<li class="slds-item slds-media slds-media_center">
+			<div class="slds-media__figure">
+				<lightning-input type="checkbox"
+					variant="label-hidden"
+					checked={isProductSelected}
+					onchange={handleOnSelectProductCheckboxChange}></lightning-input>
+			</div>
+			<div class="slds-media__body">
+				<c-product-card product={product}
+					hide-qty="true"
+					hide-totals="true"></c-product-card>
+			</div>
+		</li>
+	</ul>
+</div>
+<div>
+	<ul class="slds-has-dividers_bottom-space">
+		<li class="slds-item
+				slds-media
+				slds-media_center
+				slds-theme_shade">
+			<div class="slds-media__figure">
+				<lightning-input type="checkbox"
+					variant="label-hidden"
+					checked={isSelectAllParts}
+					onchange={handleOnSelectAllPartCheckboxChange}></lightning-input>
+			</div>
+			<div class="slds-media__body">
+				<b>Available Parts</b>&nbsp;
+				<lightning-helptext content={labels.message}></lightning-helptext>
+			</div>
+		</li>
+		<li for:each={parts}
+			for:item="part"
+			for:index="index"
+			key={part.productId}
+			class="slds-item slds-media slds-media_center">
+			<div class="slds-media__figure">
+				<lightning-input type="checkbox"
+					variant="label-hidden"
+					checked={part.isSelected}
+					data-part-id={part.productId}
+					onchange={handleOnSelectPartCheckboxChange}></lightning-input>
+			</div>
+			<div class="slds-media__body">
+				<c-product-card product={part}
+					hide-qty="true"
+					hide-totals="true"></c-product-card>
+			</div>
+		</li>
+	</ul>
+</div>
+</lightning-modal-body>
+<lightning-modal-footer>
+	<lightning-button variant="neutral"
+		label="Cancel"
+		onclick={handleOnCancelClick}></lightning-button>
+
+	<lightning-button variant="brand"
+		label={submitButtonCaption}
+		disabled={isAddPartsButtonDisabled}
+		onclick={handleOnAddPartsClick}
+		class="slds-m-left_small"></lightning-button>
+</lightning-modal-footer>
+</template>

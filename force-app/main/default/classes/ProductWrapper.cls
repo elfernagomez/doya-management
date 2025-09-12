@@ -57,6 +57,12 @@ public class ProductWrapper {
 	
 	@AuraEnabled
 	public Boolean isDiscount { get; set; }
+	
+	@AuraEnabled
+	public Boolean hasParts { get; set; }
+	
+	/* @AuraEnabled
+	public List<ProductWrapper> parts { get; set; } */
 
 	/**
 	 * @param pbe
@@ -80,25 +86,7 @@ public class ProductWrapper {
 		productTypeName = product.RecordType.DeveloperName;
 		isProduct = product.RecordType.DeveloperName == PRODUCT_RT_NAME;
 		isDiscount = product.RecordType.DeveloperName == DISCOUNT_RT_NAME;
+		hasParts = product.ProductParts__r.size() > 0;
+		// parts = new List<ProductWrapper>();
 	}
-
-	/**
-	 * @param pbe
-	 * @param product
-	 */
-	/* public ProductWrapper(OrderItem orderProduct) {
-		productId = orderProduct.Id;
-		productName = product.Name;
-		productCode = product.ProductCode;
-		depth = product.Depth__c;
-		width = product.Width__c;
-		height = product.Height__c;
-		finish = product.Finish__c;
-		unitType = product.QuantityUnitOfMeasure;
-		unitPrice = pbe.UnitPrice;
-		productTypeId = orderProduct.Product2.RecordTypeId;
-		productTypeName = orderProduct.Product2.RecordType.DeveloperName;
-		isProduct = orderProduct.Product2.RecordTypeId == PRODUCT_RT_NAME;
-		isDiscount = orderProduct.Product2.RecordType.DeveloperName == DISCOUNT_RT_NAME;
-	} */
 }

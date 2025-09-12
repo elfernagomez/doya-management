@@ -1,5 +1,6 @@
 import InputBase from 'c/inputBase';
 import { api, wire, track } from 'lwc';
+import { getFieldValue } from "lightning/uiRecordApi";
 import { getPicklistValues } from "lightning/uiObjectInfoApi";
 import rowMode from "./row.html";
 import cardMode from "./card.html";
@@ -54,7 +55,9 @@ export function createNewProduct() {
 		isProduct: true,
 		isDiscount: false,
 		isPercentage: false,
-		isFixed: false
+		isFixed: false,
+		isPart: false,
+		hasParts: false
 	};
 }
 
@@ -67,17 +70,17 @@ export function getProductFromProductRecord(record) {
 		width: getFieldValue(record, PRODUCT_WIDTH_FIELD),
 		height: getFieldValue(record, PRODUCT_HEIGHT_FIELD),
 		finish: getFieldValue(record, PRODUCT_FINISH_FIELD),
-		unitType: getFieldValue(record, PRODUCT_FINISH_FIELD),
+		unitType: getFieldValue(record, UNIT_TYPE_FIELD),
 		discountType: getFieldValue(record, PRODUCT_DISCOUNT_TYPE_FIELD),
 		discountAmount: getFieldValue(record, PRODUCT_DISCOUNT_AMOUNT_FIELD),
 		productTypeId: getFieldValue(record, RECORD_TYPE_ID_FIELD),
 		productTypeName: getFieldValue(record, RECORD_TYPE_NAME_FIELD),
 		materialId: getFieldValue(record, PRODUCT_MATERIAL_ID_FIELD),
 		materialName: getFieldValue(record, PRODUCT_MATERIAL_NAME_FIELD),
-		isProduct: getFieldValue(r, ITEM_PRODUCT_RECORD_TYPE_NAME_FIELD) == "Product",
-		isDiscount: getFieldValue(r, ITEM_PRODUCT_RECORD_TYPE_NAME_FIELD) == "Discount",
-		isPercentage: getFieldValue(r, PRODUCT_DISCOUNT_TYPE_FIELD) == "Percentage",
-		isFixed: getFieldValue(r, PRODUCT_DISCOUNT_TYPE_FIELD) == "Fixed Amount"
+		isProduct: getFieldValue(record, RECORD_TYPE_NAME_FIELD) == "Product",
+		isDiscount: getFieldValue(record, RECORD_TYPE_NAME_FIELD) == "Discount",
+		isPercentage: getFieldValue(record, PRODUCT_DISCOUNT_TYPE_FIELD) == "Percentage",
+		isFixed: getFieldValue(record, PRODUCT_DISCOUNT_TYPE_FIELD) == "Fixed Amount"
 	};
 }
 
@@ -133,7 +136,7 @@ export default class ProductCard extends InputBase {
 
 	unitTypeOptions = [{
 		label: "Each",
-		label: "Each"
+		value: "Each"
 	}];
 
 	get showQty() {
@@ -149,7 +152,7 @@ export default class ProductCard extends InputBase {
 	}
 
 	get showDimensions() {
-		return !this.hideDimensions;
+		return !this.hideDimensions && this._product.unitType != "Hour";
 	}
 
 	get showTotals() {
@@ -183,10 +186,6 @@ export default class ProductCard extends InputBase {
 
 	get productColumnSize() {
 		return this.showTotals ? "3" : "6";
-	}
-
-	get showDimensions() {
-		return this._product.unitType != "Hour"
 	}
 
 	get isDimensionsDisabled() {
@@ -227,15 +226,17 @@ export default class ProductCard extends InputBase {
 		let type = event.target.dataset.type;
 		let src = event.target.dataset.src;
 		let converted = this.convertToType(val, type);
+		let product = {};
 
 		switch (src) {
 			/* case "locals":
 				this.locals[field] = converted;
 				break; */
 			case "product":
-				let product = {};
 				product[field] = converted;
 				this.editProduct(product);
+				break;
+			default:
 				break;
 		}
 	}

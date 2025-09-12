@@ -35,7 +35,6 @@ import ACCOUNT_SHIPPING_POSTAL_CODE_FIELD
 	from "@salesforce/schema/Account.ShippingPostalCode";
 import ACCOUNT_SHIPPING_COUNTRY
 	from "@salesforce/schema/Account.ShippingCountry";
-import Title from '@salesforce/schema/Contact.Title';
 
 export const DEFAULT_GROUP_NAME = "Group";
 

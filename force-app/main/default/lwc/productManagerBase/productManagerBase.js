@@ -58,6 +58,8 @@ export default class ProductManagerBase extends InputBase {
 			case "locals":
 				this.locals[field] = converted;
 				break;
+			default:
+				break;
 		}
 	}
 

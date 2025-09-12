@@ -59,6 +59,8 @@ public with sharing class DeliveryGroupManager {
 						UnitType__c,
 						OrderId,
 						PricebookEntryId,
+						ParentOrderProduct__c,
+						ParentOrderProduct__r.Product2.Name,
 						Product2Id,
 						Product2.Name,
 						Product2.ProductCode,
@@ -141,9 +143,11 @@ public with sharing class DeliveryGroupManager {
 						UnitPrice,
 						UnitType__c,
 						OrderId,
+						ParentOrderProduct__c,
 						PricebookEntryId,
 						Product2Id
 					FROM OrderProducts__r
+					ORDER BY CreatedDate
 				)
 			FROM DeliveryGroup__c
 			WHERE Order__c IN :sourceOrdersMap.keySet()
@@ -218,6 +222,7 @@ public with sharing class DeliveryGroupManager {
 							ListPrice,
 							Notes__c,
 							OrderId,
+							ParentOrderProduct__c,
 							PricebookEntryId,
 							Product2Id,
 							Quantity,
@@ -225,6 +230,7 @@ public with sharing class DeliveryGroupManager {
 							UnitPrice,
 							UnitType__c
 						FROM OrderProducts__r
+						ORDER BY CreatedDate
 					)
 				FROM DeliveryGroup__c
 				WHERE Id = :deliveryGroupId

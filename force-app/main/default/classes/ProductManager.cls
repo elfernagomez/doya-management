@@ -27,7 +27,26 @@ public with sharing class ProductManager {
 					Material__c,
 					Material__r.Name,
 					RecordTypeId,
-					RecordType.DeveloperName
+					RecordType.DeveloperName,
+					(
+						SELECT Id
+							/* PartProduct__r.Name,
+							PartProduct__r.ProductCode,
+							PartProduct__r.Depth__c,
+							PartProduct__r.DiscountType__c,
+							PartProduct__r.DiscountAmount__c,
+							PartProduct__r.Finish__c,
+							PartProduct__r.Width__c,
+							PartProduct__r.Height__c,
+							PartProduct__r.QuantityUnitOfMeasure,
+							PartProduct__r.Material__c,
+							PartProduct__r.Material__r.Name,
+							PartProduct__r.RecordTypeId,
+							PartProduct__r.RecordType.DeveloperName */
+						FROM ProductParts__r
+						WHERE PartProduct__r.IsActive = true
+						ORDER BY PartProduct__r.Name ASC
+					)
 				FROM Product2
 				WHERE Id = :productId
 			];

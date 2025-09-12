@@ -21,7 +21,7 @@ export default class DiscountCard extends InputBase {
 
 	discountTypeOptions = [{
 		label: "Fixed",
-		label: "Fixed"
+		value: "Fixed"
 	}];
 
 	get percentage() {
@@ -37,8 +37,7 @@ export default class DiscountCard extends InputBase {
 		if (this._discount.isPercent)
 			return "percent";
 
-		return "number"
-			 
+		return "number";
 	}
 
 	@wire(getPicklistValues, {
@@ -60,13 +59,13 @@ export default class DiscountCard extends InputBase {
 		let type = event.target.dataset.type;
 		let src = event.target.dataset.src;
 		let converted = this.convertToType(val, type);
+		let discount = {};
 
 		switch (src) {
 			/* case "locals":
 				this.locals[field] = converted;
 				break; */
 			case "discount":
-				let discount = {};
 				discount[field] = converted;
 
 				if (field == "discountType") {
@@ -75,6 +74,8 @@ export default class DiscountCard extends InputBase {
 				}
 
 				this.editDiscount(discount);
+				break;
+			default:
 				break;
 		}
 	}
@@ -94,7 +95,7 @@ export default class DiscountCard extends InputBase {
 		this.customEvent("productdelete", this._discount);
 	}
 
-	handleOnCancelDeleteDiscountClic(index) {
+	handleOnCancelDeleteDiscountClic() {
 		this.isDeleting = false;
 	}
 

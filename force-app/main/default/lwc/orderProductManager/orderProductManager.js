@@ -21,6 +21,7 @@ import {
 	DEFAULT_GROUP_NAME
 } from "c/deliveryGroupCard";
 import LightningConfirm from 'lightning/confirm';
+import OrderProductPartsSelectionModal from 'c/orderProductPartsSelectionModal';
 
 import getDeliveryGroups
 	from "@salesforce/apex/OrderProductManagerCtrl.getDeliveryGroups";
@@ -87,6 +88,10 @@ import ITEM_CREATED_DATE_FIELD
 	from "@salesforce/schema/OrderItem.CreatedDate";
 /* import ITEM_FINISH_FIELD
 	from "@salesforce/schema/OrderItem.Finish__c"; */
+import ITEM_PARENT_ITEM_FIELD
+	from "@salesforce/schema/OrderItem.ParentOrderProduct__c";
+import ITEM_PARENT_PRODUCT_FIELD
+	from "@salesforce/schema/OrderItem.ParentOrderProduct__r.Product2.Name";
 
 import WO_ACCOUNT_ID_FIELD from "@salesforce/schema/WorkOrder.AccountId";
 import WO_DUE_DATE_FIELD from "@salesforce/schema/WorkOrder.DueDate__c";
@@ -121,7 +126,9 @@ export function getFieldApiNames() {
 		`${ITEM_OBJECT.objectApiName}.${ITEM_BASE_PRICE_FIELD.fieldApiName}`,
 		`${ITEM_OBJECT.objectApiName}.${ITEM_UNIT_PRICE_FIELD.fieldApiName}`,
 		`${ITEM_OBJECT.objectApiName}.${ITEM_TOTAL_PRICE_FIELD.fieldApiName}`,
-		`${ITEM_OBJECT.objectApiName}.${ITEM_CREATED_DATE_FIELD.fieldApiName}`
+		`${ITEM_OBJECT.objectApiName}.${ITEM_CREATED_DATE_FIELD.fieldApiName}`,
+		`${ITEM_OBJECT.objectApiName}.${ITEM_PARENT_ITEM_FIELD.fieldApiName}`,
+		`${ITEM_OBJECT.objectApiName}.${ITEM_PARENT_PRODUCT_FIELD.fieldApiName}`
 	];
 }
 
@@ -129,6 +136,8 @@ export function convertFromRecord(r) {
 	return {
 		...createNewProduct(),
 		uniqueId: getFieldValue(r, ITEM_ID_FIELD),
+		parentItemId: getFieldValue(r, ITEM_PARENT_ITEM_FIELD),
+		parentItemProductName: getFieldValue(r, ITEM_PARENT_PRODUCT_FIELD),
 		groupId: getFieldValue(r, ITEM_DELIVERY_GROUP_FIELD),
 		productId: getFieldValue(r, ITEM_PRODUCT_ID_FIELD),
 		productName: getFieldValue(r, ITEM_PRODUCT_NAME_FIELD),
@@ -153,6 +162,7 @@ export function convertFromRecord(r) {
 		isDiscount: getFieldValue(r, ITEM_PRODUCT_RECORD_TYPE_NAME_FIELD) == "Discount",
 		isPercentage: getFieldValue(r, ITEM_DISCOUNT_TYPE_FIELD) == "Percentage",
 		isFixed: getFieldValue(r, ITEM_DISCOUNT_TYPE_FIELD) == "Fixed Amount",
+		isPart: getFieldValue(r, ITEM_PARENT_ITEM_FIELD) != null,
 		isNew: false
 	};
 }
@@ -161,6 +171,8 @@ export function convertFromApexRecord(r) {
 	return {
 		...createNewProduct(),
 		uniqueId: r.Id,
+		parentItemId: r.ParentOrderProduct__c,
+		parentItemProductName: r.ParentOrderProduct__r?.Product2?.Name,
 		groupId: r.DeliveryGroup__c,
 		productId: r.Product2Id,
 		productName: r.Product2.Name,
@@ -184,6 +196,7 @@ export function convertFromApexRecord(r) {
 		isDiscount: r.Product2.RecordType?.DeveloperName == "Discount",
 		isPercentage: r.DiscountType__c == "Percentage",
 		isFixed: r.DiscountType__c == "Fixed Amount",
+		isPart: r.ParentOrderProduct__c != null,
 		isNew: false
 	};
 }
@@ -204,8 +217,6 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 	discounts = [];
 
 	mode = "view";
-
-	order;
 	refreshHandlerId;
 	wiredDeliveryGroupsResult;
 	openGroupSections;
@@ -290,9 +301,56 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 	}
 
 	handleOnProductCreated(event) {
-		this.addProduct(
-			event.target.dataset.groupId,
-			event.detail);
+		const groupId = event.target.dataset.groupId;
+		const product = event.detail;
+
+		console.log(JSON.stringify(product));
+
+		if (product.hasParts) {
+			OrderProductPartsSelectionModal.open({
+				productId: event.detail.productId,
+				product: event.detail,
+				size: "small"
+			})
+			.then((result) => {
+				if (result?.action == "add") {
+					if (result.addProduct && result.addParts) {
+						// both
+						this.addProduct(
+							groupId,
+							product
+						).then(newProduct => {
+							result.parts.forEach((part, i) => {
+								const np = {
+									...createNewProduct(),
+									...part,
+									uniqueId: `unsaved_${groupId}${i}`,
+									parentItemId: newProduct.uniqueId,
+									parentItemProductName: newProduct.productName,
+									isPart: true
+								};
+								this.addProduct(groupId, np);
+							});
+						});
+					} else if (result.addProduct) {
+						// only product
+						this.addProduct(groupId, product);
+					} else if (result.addParts) {
+						// only parts
+						result.parts.forEach((part, i) => {
+							const np = {
+								...createNewProduct(),
+								...part,
+								uniqueId: `unsaved_${groupId}${i}`
+							};
+							this.addProduct(groupId, np);
+						});
+					}
+				}
+			});
+		} else {
+			this.addProduct(groupId, product);
+		}
 	}
 
 	handleOnProductChange(event) {
@@ -309,7 +367,7 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 		this.filterProducts();
 	}
 
-	handleSaveClick(event) {
+	handleSaveClick() {
 		this._save();
 	}
 
@@ -323,7 +381,7 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 					{ isDropEnabled: true }));
 	}
 
-	handleOnProductDragEnd(event) {
+	handleOnProductDragEnd() {
 		this.groups
 			.forEach(g => this.applyChangesToGroup(
 				g.uniqueId,
@@ -510,7 +568,7 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 			newProduct.isProduct,
 			newProduct.isDiscount,
 			newProduct);
-		this.saveProduct(newProduct);
+		return this.saveProduct(newProduct);
 	}
 
 	updateProduct(product) {
@@ -520,7 +578,7 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 			product.isProduct,
 			product.isDiscount,
 			product);
-		this.saveProduct(product);
+		return this.saveProduct(product);
 	}
 
 	moveProduct(productId, targetGroupId, sourceGroupId) {
@@ -540,49 +598,54 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 		].sort((a, b) => a.createdDate - b.createdDate);
 
 		// and save info
-		this.saveProduct(product);
+		return this.saveProduct(product);
 	}
 
 	saveProduct(product) {
-		this.removeErrorFromProduct(product);
-		saveOrderProducts({
-			itemsToUpsert: [this.convertToRecord(product)],
-			itemsToDelete: []
-		})
-		.then(result => {
-			const prod = convertFromApexRecord(result[0]);
+		return new Promise((resolve, reject) => {
+			this.removeErrorFromProduct(product);
+			saveOrderProducts({
+				itemsToUpsert: [this.convertToRecord(product)],
+				itemsToDelete: []
+			})
+			.then(result => {
+				const prod = convertFromApexRecord(result[0]);
 
-			// calculated fields
-			const changes = {
-				listPrice: prod.listPrice,
-				totalPrice: prod.totalPrice
-			};
+				// calculated fields
+				const changes = {
+					listPrice: prod.listPrice,
+					totalPrice: prod.totalPrice
+				};
 
-			if (product.isNew) {
-				changes.isNew = false;
-				changes.uniqueId = prod.uniqueId;
-			}
-			
-			this.applyChangesToProduct(
-				product.groupId,
-				product.uniqueId,
-				product.isProduct,
-				product.isDiscount,
-				changes);
+				if (product.isNew) {
+					changes.isNew = false;
+					changes.uniqueId = prod.uniqueId;
+				}
+				
+				this.applyChangesToProduct(
+					product.groupId,
+					product.uniqueId,
+					product.isProduct,
+					product.isDiscount,
+					changes);
 
-			// is product changes we need to refresh
-			// the discount number
-			if (product.isProduct)
-				this.getDiscounts();
+				// is product changes we need to refresh
+				// the discount number
+				if (product.isProduct)
+					this.getDiscounts();
 
-			// tofiy the view the order totals have changed
-			notifyRecordUpdateAvailable([{ recordId: this.recordId }]);
-		})
-		.catch(error =>
-			this.addErrorToProduct(
-				product,
-				"Product was not created",
-				error));
+				// tofiy the view the order totals have changed
+				notifyRecordUpdateAvailable([{ recordId: this.recordId }]);
+				resolve(prod);
+			})
+			.catch(error => {
+				this.addErrorToProduct(
+					product,
+					"Product was not created",
+					error);
+				reject(error);
+			});
+		});
 	}
 
 	deleteProduct(product) {
@@ -673,11 +736,13 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 		if (product.isNew) {
 			record[ITEM_ORDER_ID_FIELD.fieldApiName] = this.recordId;
 			record[ITEM_PRODUCT_ID_FIELD.fieldApiName] = product.productId;
-		} else
+		} else {
 			record[ITEM_ID_FIELD.fieldApiName] = product.uniqueId;
+		}
 		
 		// product fields
 		if (product.isProduct) {
+			record[ITEM_PARENT_ITEM_FIELD.fieldApiName] = product.parentItemId;
 			record[ITEM_DELIVERY_GROUP_FIELD.fieldApiName] = product.groupId;
 			record[ITEM_QTY_FIELD.fieldApiName] = product.qty;
 			record[ITEM_UNIT_TYPE_FIELD.fieldApiName] = product.unitType;

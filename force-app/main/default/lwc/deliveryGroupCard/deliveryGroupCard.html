@@ -1,73 +1,81 @@
 <template>
 <div class="slds-box
-		slds-box_x-small
-		slds-is-relative
-		slds-theme_shade">
-	<lightning-card>
-		<div slot="title"
-			class="slds-media">
-			<div class="slds-media__figure">
-				<lightning-icon icon-name={headerIconName}
-					size="small"></lightning-icon>
-			</div>
-			<div class="slds-media__body">
-				<div class="slds-page-header__name">
-					<div class="slds-page-header__name-title">
-						<h2>
-							<span title={group.name}
-								class="slds-page-header__title
-									slds-text-heading_small
-									slds-truncate">{group.name}</span>
-						</h2>
+		slds-theme_shade
+		slds-var-m-bottom_small
+		slds-p-around_none">
+	<div class="slds-page-header">
+		<div class="slds-page-header__row">
+			<div class="slds-page-header__col-title">
+				<div class="slds-media">
+					<div class="slds-media__figure">
+						<lightning-icon icon-name={headerIconName}
+							alternative-text="Delivery Group"></lightning-icon>
+					</div>
+					<div class="slds-media__body">
+						<div class="slds-page-header__name">
+							<div class="slds-page-header__name-title">
+								<h1><span class="slds-truncate
+									slds-page-header__title">{group.name}</span></h1>
+							</div>
+						</div>
+						<p lwc:if={group.isPlaceHolder}
+							class="slds-page-header__name-meta">
+							<span>Products not placed in a delivery group yet</span>
+						</p>
+						<div lwc:else
+							class="slds-page-header__name-meta">
+							<ul class="slds-list_horizontal slds-has-dividers_left">
+								<li lwc:if={group.dueDate}
+									class="slds-item">
+									<lightning-formatted-date-time
+										value={group.dueDate}
+										year="numeric"
+										month="numeric"
+										day="numeric"></lightning-formatted-date-time>
+								</li>
+								<li lwc:if={group.deliveryType}
+									class="slds-item">{group.deliveryType}</li>
+								<li lwc:if={group.addressLabel}
+									class="slds-item">{group.addressLabel}</li>
+							</ul>
+						</div>
 					</div>
 				</div>
-				<p lwc:if={group.isPlaceHolder}
-					class="slds-page-header__name-meta">
-					<span>Products not placed in a delivery group yet</span>
-				</p>
-				<div lwc:else
-					class="slds-page-header__name-meta">
-					<ul class="slds-list_horizontal slds-has-dividers_left">
-						<li lwc:if={group.dueDate}
-							class="slds-item">
-							<lightning-formatted-date-time
-								value={group.dueDate}
-								year="numeric"
-								month="numeric"
-								day="numeric"></lightning-formatted-date-time>
-						</li>
-						<li lwc:if={group.deliveryType}
-							class="slds-item">{group.deliveryType}</li>
-						<li lwc:if={group.addressLabel}
-							class="slds-item">{group.addressLabel}</li>
-					</ul>
+			</div>
+			<div class="slds-page-header__col-actions">
+				<div class="slds-page-header__controls">
+					<div class="slds-page-header__control">
+						<lightning-button-group slot="actions">
+							<lightning-button lwc:if={showDetailsButton}
+								label="Details"
+								icon-name="utility:new_window"
+								icon-position="right"
+								onclick={handleOnOpenDetailsClick}
+								></lightning-button>
+							<lightning-button lwc:if={showCloneButton}
+								label="Clone"
+								onclick={handleOnCloneRequestClick}
+								></lightning-button>
+							<lightning-button-icon lwc:if={showDeleteButton}
+								title="Delete"
+								icon-name="utility:delete"
+								variant="border-filled"
+								onclick={handleOnStartDeleteClick}
+								></lightning-button-icon>
+						</lightning-button-group>
+					</div>
 				</div>
 			</div>
 		</div>
-		<lightning-button-group slot="actions">
-			<lightning-button lwc:if={showDetailsButton}
-				label="Details"
-				icon-name="utility:new_window"
-				icon-position="right"
-				onclick={handleOnOpenDetailsClick}></lightning-button>
-			<lightning-button lwc:if={showCloneButton}
-				label="Clone"
-				onclick={handleOnCloneRequestClick}></lightning-button>
-			<lightning-button-icon lwc:if={showDeleteButton}
-				title="Delete"
-				icon-name="utility:delete"
-				variant="border-filled"
-				onclick={handleOnStartDeleteClick}></lightning-button-icon>
-		</lightning-button-group>
-		<div >
-			<div lwc:if={isError}
-				class="slds-var-m-bottom_small">
-				<c-error-panel error-title={errorTitle}
-					error-object={errorObject}></c-error-panel>
-			</div>
-			<slot></slot>
+	</div>
+	<div class="slds-var-p-horizontal_large slds-var-p-bottom_large">
+		<div lwc:if={isError}
+			class="slds-var-m-bottom_small">
+			<c-error-panel error-title={errorTitle}
+				error-object={errorObject}></c-error-panel>
 		</div>
-	</lightning-card>
+		<slot></slot>
+	</div>
 </div>
 <c-modal size="small"
 	disable-scrolling=true

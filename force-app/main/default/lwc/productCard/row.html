@@ -22,6 +22,8 @@
 						</p>
 					</div>
 				</div>
+				<div lwc:if={_product.isPart}
+					style="height:2rem;"></div>
 			</lightning-layout-item>
 			<lightning-layout-item 
 				flexibility="grow"
@@ -164,6 +166,17 @@
 				</lightning-layout>
 			</lightning-layout-item>
 		</lightning-layout>
+		<div lwc:if={_product.isPart}
+			style="left:0;bottom:0;"
+			class="slds-is-absolute
+				slds-var-p-vertical_x-small
+				slds-var-p-horizontal_x-small
+				slds-truncate">
+			<c-badge>
+				<span slot="iconLeft">Part of</span>
+				<span slot="body">{_product.parentItemProductName}</span>
+			</c-badge>
+		</div>
 	</div>
 </div>
 <div lwc:if={isEdit}
@@ -197,6 +210,8 @@
 						</p>
 					</div>
 				</div>
+				<div lwc:if={_product.isPart}
+					style="height:2rem;"></div>
 			</lightning-layout-item>
 			<lightning-layout-item flexibility="grow"
 				class="slds-border_left slds-var-p-horizontal_small">
@@ -328,6 +343,17 @@
 				
 			</lightning-layout-item>
 		</lightning-layout>
+		<div lwc:if={_product.isPart}
+			style="left:0;bottom:0;"
+			class="slds-is-absolute
+				slds-var-p-vertical_x-small
+				slds-var-p-horizontal_x-small
+				slds-truncate">
+			<c-badge>
+				<span slot="iconLeft">Part of</span>
+				<span slot="body">{_product.parentItemProductName}</span>
+			</c-badge>
+		</div>
 		<c-error-panel lwc:if={_product.hasError}
 			error-title={_product.errorMessage}
 			error-object={_product.errorObject}

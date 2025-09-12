@@ -49,29 +49,28 @@
 								</div>
 							</div>
 						</template>
-						<p class="slds-page-header__name-meta">
-							<template for:each={row.mediumTopColumns}
-								for:item="col"
-								for:index="j">
-								<c-output-field lwc:if={j}
+						<div class="slds-page-header__name-meta">
+							<ul class="slds-list_horizontal slds-has-dividers_left">
+								<li for:each={row.mediumTopColumns}
+									for:item="col"
+									for:index="j"
 									key={col.key}
-									record={row.data}
-									object-api-name={objectApiName}
-									is-name-field={col.column.isNameField}
-									field-name={col.column.fieldName}
-									field-type={col.column.fieldType}
-									relationship-name={col.column.relationshipName}
-									related-to={col.column.relatedTo}
-									maximum-fraction-digits={col.column.maxFrac}
-									minimum-fraction-digits={col.column.minFrac}
-									minimum-integer-digits={col.column.minInt}
-									type={col.column.type}></c-output-field>
-								<template lwc:if={j}>
-									<span lwc:if={col.isNotLast}
-										key={col.key}>&nbsp;&middot;&nbsp;</span>
-								</template>
-							</template>
-						</p>
+									lwc:if={j}
+									class="slds-item">
+									<c-output-field record={row.data}
+										object-api-name={objectApiName}
+										is-name-field={col.column.isNameField}
+										field-name={col.column.fieldName}
+										field-type={col.column.fieldType}
+										relationship-name={col.column.relationshipName}
+										related-to={col.column.relatedTo}
+										maximum-fraction-digits={col.column.maxFrac}
+										minimum-fraction-digits={col.column.minFrac}
+										minimum-integer-digits={col.column.minInt}
+										type={col.column.type}></c-output-field>
+								</li>
+							</ul>
+						</div>
 					</div>
 				</div>
 			</div>
