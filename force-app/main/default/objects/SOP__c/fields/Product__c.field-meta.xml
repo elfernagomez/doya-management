@@ -4,6 +4,16 @@
     <deleteConstraint>SetNull</deleteConstraint>
     <externalId>false</externalId>
     <label>Product</label>
+    <lookupFilter>
+        <active>true</active>
+        <errorMessage>SOPs can only reference products (not discounts)</errorMessage>
+        <filterItems>
+            <field>Product2.RecordType.DeveloperName</field>
+            <operation>equals</operation>
+            <value>Product</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
     <referenceTo>Product2</referenceTo>
     <relationshipLabel>SOPs</relationshipLabel>
     <relationshipName>SOPs</relationshipName>

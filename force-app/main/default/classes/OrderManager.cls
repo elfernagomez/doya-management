@@ -69,7 +69,8 @@ public with sharing class OrderManager {
 			SELECT Name,
 				AccountId,
 				(
-					SELECT AvailableQuantity,
+					SELECT OrderItemNumber,
+						AvailableQuantity,
 						BasePrice__c,
 						CreatedDate,
 						DeliveryGroup__c,

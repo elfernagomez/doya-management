@@ -37,14 +37,14 @@
 					label={option.label}
 					checked={option.isChecked}
 					icon-name={option.iconName}></lightning-menu-item>
-				<!-- <lightning-menu-divider></lightning-menu-divider>
+				<lightning-menu-divider></lightning-menu-divider>
 				<lightning-menu-item for:each={listViewOptions}
 					for:item="option"
 					key={option.value}
 					value={option.value}
 					label={option.label}
 					checked={option.isChecked}
-					icon-name={option.iconName}></lightning-menu-item> -->
+					icon-name={option.iconName}></lightning-menu-item>
 			</lightning-button-menu>
 		</lightning-layout-item>
 	</lightning-layout>
@@ -66,7 +66,8 @@
 					onproductdelete={handleOnProductDelete}
 					onproductdragstart={handleOnProductDragStart}
 					onproductdragend={handleOnProductDragEnd}
-					oncreateworkorder={handleOnCreateWorkOrder}></c-product-manager>
+					oncreateworkorder={handleOnCreateWorkOrder}
+					onshowpartstoggle={handleOnShowPartsToggle}></c-product-manager>
 			</c-delivery-group-card>
 		</template>
 		<div lwc:else
@@ -87,7 +88,8 @@
 					onproductdelete={handleOnProductDelete}
 					onproductdragstart={handleOnProductDragStart}
 					onproductdragend={handleOnProductDragEnd}
-					oncreateworkorder={handleOnCreateWorkOrder}></c-product-manager>
+					oncreateworkorder={handleOnCreateWorkOrder}
+					onshowpartstoggle={handleOnShowPartsToggle}></c-product-manager>
 			</c-delivery-group-card>
 			<div lwc:if={group.isDropEnabled}
 				data-group-id={group.uniqueId}

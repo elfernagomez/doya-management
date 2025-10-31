@@ -1,0 +1,73 @@
+<template>
+<lightning-modal-header label={label}></lightning-modal-header>
+<lightning-modal-body>
+<div class="slds-is-relative">
+	<div class="slds-lookup"
+		data-select="multi"
+		data-scope="single"
+		data-typeahead="true">
+		<div class="slds-form-element
+				slds-var-m-bottom_small">
+			<lightning-input type="search"
+				placeholder="Search..."
+				value={searchTerm}
+				onchange={handleInputChange}></lightning-input>
+		</div>
+		<div lwc:if={error}
+			class="slds-var-p-top_small">
+			<c-error-panel error-title="Error loading records"
+				error-object={error}></c-error-panel>
+		</div>
+	</div>
+
+	<!-- <template if:true={isLoading}>
+		<lightning-spinner alternative-text="Searching..." size="small"></lightning-spinner>
+	</template> -->
+
+	<lightning-datatable
+		key-field="Id"
+		columns={actualColumns}
+		data={results}
+		hide-checkbox-column
+		is-loading={isLoading}
+		class="slds-m-top_small"
+		onrowaction={handleRowClick}></lightning-datatable>
+
+	<!-- <template if:true={results.length}>
+		<table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_fixed-layout">
+			<thead>
+				<tr class="slds-line-height_reset">
+					<th scope="col"><span class="slds-truncate"> </span></th>
+					<th scope="col"><span class="slds-truncate">Record</span></th>
+				</tr>
+			</thead>
+			<tbody>
+				<template for:each={results} for:item="r">
+					<tr key={r.id}
+						data-id={r.id}
+						class="slds-hint-parent"
+						onclick={handleRowClick}
+						role="button">
+						<td style="width:36px">
+							<lightning-icon icon-name={r.icon} size="small" alternative-text={r.objectType}></lightning-icon>
+						</td>
+						<td>
+							<span class="slds-truncate" title={r.label}>{r.label}</span>
+						</td>
+					</tr>
+				</template>
+			</tbody>
+		</table>
+	</template> -->
+
+	<template lwc:if={showNoResults}>
+		<div class="slds-text-body_regular slds-p-top_small">No results</div>
+	</template>
+</div>
+</lightning-modal-body>
+<lightning-modal-footer>
+	<lightning-button variant="neutral"
+		label="Done"
+		onclick={handleCancel}></lightning-button>
+</lightning-modal-footer>
+</template>

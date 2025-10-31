@@ -52,6 +52,7 @@ export function createNewProduct() {
 		errorMessage: null,
 		isNew: true,
 		isHidden: false,
+		isVisible: true,
 		isProduct: true,
 		isDiscount: false,
 		isPercentage: false,
@@ -323,6 +324,17 @@ export default class ProductCard extends InputBase {
 				composed: true,
 				bubbles: true
 			});
+	}
+
+	handleOnShowPartsToggleClick() {
+		this.customEvent(
+			"showpartstoggle",
+			this._product,
+			{
+				composed: true,
+				bubbles: true
+			}
+		);
 	}
 
 	editProduct(changes) {

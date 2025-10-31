@@ -17,8 +17,9 @@ public with sharing class DeliveryGroupManager {
 		Map<Id, List<DeliveryGroup__c>> result =
 			new Map<Id, List<DeliveryGroup__c>>();
 
-		for (Id orderId : orderIds)
+		for (Id orderId : orderIds){
 			result.put(orderId, new List<DeliveryGroup__c>());
+		}
 
 		groups = [
 			SELECT Name,
@@ -77,8 +78,9 @@ public with sharing class DeliveryGroupManager {
 			ORDER BY DueDate__c NULLS LAST, CreatedDate
 		];
 
-		for (DeliveryGroup__c g : groups)
+		for (DeliveryGroup__c g : groups) {
 			result.get(g.Order__c).add(g);
+		}
 
 		return result;
 	}

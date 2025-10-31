@@ -1,76 +1,263 @@
 <template>
-<lightning-quick-action-panel header="Create Work Orders">
-	<div class="slds-theme_shade
-			slds-border_bottom
-			slds-var-m-bottom_large">
-		<lightning-layout>
-			<lightning-layout-item
-				class="slds-var-p-horizontal_large
-					slds-var-p-vertical_small
-					slds-cell_action-mode">
-				<lightning-input type="checkbox"
-					variant="label-hidden"
-					value={selectAll}
-					checked={selectAll}
-					onclick={handleOnSelectedAllClick}></lightning-input>
-			</lightning-layout-item>
-			<lightning-layout-item flexibility="grow"
-				class="slds-var-p-horizontal_large
-					slds-var-p-vertical_small
-					slds-border_left">
-				<b class="slds-truncate">Order Products</b>
-			</lightning-layout-item>
-		</lightning-layout>
-	</div>
-	<div for:each={productGroups}
+<div class="slds-is-relative">
+<div lwc:if={isError}
+	class="slds-var-m-bottom_medium">
+	<c-error-panel error-title={errorTitle}
+		error-object={errorObject}></c-error-panel>
+</div>
+<ul class="slds-has-dividers_bottom-space">
+	<li class="slds-item
+			slds-media
+			slds-media_center
+			slds-theme_shade">
+		<div class="slds-media__figure">
+			<lightning-input type="checkbox"
+				variant="label-hidden"
+				value={selectAll}
+				checked={selectAll}
+				disabled={isComplete}
+				onclick={handleOnSelectedAllClick}></lightning-input>
+		</div>
+		<div class="slds-media__body">
+			<lightning-layout>
+				<lightning-layout-item size="1"
+					class="slds-var-p-horizontal_small
+						slds-cell_action-mode
+						slds-border_left">
+					<b class="slds-truncate">Qty</b>
+				</lightning-layout-item>
+				<lightning-layout-item flexibility="grow"
+					class="slds-var-p-horizontal_small
+						slds-cell_action-mode
+						slds-border_left">
+					<b class="slds-truncate">Product</b>
+				</lightning-layout-item>
+				<lightning-layout-item size="3"
+					class="slds-var-p-horizontal_small
+						slds-cell_action-mode
+						slds-border_left">
+					<b class="slds-truncate">Work Order</b>
+				</lightning-layout-item>
+				<lightning-layout-item size="3"
+					class="slds-var-p-horizontal_small
+						slds-cell_action-mode
+						slds-border_left">
+					<b class="slds-truncate">&nbsp;</b>
+				</lightning-layout-item>
+			</lightning-layout>
+		</div>
+	</li>
+	<li for:each={productGroups}
 		for:item="product"
 		for:index="index"
 		key={product.uniqueId}
-		class="slds-var-m-bottom_medium">
-		<lightning-layout>
-			<lightning-layout-item
-				padding="horizontal-small">
-				<lightning-input type="checkbox"
-					variant="label-hidden"
-					value={product.isSelected}
-					data-unique-id={product.uniqueId}
-					checked={product.isSelected}
-					onclick={handleOnProductSelectedClick}></lightning-input>
-			</lightning-layout-item>
-			<lightning-layout-item flexibility="grow"
-				padding="horizontal-small">
-				<c-product-card product={product}
-					mode="view"
-					variant="row"
-					hide-unit-price=true
-					hide-totals=true></c-product-card>
-			</lightning-layout-item>
-			<lightning-layout-item padding="horizontal-small">
-				<lightning-record-picker label="Select SOP"
-					variant="label-hidden"
-					placeholder="Add Sop..."
-					value={product.sopId}
-					object-api-name="SOP__c"
-					disabled={product.isSopDisabled}></lightning-record-picker>
-				<div lwc:if={product.workOrders.length}
-					class="slds-var-m-top_xx-small">
-					<c-badge><span
-						slot="body">{product.workOrders.length} work order(s)</span>
-					</c-badge>
-				</div>
-			</lightning-layout-item>
-		</lightning-layout>
-	</div>
-	<div slot="footer">
-		<lightning-button
-			variant="neutral"
-			label="Cancel"></lightning-button>
+		class="slds-item slds-media">
+		<div class="slds-media__figure">
+			<lightning-input type="checkbox"
+				variant="label-hidden"
+				value={product.isSelected}
+				data-unique-id={product.uniqueId}
+				checked={product.isSelected}
+				disabled={product.isComplete}
+				onclick={handleOnProductSelectedClick}></lightning-input>
+		</div>
+		<div class="slds-media__body">
+			<lightning-layout>
+				<lightning-layout-item size="1"
+					class="slds-var-p-horizontal_small">
+					<!-- <lightning-input type="number"
+						step="1"
+						min="1"
+						value={product.qty}
+						variant="label-hidden"
+						data-src="product"
+						data-field="qty"
+						data-type="float"
+						readonly></lightning-input> -->
+					<lightning-formatted-number
+						maximum-fraction-digits="2"
+						value={product.qty}></lightning-formatted-number>
+				</lightning-layout-item>
+				<lightning-layout-item flexibility="grow"
+					class="slds-var-p-horizontal_small">
+					<c-product-card product={product}
+						mode="view"
+						variant="row"
+						hide-qty=true
+						hide-unit-price=true
+						hide-totals=true></c-product-card>
+					<ul class="slds-list_horizontal
+							slds-has-dividers_left
+							slds-has-block-links
+							slds-var-m-top_x-small">
+						<li class="slds-item">
+							{product.items.length} item(s)&nbsp;
+							<lightning-helptext
+								content={labels.itemsHelpText}></lightning-helptext>
+						</li>
+						<li lwc:if={product.allowSplit}
+							class="slds-item">
+							<a href="#"
+								data-unique-id={product.uniqueId}
+								onclick={handleOnSplitClick}>Split</a>
+						</li>
+						<li lwc:if={product.allowJoin}
+							class="slds-item">
+							<a href="#"
+								data-unique-id={product.uniqueId}
+								onclick={handleOnJoinClick}>Join</a>
+						</li>
+						<li lwc:if={product.workOrders.length}
+							class="slds-item">
+							{product.workOrders.length} work order(s)&nbsp;
+							<lightning-helptext
+								content={product.workOrdersHelpText}
+								></lightning-helptext>
+						</li>
+					</ul>
+				</lightning-layout-item>
+				<lightning-layout-item size="3"
+					class="slds-var-p-horizontal_small">
+					<lightning-radio-group
+						variant="label-hidden"
+						options={workOrderActionOptions}
+						value={product.workOrderAction}
+						data-unique-id={product.uniqueId}
+						disabled={product.isWorkOrderActionDisabled}
+						onchange={handleWorkOrderActionChange}
+						required
+						class="validate"></lightning-radio-group>
+				</lightning-layout-item>
+				<lightning-layout-item size="3"
+					class="slds-border_left slds-var-p-horizontal_small">
+					<template lwc:if={product.isComplete}>
+						<c-production-field lwc:if={product.sopId}
+							field={sopNameField}
+							record={product.sopRecord}
+							mode="view"
+							object-api-name="SOP__c"></c-production-field>
 
-		<lightning-button
-			variant="brand"
-			label="Create Work Orders"
-			disabled={isCreateItemsButtonDisabled}
-			class="slds-m-left_x-small"></lightning-button>
-	</div>
-</lightning-quick-action-panel>
+						<div lwc:if={product.workOrderId}>
+							<c-production-field field={workOrderTitleField}
+								record={product.workOrderRecord}
+								mode="view"
+								object-api-name="WorkOrder"></c-production-field>
+
+							<div class="slds-media
+									slds-media_small
+									slds-var-m-vertical_small">
+								<div class="slds-media__figure">
+									<lightning-icon icon-name="utility:success"
+										alternative-text="Success"
+										size="xx-small"
+										variant="success"></lightning-icon>
+								</div>
+								<div class="slds-media__body">
+									<p>Success</p>
+								</div>
+							</div>
+							<lightning-button
+								variant="neutral"
+								label="View Work Order"
+								icon-name="utility:new_window"
+								icon-position="right"
+								data-work-order-id={product.workOrderId}
+								onclick={handleOnViewWorkOrderClick}
+								class="slds-truncate"></lightning-button>
+						</div>
+					</template>
+					<template lwc:else>
+						<div lwc:if={product.showSopRecordPicker}>
+							<div lwc:if={product.sopRecord}
+								class="slds-media
+									slds-media_small
+									slds-media_center
+									slds-border_bottom">
+								<div class="slds-media__body">
+									<c-production-field field={sopNameField}
+										record={product.sopRecord}
+										mode="view"
+										object-api-name="SOP__c"></c-production-field>
+									<!-- <p lwc:if={product.isDefaultSopSelected}>
+										<lightning-badge
+											label="Default"></lightning-badge>
+									</p> -->
+								</div>
+								<div class="slds-media__figure-reverse">
+									<lightning-button-icon variant="bare"
+										icon-name="utility:clear"
+										alternative-text="Remove SOP"
+										title="Remove SOP"
+										data-unique-id={product.uniqueId}
+										disabled={product.isSopDisabled}
+										onclick={handleOnRemoveSopClick}
+										class="slds-m-left_x-small"
+										></lightning-button-icon>
+								</div>
+							</div>
+							<lightning-button-group lwc:else>
+								<lightning-button variant="neutral"
+									label="Choose SOP"
+									data-unique-id={product.uniqueId}
+									disabled={product.isSopDisabled}
+									onclick={handleOnSopSelectClick}
+									class="slds-m-bottom_x-small"></lightning-button>
+								<lightning-button lwc:if={product.defaultSopId}
+									variant="neutral"
+									label="Default"
+									data-unique-id={product.uniqueId}
+									disabled={product.isSopDisabled}
+									onclick={handleOnDefaultSopSelectClick}
+									class="slds-m-bottom_x-small"></lightning-button>
+							</lightning-button-group>
+						</div>
+						<div lwc:if={product.showWorkOrderRecordPicker}>
+							<div lwc:if={product.workOrderRecord}
+								class="slds-media
+									slds-media_small
+									slds-media_center
+									slds-border_bottom">
+								<div class="slds-media__body">
+									<c-production-field field={workOrderTitleField}
+										record={product.workOrderRecord}
+										mode="view"
+										object-api-name="WorkOrder"></c-production-field>
+								</div>
+								<div class="slds-media__figure-reverse">
+									<lightning-button-icon variant="bare"
+										icon-name="utility:clear"
+										alternative-text="Remove Work Order"
+										title="Remove Work Order"
+										data-unique-id={product.uniqueId}
+										disabled={product.isWorkOrderRecordPickerDisabled}
+										onclick={handleOnRemoveWorkOrderClick}
+										class="slds-m-left_x-small"
+										></lightning-button-icon>
+								</div>
+							</div>
+							<lightning-button lwc:else
+								variant="neutral"
+								label="Choose Work Order"
+								data-unique-id={product.uniqueId}
+								disabled={product.isWorkOrderRecordPickerDisabled}
+								onclick={handleOnSelectWorkOrderClick}
+								class="slds-m-bottom_x-small"></lightning-button>
+							<!-- <div lwc:else>
+								<span class="slds-text-color_weak"
+									>No qualifying work orders</span>&nbsp;
+								<lightning-helptext
+									content={labels.noQualifyingWorkOrdersHelpText}
+									></lightning-helptext>
+							</div> -->
+						</div>
+					</template>
+				</lightning-layout-item>
+			</lightning-layout>
+		</div>
+	</li>
+</ul>
+<lightning-spinner lwc:if={isLoading}
+	size="medium"
+	variant="brand"></lightning-spinner>
+</div>
 </template>

@@ -20,7 +20,8 @@ import {
 	createGroupFromApexRecord,
 	DEFAULT_GROUP_NAME
 } from "c/deliveryGroupCard";
-import LightningConfirm from 'lightning/confirm';
+
+import NewWorkOrdersModal from 'c/newWorkOrdersModal';
 import OrderProductPartsSelectionModal from 'c/orderProductPartsSelectionModal';
 
 import getDeliveryGroups
@@ -46,6 +47,8 @@ import ITEM_OBJECT
 
 import ITEM_ID_FIELD
 	from "@salesforce/schema/OrderItem.Id";
+import ITEM_NUMBER_FIELD
+	from "@salesforce/schema/OrderItem.OrderItemNumber";
 import ITEM_ORDER_ID_FIELD
 	from "@salesforce/schema/OrderItem.OrderId";
 import ITEM_PRODUCT_ID_FIELD
@@ -107,6 +110,8 @@ import WO_TITLE_FIELD from "@salesforce/schema/WorkOrder.Title__c";
 export function getFieldApiNames() {
 	return [
 		`${ITEM_OBJECT.objectApiName}.${ITEM_ID_FIELD.fieldApiName}`,
+		`${ITEM_OBJECT.objectApiName}.${ITEM_NUMBER_FIELD.fieldApiName}`,
+		`${ITEM_OBJECT.objectApiName}.${ITEM_CREATED_DATE_FIELD.fieldApiName}`,
 		`${ITEM_OBJECT.objectApiName}.${ITEM_DELIVERY_GROUP_FIELD.fieldApiName}`,
 		`${ITEM_OBJECT.objectApiName}.${ITEM_PRODUCT_ID_FIELD.fieldApiName}`,
 		`${ITEM_OBJECT.objectApiName}.${ITEM_PRODUCT_NAME_FIELD.fieldApiName}`,
@@ -126,7 +131,6 @@ export function getFieldApiNames() {
 		`${ITEM_OBJECT.objectApiName}.${ITEM_BASE_PRICE_FIELD.fieldApiName}`,
 		`${ITEM_OBJECT.objectApiName}.${ITEM_UNIT_PRICE_FIELD.fieldApiName}`,
 		`${ITEM_OBJECT.objectApiName}.${ITEM_TOTAL_PRICE_FIELD.fieldApiName}`,
-		`${ITEM_OBJECT.objectApiName}.${ITEM_CREATED_DATE_FIELD.fieldApiName}`,
 		`${ITEM_OBJECT.objectApiName}.${ITEM_PARENT_ITEM_FIELD.fieldApiName}`,
 		`${ITEM_OBJECT.objectApiName}.${ITEM_PARENT_PRODUCT_FIELD.fieldApiName}`
 	];
@@ -136,6 +140,8 @@ export function convertFromRecord(r) {
 	return {
 		...createNewProduct(),
 		uniqueId: getFieldValue(r, ITEM_ID_FIELD),
+		itemNo: getFieldValue(r, ITEM_NUMBER_FIELD),
+		createdDate: new Date(getFieldValue(r, ITEM_CREATED_DATE_FIELD)),
 		parentItemId: getFieldValue(r, ITEM_PARENT_ITEM_FIELD),
 		parentItemProductName: getFieldValue(r, ITEM_PARENT_PRODUCT_FIELD),
 		groupId: getFieldValue(r, ITEM_DELIVERY_GROUP_FIELD),
@@ -157,13 +163,15 @@ export function convertFromRecord(r) {
 		unitPrice: getFieldValue(r, ITEM_BASE_PRICE_FIELD),
 		listPrice: getFieldValue(r, ITEM_UNIT_PRICE_FIELD),
 		totalPrice: getFieldValue(r, ITEM_TOTAL_PRICE_FIELD),
-		createdDate: new Date(getFieldValue(r, ITEM_CREATED_DATE_FIELD)),
 		isProduct: getFieldValue(r, ITEM_PRODUCT_RECORD_TYPE_NAME_FIELD) == "Product",
 		isDiscount: getFieldValue(r, ITEM_PRODUCT_RECORD_TYPE_NAME_FIELD) == "Discount",
 		isPercentage: getFieldValue(r, ITEM_DISCOUNT_TYPE_FIELD) == "Percentage",
 		isFixed: getFieldValue(r, ITEM_DISCOUNT_TYPE_FIELD) == "Fixed Amount",
 		isPart: getFieldValue(r, ITEM_PARENT_ITEM_FIELD) != null,
-		isNew: false
+		hasParts: false,
+		showParts: false,
+		isNew: false,
+		isVisible: getFieldValue(r, ITEM_PARENT_ITEM_FIELD) == null
 	};
 }
 
@@ -171,6 +179,8 @@ export function convertFromApexRecord(r) {
 	return {
 		...createNewProduct(),
 		uniqueId: r.Id,
+		itemNo: r.OrderItemNumber,
+		createdDate: new Date(r.CreatedDate),
 		parentItemId: r.ParentOrderProduct__c,
 		parentItemProductName: r.ParentOrderProduct__r?.Product2?.Name,
 		groupId: r.DeliveryGroup__c,
@@ -191,14 +201,24 @@ export function convertFromApexRecord(r) {
 		unitPrice: r.BasePrice__c,
 		listPrice: r.UnitPrice,
 		totalPrice: r.TotalPrice,
-		createdDate: new Date(r.CreatedDate),
 		isProduct: r.Product2.RecordType?.DeveloperName == "Product",
 		isDiscount: r.Product2.RecordType?.DeveloperName == "Discount",
 		isPercentage: r.DiscountType__c == "Percentage",
 		isFixed: r.DiscountType__c == "Fixed Amount",
 		isPart: r.ParentOrderProduct__c != null,
-		isNew: false
+		hasParts: false,
+		showParts: false,
+		isNew: false,
+		isVisible: r.ParentOrderProduct__c == null
 	};
+}
+
+export function calculateAggregations(items) {
+	const parentItemIds = {};
+	items.filter(item => item.isPart)
+		.forEach(item => (parentItemIds[item.parentItemId] = true));
+	items.filter(item => parentItemIds[item.uniqueId])
+		.forEach(item => (item.hasParts = true));
 }
 
 /**
@@ -225,6 +245,7 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 	isSaveDisabled = true;
 	isLoading = false;
 	searchProductsKey = null;
+	parentItemIds = [];
 
 	get listViewOptions() {
 		return [{
@@ -304,8 +325,6 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 		const groupId = event.target.dataset.groupId;
 		const product = event.detail;
 
-		console.log(JSON.stringify(product));
-
 		if (product.hasParts) {
 			OrderProductPartsSelectionModal.open({
 				productId: event.detail.productId,
@@ -373,12 +392,13 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 
 	handleOnProductDragStart(event) {
 		let product = event.detail;
-		if (product)
+		if (product) {
 			this.groups
 				.filter(g => g.uniqueId != event.detail.groupId)
 				.forEach(g => this.applyChangesToGroup(
 					g.uniqueId,
 					{ isDropEnabled: true }));
+		}
 	}
 
 	handleOnProductDragEnd() {
@@ -424,19 +444,38 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 	}
 
 	handleOnCreateWorkOrder(event) {
-		LightningConfirm.open({
-			label: `Confirm New Work Order`,
-			message: [
-				"A new Wok Order will be created for this product:",
-				`${event.detail.productName}.\nAre you sure you wish to proceed?`
-			].join("\n"),
-			variant: "header",
-			theme: "warning"
-		})
-		.then(result => {
-			if (result)
-				this.createNewWorkOrder(event.detail);
+		const product = event.detail;
+		NewWorkOrdersModal.open({
+			size: 'small',
+			orderId: this.recordId,
+			orderProductId: product.uniqueId
 		});
+	}
+
+	handleOnShowPartsToggle(event) {
+		const product = event.detail;
+		const showParts = !product.showParts;
+		this.applyChangesToProduct(
+			product.groupId,
+			product.uniqueId,
+			product.isProduct,
+			product.isDiscount,
+			{
+				showParts
+			});
+
+		this.groups.forEach(g =>
+			g.products
+				.filter(p => p.parentItemId == product.uniqueId)
+				.forEach(p =>
+					this.applyChangesToProduct(
+						p.groupId,
+						p.uniqueId,
+						p.isProduct,
+						p.isDiscount,
+						{
+							isVisible: showParts
+						})));
 	}
 
 	getDeliveryGroupsAndProducts() {
@@ -445,6 +484,7 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 		})
 		.then(data => {
 			// this.wiredDeliveryGroupsResult = result;
+			this.parentItemIds = {};
 			this.groups = [
 				...data.map(r => ({
 					...createGroupFromApexRecord(r),
@@ -459,9 +499,13 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 				})
 			];
 
+			// aggregations
+			calculateAggregations(this.groups.flatMap(g => g.products));
+
 			// if the order is in draft, we enable edit
-			if (this.isDraft)
+			if (this.isDraft) {
 				this.mode = "edit";
+			}
 		})
 		.catch(error => {
 			console.error(error);
@@ -631,8 +675,9 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 
 				// is product changes we need to refresh
 				// the discount number
-				if (product.isProduct)
+				if (product.isProduct) {
 					this.getDiscounts();
+				}
 
 				// tofiy the view the order totals have changed
 				notifyRecordUpdateAvailable([{ recordId: this.recordId }]);
@@ -679,8 +724,9 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 
 				// is product changes we need to refresh
 				// the discount number
-				if (product.isProduct)
+				if (product.isProduct) {
 					this.getDiscounts();
+				}
 
 				// tofiy the view the order totals have changed
 				notifyRecordUpdateAvailable([{ recordId: this.recordId }]);
@@ -694,7 +740,7 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 	}
 
 	filterProducts() {
-		let key = this.searchProductsKey;
+		const key = this.searchProductsKey;
 		this.groups.forEach(g =>
 			g.products.forEach(p =>
 				this.applyChangesToProduct(
@@ -704,8 +750,8 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 					p.isDiscount,
 					{
 						isHidden: key ?
-							!p.productName.toLowerCase().includes(key) &&
-							!p.productCode.toLowerCase().includes(key) : false
+							!p.productName?.toLowerCase().includes(key) &&
+							!p.productCode?.toLowerCase().includes(key) : false
 					})));
 	}
 

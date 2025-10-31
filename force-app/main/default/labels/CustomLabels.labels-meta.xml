@@ -133,4 +133,25 @@
 		<shortDescription>OrderProductPartsSelectionModal_partsAvailableMessage</shortDescription>
 		<value>Based on the product you selected, we've identified other related products that are considered parts of it. Please review the list below and select the parts you'd like to include in your order.</value>
 	</labels>
+	<labels>
+		<fullName>NewWorkOrders_ItemsHelpText</fullName>
+		<language>en_US</language>
+		<protected>false</protected>
+		<shortDescription>NewWorkOrders_ItemsHelpText</shortDescription>
+		<value>This is the number of items (order products) grouped into a single work order line. They have been grouped because they have the same product and dimensions. If there is more than one, you can split them so there is one work order per order product.</value>
+	</labels>
+	<labels>
+		<fullName>NewWorkOrders_workOrdersHelpText</fullName>
+		<language>en_US</language>
+		<protected>false</protected>
+		<shortDescription>NewWorkOrders_workOrdersHelpText</shortDescription>
+		<value>There are already work orders created for this item: {0}</value>
+	</labels>
+	<labels>
+		<fullName>NewWorkOrders_noQualifyingWorkOrdersHelpText</fullName>
+		<language>en_US</language>
+		<protected>false</protected>
+		<shortDescription>NewWorkOrders_noQualifyingWorkOrdersHelpText</shortDescription>
+		<value>Only new work orders for the same product, unit type, and dimensions are available here. Work orders that are already in progress or completed will not appear. You can only add items to a work order before production has started.</value>
+	</labels>
 </CustomLabels>

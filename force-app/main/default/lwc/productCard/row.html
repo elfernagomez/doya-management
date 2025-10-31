@@ -2,8 +2,7 @@
 <div lwc:if={isView}
 	class={mainViewClass}>
 	<div class="slds-media__body">
-		<lightning-layout vertical-align="stretch"
-			multiple-rows="true">
+		<lightning-layout vertical-align="stretch">
 			<lightning-layout-item size="12"
 				large-device-size={productColumnSize}
 				class="slds-var-p-right_small">
@@ -20,18 +19,20 @@
 						<p class="slds-text-body_small">
 							{_product.productCode}
 						</p>
+						<p lwc:if={_product.isPart}
+							class="slds-var-p-top_small">
+							<span class="slds-badge"></span>&nbsp;</span></p>
 					</div>
 				</div>
-				<div lwc:if={_product.isPart}
-					style="height:2rem;"></div>
 			</lightning-layout-item>
 			<lightning-layout-item 
 				flexibility="grow"
 				class="slds-border_left
 					slds-var-p-horizontal_large">
-				<lightning-layout>
+				<lightning-layout multiple-rows="true">
 					<lightning-layout-item lwc:if={showQty}
-						class="slds-var-m-right_xx-large">
+						class="slds-var-m-right_xx-large
+							slds-var-m-bottom_x-small">
 						<div class="slds-form-element">
 							<label class="slds-form-element__label slds-p-top_none">
 								Qty
@@ -47,7 +48,8 @@
 						</div>
 					</lightning-layout-item>
 					<lightning-layout-item lwc:if={showUnitType}
-						class="slds-var-m-right_xx-large">
+						class="slds-var-m-right_xx-large
+							slds-var-m-bottom_x-small">
 						<div class="slds-form-element">
 							<label class="slds-form-element__label slds-p-top_none">
 								Unit Type
@@ -60,46 +62,54 @@
 						</div>
 					</lightning-layout-item>
 					<lightning-layout-item lwc:if={showDimensions}
-						class="slds-var-m-right_xx-large">
+						class="slds-var-m-right_xx-large
+							slds-var-m-bottom_x-small">
 						<div class="slds-form-element">
 							<label class="slds-form-element__label slds-p-top_none">
 								Dimensions
 							</label>
 							<div class="slds-form-element__control">
 								<div class="slds-form-element__static">
-									<label class="slds-text-body_small
-										slds-var-p-right_xx-small">W</label>
-									<lightning-formatted-number
-										maximum-fraction-digits="2"
-										value={_product.width}
-										class="slds-var-p-right_xx-small"
-										></lightning-formatted-number>
+									<span class="slds-show_inline-block
+											slds-var-p-right_xx-small">
+										<span class="slds-text-body_small">W</span>
+										<lightning-formatted-number
+											maximum-fraction-digits="2"
+											value={_product.width}
+											class="slds-var-p-right_xx-small"
+											></lightning-formatted-number>
+									</span>
 									<label class="slds-text-body_small
 										slds-var-p-right_xx-small">&times;</label>
-									<label class="slds-text-body_small
-										slds-var-p-right_xx-small">H</label>
-									<lightning-formatted-number
-										maximum-fraction-digits="2"
-										value={_product.height}
-										class="slds-var-p-right_xx-small"
-										></lightning-formatted-number>
+									<span class="slds-show_inline-block
+											slds-var-p-right_xx-small">
+										<span class="slds-text-body_small">H</span>
+										<lightning-formatted-number
+											maximum-fraction-digits="2"
+											value={_product.height}
+											class="slds-var-p-right_xx-small"
+											></lightning-formatted-number>
+									</span>
 									<template lwc:if={_product.depth}>
-									<label class="slds-text-body_small
-										slds-var-p-right_xx-small">&times;</label>
-									<label class="slds-text-body_small
-										slds-var-p-right_xx-small">D</label>
-									<lightning-formatted-number
-										maximum-fraction-digits="2"
-										value={_product.depth}
-										class="slds-var-p-right_xx-small"
-										></lightning-formatted-number>
+										<label class="slds-text-body_small
+											slds-var-p-right_xx-small">&times;</label>
+										<span class="slds-show_inline-block
+												slds-var-p-right_xx-small">
+											<span class="slds-text-body_small">D</span>
+											<lightning-formatted-number
+												maximum-fraction-digits="2"
+												value={_product.depth}
+												class="slds-var-p-right_xx-small"
+												></lightning-formatted-number>
+										</span>
 									</template>
 								</div>
 							</div>
 						</div>
 					</lightning-layout-item>
 					<lightning-layout-item lwc:if={showUnitPrice}
-						class="slds-var-m-right_xx-large">
+						class="slds-var-m-right_xx-large
+							slds-var-m-bottom_x-small">
 						<div class="slds-form-element">
 							<label class="slds-form-element__label slds-p-top_none">
 								Unit Price
@@ -167,15 +177,29 @@
 			</lightning-layout-item>
 		</lightning-layout>
 		<div lwc:if={_product.isPart}
+			title={_product.parentItemProductName}
 			style="left:0;bottom:0;"
 			class="slds-is-absolute
-				slds-var-p-vertical_x-small
-				slds-var-p-horizontal_x-small
-				slds-truncate">
-			<c-badge>
-				<span slot="iconLeft">Part of</span>
-				<span slot="body">{_product.parentItemProductName}</span>
-			</c-badge>
+				slds-var-p-around_small">
+			<lightning-badge label="Part"></lightning-badge>
+		</div>
+		<div lwc:elseif={_product.hasParts}
+			title={_product.parentItemProductName}
+			style="left:0;bottom:0;"
+			class="slds-is-absolute
+				slds-var-p-horizontal_small">
+			<lightning-button lwc:if={_product.showParts}
+				variant="base"
+				label="Parts"
+				title="Hide Parts"
+				icon-name="utility:chevrondown"
+				onclick={handleOnShowPartsToggleClick}></lightning-button>
+			<lightning-button lwc:else
+				variant="base"
+				label="Parts"
+				title="Show Parts"
+				icon-name="utility:chevronright"
+				onclick={handleOnShowPartsToggleClick}></lightning-button>
 		</div>
 	</div>
 </div>
@@ -208,10 +232,11 @@
 						<p class="slds-text-body_small">
 							{_product.productCode}
 						</p>
+						<p lwc:if={_product.isPart}
+							class="slds-var-p-top_small">
+							<span class="slds-badge"></span>&nbsp;</span></p>
 					</div>
 				</div>
-				<div lwc:if={_product.isPart}
-					style="height:2rem;"></div>
 			</lightning-layout-item>
 			<lightning-layout-item flexibility="grow"
 				class="slds-border_left slds-var-p-horizontal_small">
@@ -344,15 +369,29 @@
 			</lightning-layout-item>
 		</lightning-layout>
 		<div lwc:if={_product.isPart}
+			title={_product.parentItemProductName}
 			style="left:0;bottom:0;"
 			class="slds-is-absolute
-				slds-var-p-vertical_x-small
-				slds-var-p-horizontal_x-small
-				slds-truncate">
-			<c-badge>
-				<span slot="iconLeft">Part of</span>
-				<span slot="body">{_product.parentItemProductName}</span>
-			</c-badge>
+				slds-var-p-around_small">
+			<lightning-badge label="Part"></lightning-badge>
+		</div>
+		<div lwc:elseif={_product.hasParts}
+			title={_product.parentItemProductName}
+			style="left:0;bottom:0;"
+			class="slds-is-absolute
+				slds-var-p-horizontal_small">
+			<lightning-button lwc:if={_product.showParts}
+				variant="base"
+				label="Parts"
+				title="Hide Parts"
+				icon-name="utility:chevrondown"
+				onclick={handleOnShowPartsToggleClick}></lightning-button>
+			<lightning-button lwc:else
+				variant="base"
+				label="Parts"
+				title="Show Parts"
+				icon-name="utility:chevronright"
+				onclick={handleOnShowPartsToggleClick}></lightning-button>
 		</div>
 		<c-error-panel lwc:if={_product.hasError}
 			error-title={_product.errorMessage}

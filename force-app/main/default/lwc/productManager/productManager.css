@@ -37,3 +37,7 @@
 	bottom: 0;
 	background-color: rgba(0,0,0,.2);
 }
+
+.product-row[data-is-part="true"] {
+	padding-left: var(--lwc-spacingLarge,1.25rem);
+}

@@ -39,6 +39,13 @@ import ORDER_PRODUCT_PARTS_SELECTION_MODAL_PARTS_AVAILABLE_TITLE
 import ORDER_PRODUCT_PARTS_SELECTION_MODAL_PARTS_AVAILABLE_MESSAGE
 	from "@salesforce/label/c.OrderProductPartsSelectionModal_partsAvailableMessage";
 
+import NEW_WORK_ORDERS_ITEMS_HELP_TEXT
+	from "@salesforce/label/c.NewWorkOrders_ItemsHelpText";
+import NEW_WORK_ORDERS_WORK_ORDERS_HELP_TEXT
+	from "@salesforce/label/c.NewWorkOrders_workOrdersHelpText";
+import NEW_WORK_ORDERS_NO_QUALIFYING_WORK_ORDERS_HELP_TEXT
+	from "@salesforce/label/c.NewWorkOrders_noQualifyingWorkOrdersHelpText";
+
 export const lineItemManagerLabels = {
 	noItemsMsg: NO_ITEMS_MSG,
 	addItemBtn: ADD_ITEM_BTN,
@@ -70,4 +77,10 @@ export const workOrderListViewLabels = {
 export const orderProductPartsSelectionModalLabels = {
 	title: ORDER_PRODUCT_PARTS_SELECTION_MODAL_PARTS_AVAILABLE_TITLE,
 	message: ORDER_PRODUCT_PARTS_SELECTION_MODAL_PARTS_AVAILABLE_MESSAGE
+};
+
+export const newWorkOrdersLabels = {
+	itemsHelpText: NEW_WORK_ORDERS_ITEMS_HELP_TEXT,
+	workOrdersHelpText: NEW_WORK_ORDERS_WORK_ORDERS_HELP_TEXT,
+	noQualifyingWorkOrdersHelpText: NEW_WORK_ORDERS_NO_QUALIFYING_WORK_ORDERS_HELP_TEXT
 };

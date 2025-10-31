@@ -173,7 +173,7 @@ export default class LwcBase extends LightningElement {
 	validateInputs(selector) {
 		let isValid = true;
 		let inputFields = this.template.querySelectorAll(selector);
-		
+
 		inputFields.forEach(inputField => {
 			if (!inputField.checkValidity()) {
 				inputField.reportValidity();

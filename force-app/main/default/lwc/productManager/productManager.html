@@ -10,45 +10,52 @@
 		error-object={errorObject}></c-error-panel>
 </div>
 <div lwc:if={hasProducts}>
-	<div lwc:if={isCard}
+	<!-- <div lwc:if={isCard}
 		class="slds-grid
 			slds-gutters
 			slds-gutters_direct
 			slds-wrap">
-		<div for:each={products}
+		<div>
+		<template for:each={products}
 			for:item="product"
-			for:index="index"
-			key={product.uniqueId}
-			class="slds-col
-				slds-no-flex
-				slds-var-m-bottom_medium"
-			style="min-width:14rem;max-width:16rem;">
-			<c-product-card product={product}
-				data-index={index}
-				mode={mode}
-				variant="card"
-				onproductchange={handleOnProductChange}
-				onproductdelete={handleOnProductDelete}
-				onproductdragstart={handleOnProductDragStart}
-				onproductdragend={handleOnProductDragEnd}></c-product-card>
-		</div>
-	</div>
+			for:index="index">
+			<div lwc:if={product.isVisible}
+				key={product.uniqueId}
+				data-is-part={product.isPart}
+				class="slds-col
+					slds-no-flex
+					slds-var-m-bottom_medium"
+				style="min-width:14rem;max-width:16rem;">
+				<c-product-card product={product}
+					data-index={index}
+					mode={mode}
+					variant="card"
+					onproductchange={handleOnProductChange}
+					onproductdelete={handleOnProductDelete}
+					onproductdragstart={handleOnProductDragStart}
+					onproductdragend={handleOnProductDragEnd}></c-product-card>
+			</div>
+		</template>
+	</div> -->
 	<div lwc:if={isList}
 		class="">
-		<div for:each={products}
+		<template for:each={products}
 			for:item="product"
-			for:index="index"
-			key={product.uniqueId}
-			class="slds-var-m-bottom_xx-small">
-			<c-product-card product={product}
-				data-index={index}
-				mode={mode}
-				variant="row"
-				onproductchange={handleOnProductChange}
-				onproductdelete={handleOnProductDelete}
-				onproductdragstart={handleOnProductDragStart}
-				onproductdragend={handleOnProductDragEnd}></c-product-card>
-		</div>
+			for:index="index">
+			<div lwc:if={product.isVisible}
+				key={product.uniqueId}
+				data-is-part={product.isPart}
+				class="product-row slds-var-m-bottom_xx-small">
+				<c-product-card product={product}
+					data-index={index}
+					mode={mode}
+					variant="row"
+					onproductchange={handleOnProductChange}
+					onproductdelete={handleOnProductDelete}
+					onproductdragstart={handleOnProductDragStart}
+					onproductdragend={handleOnProductDragEnd}></c-product-card>
+			</div>
+		</template>
 	</div>
 	<div lwc:if={showAddProduct}
 		class="slds-var-m-top_small"
