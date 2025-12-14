@@ -113,6 +113,10 @@ export default class LineItemManager extends LwcBase {
 		return this.items.find(item => item.isSelected);
 	}
 
+	get showAddItemBtn() {
+		return this.mode == "admin" || this.items.length == 0;
+	}
+
 	@wire(getAllProcedures)
 	wiredProcedureOptions({ data, error }) {
 		if (data) {

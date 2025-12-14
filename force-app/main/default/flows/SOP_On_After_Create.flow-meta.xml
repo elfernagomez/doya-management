@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <name>Clone_SOP_Line_Items_Action_1</name>
+        <label>Clone SOP Line Items Action 1</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <actionName>CloneSopLineItemsInvocable</actionName>
+        <actionType>apex</actionType>
+        <flowTransactionModel>Automatic</flowTransactionModel>
+        <inputParameters>
+            <name>targetSop</name>
+            <value>
+                <elementReference>$Record</elementReference>
+            </value>
+        </inputParameters>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </actionCalls>
+    <apiVersion>65.0</apiVersion>
+    <decisions>
+        <name>decision_isItAClone</name>
+        <label>Is it a Clone?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Nope, not a clone</defaultConnectorLabel>
+        <rules>
+            <name>outcome_yesItsAClone</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>formula_isClone</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Clone_SOP_Line_Items_Action_1</targetReference>
+            </connector>
+            <label>Yes, it&apos;s a clone</label>
+        </rules>
+    </decisions>
+    <formulas>
+        <name>formula_isClone</name>
+        <dataType>Boolean</dataType>
+        <expression>ISCLONE()</expression>
+    </formulas>
+    <interviewLabel>SOP {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SOP: On After Create</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>decision_isItAClone</targetReference>
+        </connector>
+        <object>SOP__c</object>
+        <recordTriggerType>Create</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

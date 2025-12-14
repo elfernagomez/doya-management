@@ -169,31 +169,33 @@
 					<template lwc:else>
 						<div lwc:if={product.showSopRecordPicker}>
 							<div lwc:if={product.sopRecord}
+								style="align-items:flex-end;"
 								class="slds-media
 									slds-media_small
-									slds-media_center
-									slds-border_bottom">
+									slds-border_bottom
+									slds-var-m-bottom_x-small">
 								<div class="slds-media__body">
-									<c-production-field field={sopNameField}
-										record={product.sopRecord}
-										mode="view"
-										object-api-name="SOP__c"></c-production-field>
-									<!-- <p lwc:if={product.isDefaultSopSelected}>
-										<lightning-badge
-											label="Default"></lightning-badge>
-									</p> -->
+								<c-production-field field={sopNameField}
+									record={product.sopRecord}
+									mode="view"
+									object-api-name="SOP__c"
+									custom-button-icon={product.sopCustomButtonIcon}
+									data-unique-id={product.uniqueId}
+									oncustombuttonclick={handleOnRemoveSopClick}
+									></c-production-field>
 								</div>
-								<div class="slds-media__figure-reverse">
+								<!-- <div class="slds-media__figure-reverse
+										slds-var-m-bottom_small">
 									<lightning-button-icon variant="bare"
 										icon-name="utility:clear"
 										alternative-text="Remove SOP"
 										title="Remove SOP"
 										data-unique-id={product.uniqueId}
 										disabled={product.isSopDisabled}
-										onclick={handleOnRemoveSopClick}
-										class="slds-m-left_x-small"
+										class="slds-var-m-left_x-small
+											slds-var-m-bottom_x-small"
 										></lightning-button-icon>
-								</div>
+								</div> -->
 							</div>
 							<lightning-button-group lwc:else>
 								<lightning-button variant="neutral"
@@ -201,29 +203,33 @@
 									data-unique-id={product.uniqueId}
 									disabled={product.isSopDisabled}
 									onclick={handleOnSopSelectClick}
-									class="slds-m-bottom_x-small"></lightning-button>
+									class="slds-var-m-bottom_x-small"></lightning-button>
 								<lightning-button lwc:if={product.defaultSopId}
 									variant="neutral"
 									label="Default"
 									data-unique-id={product.uniqueId}
 									disabled={product.isSopDisabled}
 									onclick={handleOnDefaultSopSelectClick}
-									class="slds-m-bottom_x-small"></lightning-button>
+									class="slds-var-m-bottom_x-small"></lightning-button>
 							</lightning-button-group>
 						</div>
 						<div lwc:if={product.showWorkOrderRecordPicker}>
 							<div lwc:if={product.workOrderRecord}
+								style="align-items:flex-end;"
 								class="slds-media
 									slds-media_small
-									slds-media_center
 									slds-border_bottom">
 								<div class="slds-media__body">
-									<c-production-field field={workOrderTitleField}
-										record={product.workOrderRecord}
-										mode="view"
-										object-api-name="WorkOrder"></c-production-field>
+								<c-production-field field={workOrderTitleField}
+									record={product.workOrderRecord}
+									mode="view"
+									object-api-name="WorkOrder"
+									custom-button-icon={product.workOrderCustomButtonIcon}
+									data-unique-id={product.uniqueId}
+									oncustombuttonclick={handleOnRemoveWorkOrderClick}
+									></c-production-field>
 								</div>
-								<div class="slds-media__figure-reverse">
+								<!-- <div class="slds-media__figure-reverse">
 									<lightning-button-icon variant="bare"
 										icon-name="utility:clear"
 										alternative-text="Remove Work Order"
@@ -231,9 +237,9 @@
 										data-unique-id={product.uniqueId}
 										disabled={product.isWorkOrderRecordPickerDisabled}
 										onclick={handleOnRemoveWorkOrderClick}
-										class="slds-m-left_x-small"
+										class="slds-var-m-left_x-small"
 										></lightning-button-icon>
-								</div>
+								</div> -->
 							</div>
 							<lightning-button lwc:else
 								variant="neutral"
@@ -241,7 +247,7 @@
 								data-unique-id={product.uniqueId}
 								disabled={product.isWorkOrderRecordPickerDisabled}
 								onclick={handleOnSelectWorkOrderClick}
-								class="slds-m-bottom_x-small"></lightning-button>
+								class="slds-var-m-bottom_x-small"></lightning-button>
 							<!-- <div lwc:else>
 								<span class="slds-text-color_weak"
 									>No qualifying work orders</span>&nbsp;

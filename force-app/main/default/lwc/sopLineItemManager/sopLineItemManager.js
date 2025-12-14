@@ -1,25 +1,25 @@
 import LwcBase from 'c/lwcBase';
 import { api, wire } from 'lwc';
+import { refreshApex } from '@salesforce/apex';
 import {
 	getObjectInfo
 } from "lightning/uiObjectInfoApi";
 import {
-	getRelatedListRecords
-} from "lightning/uiRelatedListApi";
-import {
 	createRecord,
 	updateRecord,
-	deleteRecord,
-	getFieldValue
+	deleteRecord
 } from 'lightning/uiRecordApi';
 import {
 	isItemNew,
 	createNewItem,
-	applyProcedureRecord,
+	applyProcedureApexRecord,
 	applyStatusFlags,
 	addErrorToItem,
 	removeErrorFromItem
 } from "c/lineItemManagerStep";
+
+import getSopLineItems
+	from "@salesforce/apex/SopLineItemManagerCtrl.getSopLineItems";
 
 import SOP_LINE_ITEM_OBJECT from '@salesforce/schema/SopLineItem__c';
 
@@ -46,28 +46,32 @@ export default class SopLineItemManager extends LwcBase {
 	recordId;
 
 	@api
+	childObjectApiName = "SopLineItem__c";
+
 	details = {
 		parentRecordId: this.recordId,
 		items: []
 	};
-
-	@api
-	objectApiName = "SopLineItem__c";
 	
-	mode = "admin";
+	mode = "prod";
 	isReady = false;
 	fields = [];
 	fieldApiNames = [];
+	wiredWorkOrderLineItemsResult;
 
 	get modeOptions() {
 		return [{
-			label: "Admin",
+			label: "Edit",
 			value: "admin",
-			isChecked: this.mode == "admin"
+			iconName: "utility:edit",
+			isChecked: this.mode == "admin",
+			isNotChecked: this.mode != "admin"
 		}, {
-			label: "Production",
+			label: "Done Editing",
 			value: "prod",
-			isChecked: this.mode == "prod"
+			iconName: "utility:close",
+			isChecked: this.mode == "prod",
+			isNotChecked: this.mode != "prod"
 		}];
 	}
 
@@ -77,6 +81,17 @@ export default class SopLineItemManager extends LwcBase {
 
 	get subtitle() {
 		return ``;
+	}
+
+	get showNoItemsMessage() {
+		return this.isReady &&
+			this.mode == "prod" &&
+			this.details.items.length == 0;
+	}
+
+	get eidtModeOption() {
+		return this.modeOptions.find(
+			option => option.value == "admin");
 	}
 
 	@wire(getObjectInfo, {
@@ -108,30 +123,26 @@ export default class SopLineItemManager extends LwcBase {
 			this.addError("Error retrieving Work Order Line Item fields", error);
 	}
 
-	@wire(getRelatedListRecords, {
-		parentRecordId: "$recordId",
-		relatedListId: "SopLineItems__r",
+	@wire(getSopLineItems, {
+		sopId: "$recordId",
 		fields: "$fieldApiNames"
 	})
-	wiredWorkOrderLineItems({ error, data }) {
+	wiredWorkOrderLineItems(result) {
+		const { data, error } = result;
 		if (data) {
+			this.wiredWorkOrderLineItemsResult = result;
 			this.details.items =
 				// we got data so, we are ready
-				data.records.map(r => {
-					let record = {"Id": r.id};
-					let procedureRecord = r.fields.Procedure__r?.value;
-					
-					// create a one level record with all field values
-					this.fields.forEach(f =>
-						(record[f] = getFieldValue(r,
-							this.getFieldFullName(f))));
+				data.map(record => {
+					let procedureRecord = record.Procedure__r;
 					
 					// we convert the record into an item
 					let item = this.getFromRecord(record);
 					
 					// and apply the procedure
-					if (procedureRecord)
-						applyProcedureRecord(item, procedureRecord);
+					if (procedureRecord) {
+						applyProcedureApexRecord(item, procedureRecord);
+					}
 
 					// the item may be selected
 					item.isSelected =
@@ -149,19 +160,26 @@ export default class SopLineItemManager extends LwcBase {
 		}
 	}
 
-	handleOnModeSelect(event) {
+	/* handleOnModeSelect(event) {
 		this.mode = event.detail.value;
+	} */
+
+	handleOnModeClick(event) {
+		this.mode = event.target.dataset.value;
+	}
+
+	handleItemCreate(event) {
+		this.mode = "admin";
+		/* let item = event.detail.item;
+		if (this.isItemReadyToSave(item)) {
+			this.saveItem(item);
+		} */
 	}
 
 	handleItemChange(event) {
-		try {
 		let item = event.detail.item;
 		if (this.isItemReadyToSave(item)) {
 			this.saveItem(item);
-		}
-		} catch (e) {
-			console.error('Error handling item change',
-				JSON.stringify(e.stack));
 		}
 	}
 
@@ -185,7 +203,27 @@ export default class SopLineItemManager extends LwcBase {
 			procedureId: record.Procedure__c,
 			machineId: record.Machine__c,
 			adminNotes: record.AdminNotes__c,
-			// productionNotes: record.ProductionNotes__c,
+			productionNotes: record.ProductionNotes__c,
+			procedureName: record.Procedure__r?.Name ?? "",
+			// additional procedure information
+			colorCssCode:
+				record.Procedure__r?.ColorCssCode__c ?? null,
+			defaultNextProcedureId:
+				record.Procedure__r?.DefaultNextProcedure__c ?? null,
+			isMachineInfoRequired:
+				record.Procedure__r?.IsMachineInfoRequired__c ?? false,
+			machineSkills:
+				record.Procedure__r?.MachineSkills__c ?? "",
+			productionFieldsJson:
+				record.Procedure__r?.ProductionFieldsJson__c ?? "",
+			// other fields
+			description: record.Description__c ?? "",
+			finishing: record.Finishing__c ?? "",
+			specifications: record.Specifications__c ?? "",
+			specifics: record.Specifics__c ?? "",
+			title: record.Title__c ?? "",
+			type: record.Type__c ?? "",
+			// keep a reference to the
 			// actual salesforce record
 			record: {...record}
 		};
@@ -208,10 +246,17 @@ export default class SopLineItemManager extends LwcBase {
 				apiName,
 				fields
 			})
-			.then(result => this.updateItem(item, true, result.id))
+			.then(result => {
+				item.record = {
+					...fields,
+					Id: result.id
+				};
+				this.updateItem(item, true, result.id);
+			}) 
 			.catch(error => this.addErrorToItem(item, "Item was not created", error));
 		} else {
 			fields.Id = item.uniqueId;
+			delete fields.SOP__c;
 			updateRecord({
 				fields
 			})
@@ -240,12 +285,13 @@ export default class SopLineItemManager extends LwcBase {
 	}
 
 	updateItem(item, updateUniqueId = false, newUniqueId = null) {
-		this.getComponent("c-line-item-manager").updateItem(
-			item.uniqueId,
-			item,
-			true,
-			updateUniqueId,
-			newUniqueId);
+		this.getComponent("c-line-item-manager")
+			.updateItem(
+				item.uniqueId,
+				item,
+				true,
+				updateUniqueId,
+				newUniqueId);
 	}
 
 	addErrorToItem(item, errorTitle, errorObject) {

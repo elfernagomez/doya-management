@@ -55,6 +55,18 @@ export function getProcedureFromRecord(record) {
 	};
 }
 
+export function getProcedureFromApexRecord(record) {
+	return {
+		value: record.Id,
+		label: record.Name,
+		colorCode: record.ColorCssCode__c || "#ffffff",
+		defaultNextId: record.DefaultNextProcedure__c,
+		isMachineInfoRequired: record.IsMachineInfoRequired__c,
+		machineSkills: record.MachineSkills__c?.split(";") || null,
+		productionFields: JSON.parse(record.ProductionFieldsJson__c || "[]"),
+	};
+}
+
 export default class ProcedureConfiguration extends LwcBase {
 	@api
 	recordId;

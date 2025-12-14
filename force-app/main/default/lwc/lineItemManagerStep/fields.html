@@ -64,21 +64,10 @@
 		<lightning-layout-item lwc:if={_item.isMachineNeeded}
 			class="slds-var-m-bottom_small
 				slds-var-m-right_xx-large">
-			<c-production-field lwc:if={_item.isComplete}
-				field={machineField}
+			<c-production-field field={machineField}
 				record={_item.record}
 				mode="view"
 				object-api-name={objectApiName}></c-production-field>
-			<lightning-record-picker lwc:else
-				label="Machine"
-				object-api-name="Asset"
-				placeholder="Search Machines..."
-				filter={_item.machineFilter}
-				value={_item.machineId}
-				data-field="machineId"
-				onchange={handleLookupFieldChange}
-				required
-				class="validate"></lightning-record-picker>
 		</lightning-layout-item>
 		<lightning-layout-item for:each={_item.productionFields}
 			for:item="field"

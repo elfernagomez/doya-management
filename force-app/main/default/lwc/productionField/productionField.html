@@ -64,5 +64,13 @@
 		onclick={handleOnEditClick}
 		class="slds-is-absolute slds-var-m-bottom_xx-small"
 		style="bottom:0;right:0;"></lightning-button-icon>
+	<!-- sldsValidatorIgnoreNextLine -->
+	<lightning-button-icon lwc:elseif={customButtonIcon}
+		icon-name={customButtonIcon.iconName}
+		variant="bare"
+		title={customButtonIcon.title}
+		onclick={handleOnCustomIconClick}
+		class="slds-is-absolute slds-var-m-bottom_xx-small"
+		style="bottom:0;right:0;"></lightning-button-icon>
 </div>
 </template>

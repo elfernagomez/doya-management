@@ -6,19 +6,7 @@
 <template>
 <lightning-card title="Steps">
 	<lightning-button-group slot="actions">
-		<!-- <lightning-radio-group name="modeRadioGroup"
-			alternative-text="Mode"
-			options={modeOptions}
-			value={mode}
-			type="button"
-			variant="label-hidden"
-			onchange={handleModeChange}></lightning-radio-group> -->
-		<!-- <lightning-button label="Complete Step"
-			name="completeStep"
-			alternative-text="Complete Step"
-			variant="brand"
-			onclick={handleOnCompleteStepClick}></lightning-button> -->
-		<lightning-button-menu menu-alignment="right"
+		<!-- <lightning-button-menu menu-alignment="right"
 			onselect={handleOnModeSelect}>
 			<lightning-menu-item for:each={modeOptions}
 				for:item="modeOption"
@@ -27,7 +15,15 @@
 				key={modeOption.value}
 				value={modeOption.value}
 				label={modeOption.label}></lightning-menu-item>
-		</lightning-button-menu>
+		</lightning-button-menu> -->
+		<template for:each={modeOptions} for:item="modeOption" for:index="index">
+			<lightning-button lwc:if={modeOption.isNotChecked}
+				icon-name={modeOption.iconName}
+				key={modeOption.value}
+				data-value={modeOption.value}
+				label={modeOption.label}
+				onclick={handleOnModeClick}></lightning-button>
+		</template>
 	</lightning-button-group>
 	<div lwc:if={isError}
 		class="slds-var-p-horizontal_small">
@@ -39,9 +35,10 @@
 		mode={mode}
 		variant="details"
 		details={details}
-		object-api-name={objectApiName}
-		onitemchange={handleItemChange}
-		onitemdelete={handleItemDelete}></c-line-item-manager>
+		object-api-name={childObjectApiName}
+		onitemcreate={handleItemCreate}
+		onitemdelete={handleItemDelete}
+		onitemchange={handleItemChange}></c-line-item-manager>
 	<!-- <template lwc:if={isLoading}>
 		<lightning-spinner variant="brand"
 			alternative-text="Loading..."></lightning-spinner>

@@ -2,21 +2,20 @@ import WorkOrderLineItemManagerBase from 'c/workOrderLineItemManagerBase';
 import WorkOrderCompleteStepModal from 'c/workOrderCompleteStepModal';
 import { api, wire } from 'lwc';
 import {
-	getRelatedListRecords
-} from "lightning/uiRelatedListApi";
-import {
 	updateRecord,
-	getFieldValue,
 	deleteRecord
 } from 'lightning/uiRecordApi';
 import {
 	isItemNew,
-	applyProcedureRecord,
+	applyProcedureApexRecord,
 	applyStatusFlags,
 	STATUS_COMPLETED,
 	STATUS_IN_PROGRESS,
 	STATUS_PENDING
 } from "c/lineItemManagerStep";
+
+import getWorkOrderLineItems
+	from "@salesforce/apex/WorkOrderLineItemManagerCtrl.getWorkOrderLineItems";
 
 import detailsView from "./details.html";
 import compactView from "./compact.html";
@@ -83,9 +82,8 @@ export default class WorkOrderLineItemManager extends WorkOrderLineItemManagerBa
 		}
 	}
 
-	@wire(getRelatedListRecords, {
-		parentRecordId: "$recordId",
-		relatedListId: "WorkOrderLineItems",
+	@wire(getWorkOrderLineItems, {
+		workOrderId: "$recordId",
 		fields: "$fieldApiNames"
 	})
 	wiredWorkOrderLineItems({ error, data }) {
@@ -93,21 +91,19 @@ export default class WorkOrderLineItemManager extends WorkOrderLineItemManagerBa
 			console.log("wiredWorkOrderLineItems invoked");
 			this.details.items =
 				// we got data so, we are ready
-				data.records.map(r => {
-					let record = {"Id": r.id};
-					let procedureRecord = r.fields.Procedure__r?.value;
-					
-					// create a one level record with all field values
-					this.fields.forEach(f =>
-						(record[f] = getFieldValue(r,
-							this.getFieldFullName(f))));
+				data.map(record => {
+					let procedureRecord = record.Procedure__r;
+					console.log("Loaded line items:", 
+						JSON.stringify(record),
+						JSON.stringify(procedureRecord));
 					
 					// we convert the record into an item
 					let item = this.getFromRecord(record);
 					
 					// and apply the procedure
-					if (procedureRecord)
-						applyProcedureRecord(item, procedureRecord);
+					if (procedureRecord) {
+						applyProcedureApexRecord(item, procedureRecord);
+					}
 
 					// the item may be selected
 					item.isSelected =
@@ -120,8 +116,9 @@ export default class WorkOrderLineItemManager extends WorkOrderLineItemManagerBa
 
 			// and set the ready status
 			this.isReady = true;
-		} else if (error)
+		} else if (error) {
 			this.addError("Error retrieving related line items", error);
+		}
 	}
 
 	@api

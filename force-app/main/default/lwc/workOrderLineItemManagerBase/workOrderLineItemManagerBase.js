@@ -53,13 +53,17 @@ export default class WorkOrderLineItemManagerBase extends LwcBase {
 
 	get modeOptions() {
 		return [{
-			label: "Admin",
+			label: "Edit",
 			value: "admin",
-			isChecked: this.mode == "admin"
+			iconName: "utility:edit",
+			isChecked: this.mode == "admin",
+			isNotChecked: this.mode != "admin"
 		}, {
-			label: "Production",
+			label: "Done Editing",
 			value: "prod",
-			isChecked: this.mode == "prod"
+			iconName: "utility:close",
+			isChecked: this.mode == "prod",
+			isNotChecked: this.mode != "prod"
 		}];
 	}
 
@@ -109,8 +113,12 @@ export default class WorkOrderLineItemManagerBase extends LwcBase {
 		}
 	}
 
-	handleOnModeSelect(event) {
+	/* handleOnModeSelect(event) {
 		this.mode = event.detail.value;
+	} */
+
+	handleOnModeClick(event) {
+		this.mode = event.target.dataset.value;
 	}
 
 	isItemReadyToSave(item) {

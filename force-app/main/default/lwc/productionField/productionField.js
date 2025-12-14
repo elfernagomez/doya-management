@@ -23,6 +23,9 @@ export default class ProductionField extends InputBase {
 	@api
 	isEditAllowedOverride = null;
 
+	@api
+	customButtonIcon = null;
+
 	_record = {};
 	isEditing = false;
 	isFormReady = false;
@@ -56,7 +59,7 @@ export default class ProductionField extends InputBase {
 	}
 
 	get viewModeContainerClass() {
-		return this.isEditAllowed ?
+		return this.isEditAllowed || this.customButtonIcon ?
 			"slds-is-relative slds-var-p-right_medium" :
 			""
 	}
@@ -88,6 +91,13 @@ export default class ProductionField extends InputBase {
 
 	handleOnFormLoad() {
 		this.isFormReady = true;
+	}
+
+	handleOnCustomIconClick() {
+		this.customEvent("custombuttonclick", {
+			field: this.field,
+			record: this._record
+		});
 	}
 
 	setValue(v, doNotify) {

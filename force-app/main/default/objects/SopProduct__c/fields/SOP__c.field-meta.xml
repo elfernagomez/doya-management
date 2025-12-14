@@ -4,10 +4,10 @@
     <externalId>false</externalId>
     <label>SOP</label>
     <referenceTo>SOP__c</referenceTo>
-    <relationshipLabel>SOP Line Items</relationshipLabel>
-    <relationshipName>SopLineItems</relationshipName>
+    <relationshipLabel>SOP Products</relationshipLabel>
+    <relationshipName>SopProducts</relationshipName>
     <relationshipOrder>0</relationshipOrder>
-    <reparentableMasterDetail>false</reparentableMasterDetail>
+    <reparentableMasterDetail>true</reparentableMasterDetail>
     <trackTrending>false</trackTrending>
     <type>MasterDetail</type>
     <writeRequiresMasterRead>false</writeRequiresMasterRead>

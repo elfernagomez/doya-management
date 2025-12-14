@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>65.0</apiVersion>
+    <assignments>
+        <name>assign_calculateUniqueKey</name>
+        <label>Calculate Unique Key</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.UniqueKey__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>formula_uniqueKey</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <decisions>
+        <name>decision_shouldUniqueKeyBeRecalculated</name>
+        <label>Should Unique Key be recalculated?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>No recalculation needed</defaultConnectorLabel>
+        <rules>
+            <name>outcome_yesNeedRecalculation</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>formula_shouldRecalculateUniqueKey</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>assign_calculateUniqueKey</targetReference>
+            </connector>
+            <label>Yes, need recalculation</label>
+        </rules>
+    </decisions>
+    <environments>Default</environments>
+    <formulas>
+        <name>formula_shouldRecalculateUniqueKey</name>
+        <dataType>Boolean</dataType>
+        <expression>OR (
+  ISNEW(),
+  ISCHANGED({!$Record.Product__c}),
+  ISCHANGED({!$Record.SOP__c}) 
+)</expression>
+    </formulas>
+    <formulas>
+        <name>formula_uniqueKey</name>
+        <dataType>String</dataType>
+        <expression>{!$Record.SOP__c} &amp; &quot;:&quot; &amp; {!$Record.Product__c}</expression>
+    </formulas>
+    <interviewLabel>SOP Product {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SOP Product: On Before Create/Update</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>decision_shouldUniqueKeyBeRecalculated</targetReference>
+        </connector>
+        <object>SopProduct__c</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

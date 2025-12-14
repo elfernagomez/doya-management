@@ -62,7 +62,7 @@
 		<c-illustration variant="no-task"
 			image-size=""
 			message={labels.noItemsMsg}></c-illustration>
-		<div lwc:if={isAdmin}
+		<div lwc:if={showAddItemBtn}
 			class="slds-text-align_center">
 			<lightning-button label={labels.addItemBtn}
 				icon-name="utility:add"

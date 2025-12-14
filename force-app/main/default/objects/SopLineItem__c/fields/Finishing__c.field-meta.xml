@@ -3,11 +3,9 @@
     <fullName>Finishing__c</fullName>
     <externalId>false</externalId>
     <label>Finishing</label>
+    <length>255</length>
     <required>false</required>
     <trackTrending>false</trackTrending>
-    <type>Picklist</type>
-    <valueSet>
-        <restricted>true</restricted>
-        <valueSetName>Finishing</valueSetName>
-    </valueSet>
+    <type>Text</type>
+    <unique>false</unique>
 </CustomField>

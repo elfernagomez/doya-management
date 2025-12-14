@@ -25,9 +25,7 @@ export default class RecordLookupModal extends LightningModal {
 
 	get actualColumns() {
 		return [
-			...this.columns.map(col => ({
-				...col
-			})),
+			...this.columns.filter(col => col.isHidden != true),
 			{
 				type: 'button',
 				label: "Action",
@@ -58,7 +56,8 @@ export default class RecordLookupModal extends LightningModal {
 		// Try to focus the search input when the modal opens
 		const input = this.template &&
 			(this.template.querySelector('lightning-input') ||
-				this.template.querySelector('input'));
+			this.template.querySelector('input'));
+
 		if (input && typeof input.focus === 'function') {
 			input.focus();
 		}
@@ -83,7 +82,6 @@ export default class RecordLookupModal extends LightningModal {
 			lookupFilters: this.filters
 		})
 		.then(res => {
-			console.log('Search results:', JSON.stringify(res));
 			this.results = res;
 		})
 		.catch(e => {

@@ -172,11 +172,16 @@ public with sharing class RecordSearchCtrl {
                     } else if (isNumericType) {
                         // For numeric types, avoid quotes if value is numeric
                         try {
-                            System.Decimal.valueOf(safe);
-                            whereClauses.add(fieldPath + ' ' + op + ' ' + safe);
+                            if (String.isBlank(safe)) {
+                                // consider this as valid numeric (empty)
+                                whereClauses.add(fieldPath + ' ' + op + ' null');
+                            } else {
+                                System.Decimal.valueOf(safe);
+                                whereClauses.add(fieldPath + ' ' + op + ' ' + safe);
+                            }
                         } catch (Exception ex) {
-                            // fallback to quoted string if not numeric
-                            whereClauses.add(fieldPath + ' ' + op + ' \'' + safe + '\'');
+                            // invalid numeric value -> skip filter
+                            continue;
                         }
                     } else {
                         whereClauses.add(fieldPath + ' ' + op + ' \'' + safe + '\'');
@@ -185,8 +190,13 @@ public with sharing class RecordSearchCtrl {
                     String rawVal = value == null ? '' : value.trim();
                     if (isNumericType) {
                         try {
-                            System.Decimal.valueOf(rawVal);
-                            whereClauses.add(fieldPath + ' ' + op + ' ' + rawVal);
+                            if (String.isBlank(rawVal)) {
+                                // consider this as valid numeric (empty)
+                                whereClauses.add(fieldPath + ' ' + op + ' null');
+                            } else {
+                                System.Decimal.valueOf(rawVal);
+                                whereClauses.add(fieldPath + ' ' + op + ' ' + rawVal);
+                            }
                         } catch (Exception ex) {
                             // invalid numeric value -> skip filter
                             continue;

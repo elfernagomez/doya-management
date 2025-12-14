@@ -1,7 +1,7 @@
 import LwcBase from "c/lwcBase";
 import { NavigationMixin } from 'lightning/navigation';
 import { api, track } from "lwc";
-import { getProcedureFromRecord } from "c/procedureConfiguration";
+import { getProcedureFromRecord, getProcedureFromApexRecord } from "c/procedureConfiguration";
 import { lineItemManagerLabels } from "c/constants";
 import { selectStaff } from 'c/staffSelector';
 
@@ -28,6 +28,12 @@ export function applyProcedureRecord(item, procedureRecord) {
 	}
 }
 
+export function applyProcedureApexRecord(item, procedureRecord) {
+	if (procedureRecord && getProcedureFromApexRecord) {
+		setProcedure(item, getProcedureFromApexRecord(procedureRecord));
+	}
+}
+
 export function setProcedure(item, procedure) {
 	if (procedure) {
 		item.procedureName = procedure.label;
@@ -39,7 +45,9 @@ export function setProcedure(item, procedure) {
 					fieldPath: "Skills__c",
 					operator: "includes",
 					value: skill
-				}))
+				})),
+				filterLogic: procedure.machineSkills.map(
+					(_, index) => `${index + 1}`).join(" OR ")
 			} : null;
 	}
 }
@@ -163,6 +171,10 @@ export default class LineItemManagerStep extends NavigationMixin(LwcBase) {
 
 	set statusOptions(value) {
 		this._statusOptions = this.deepClone(value);
+	}
+
+	get ijson() {
+		return JSON.stringify(this._item, null, 2);
 	}
 
 	@api

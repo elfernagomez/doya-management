@@ -148,6 +148,20 @@ export default class NewWorkOrders extends NavigationMixin(LwcBase) {
 		};
 	}
 
+	get sopCustomButtonIcon() {
+		return {
+			iconName: "utility:clear",
+			title: "Remove Selected SOP"
+		};
+	}
+
+	get workOrderCustomButtonIcon() {
+		return {
+			iconName: "utility:clear",
+			title: "Remove Work Order"
+		};
+	}
+
 	@wire(getExistingWorkOrders, {
 		orderId: "$orderId"
 	})
@@ -246,17 +260,15 @@ export default class NewWorkOrders extends NavigationMixin(LwcBase) {
 			p.uniqueId == event.target.dataset.uniqueId);
 		// product.sopId = event.detail.recordId;
 		this.setSelectionStatus(product, true);
-
+		
 		RecordLookupModal.open({
 			label: 'Select SOP',
-			objectApiName: 'SOP__c',
-			filter: product.sopFilter,
-			selectedId: product.sopId,
+			objectApiName: 'SopProduct__c',
 			size: "small",
 			columns: [
 				{
-					label: 'Name',
-					fieldName: 'Name',
+					label: 'SOP',
+					fieldName: 'SopName__c',
 					type: 'text'
 				},
 				{
@@ -264,6 +276,12 @@ export default class NewWorkOrders extends NavigationMixin(LwcBase) {
 					fieldName: 'IsDefault__c',
 					type: 'boolean',
 					initialWidth: 100
+				},
+				{
+					label: 'SOP ID',
+					fieldName: 'SOP__c',
+					type: 'text',
+					isHidden: true
 				}
 			],
 			filters: [
@@ -273,7 +291,7 @@ export default class NewWorkOrders extends NavigationMixin(LwcBase) {
 					value: product.productId
 				},
 				{
-					fieldPath: 'IsActive__c',
+					fieldPath: 'IsSopActive__c',
 					operator: 'eq',
 					value: true
 				}
@@ -368,8 +386,11 @@ export default class NewWorkOrders extends NavigationMixin(LwcBase) {
 
 	handleOnSelectSopChange(uniqueId, selectedRecord) {
 		const product = this.productGroups.find(p => p.uniqueId == uniqueId);
-		product.sopId = selectedRecord.recordId;
-		product.sopRecord = selectedRecord.record;
+		product.sopId = selectedRecord.record?.SOP__c;
+		product.sopRecord = {
+			Id: selectedRecord.record?.SOP__c,
+			Name: selectedRecord.record?.SopName__c
+		};
 		product.isDefaultSopSelected =
 			product.defaultSopId != null &&
 			product.sopId == product.defaultSopId;
@@ -388,7 +409,6 @@ export default class NewWorkOrders extends NavigationMixin(LwcBase) {
 	handleOnDefaultSopSelectClick(event) {
 		const product = this.productGroups.find(p =>
 			p.uniqueId == event.target.dataset.uniqueId);
-		console.log("handleOnDefaultSopSelectClick", product.defaultSopId);
 		if (product.defaultSopId) {
 			product.sopId = product.defaultSopId;
 			product.sopRecord = product.defaultSopRecord;
@@ -401,7 +421,6 @@ export default class NewWorkOrders extends NavigationMixin(LwcBase) {
 		const product = this.productGroups.find(p => p.uniqueId == uniqueId);
 		product.workOrderId = selectedRecord.recordId;
 		product.workOrderRecord = selectedRecord.record;
-		console.log(JSON.stringify(selectedRecord), JSON.stringify(product));
 		this.setSelectionStatus(product, true);
 	}
 
@@ -419,7 +438,6 @@ export default class NewWorkOrders extends NavigationMixin(LwcBase) {
 	}
 
 	fetchItems() {
-		console.log("newWorkOrders.fetchItems()", this.orderId);
 		const onerror = (error) => {
 			this.addError("Error fetching Order Products", error);
 		};
@@ -572,6 +590,10 @@ export default class NewWorkOrders extends NavigationMixin(LwcBase) {
 		product.isSopDisabled = !value;
 		product.isWorkOrderActionDisabled = !value;
 		product.isWorkOrderRecordPickerDisabled = !value;
+		product.sopCustomButtonIcon =
+			product.isSopDisabled ? null : this.sopCustomButtonIcon;
+		product.workOrderCustomButtonIcon =
+			product.isWorkOrderActionDisabled ? null : this.workOrderCustomButtonIcon;
 		this.selectAll = this.productGroups.every(p => p.isSelected);
 	}
 
