@@ -1,0 +1,70 @@
+<template>
+<div class="slds-box
+		slds-theme_shade
+		slds-var-m-bottom_small
+		slds-p-around_none">
+	<div class="slds-page-header"
+		style="background:none;">
+		<div class="slds-page-header__row">
+			<div class="slds-page-header__col-title">
+				<div class="slds-media">
+					<div class="slds-media__figure">
+						<template lwc:if={isIconUrl}>
+							<span class="slds-icon_container">
+								<img src={headerIconName} alt="Packing Slip" class="slds-icon slds-icon_small" />
+							</span>
+						</template>
+						<template lwc:else>
+							<lightning-icon icon-name={headerIconName}
+								alternative-text="Packing Slip"></lightning-icon>
+						</template>
+					</div>
+					<div class="slds-media__body">
+						<div class="slds-page-header__name">
+							<div class="slds-page-header__name-title">
+								<h1>
+									<a href="#" onclick={handleOnNavigateToRecord} class="slds-page-header__title slds-truncate" title={_packingSlip.name}>
+										{_packingSlip.name}
+									</a>
+								</h1>
+							</div>
+						</div>
+						<div class="slds-page-header__name-meta">
+							<ul class="slds-list_horizontal slds-has-dividers_left">
+							<li lwc:if={_packingSlip.deliveryGroupName}
+								class="slds-item">{_packingSlip.deliveryGroupName}</li>
+							<li lwc:if={_packingSlip.trackingNumber}
+								class="slds-item">{_packingSlip.trackingNumber}</li>
+								<li lwc:if={itemCount}
+									class="slds-item">{itemCount} items</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="slds-page-header__col-actions">
+				<div class="slds-page-header__controls">
+					<div class="slds-page-header__control">
+						<lightning-button-group slot="actions">
+							<lightning-button-icon lwc:if={showDeleteButton}
+								title="Delete"
+								icon-name="utility:delete"
+								variant="border-filled"
+								onclick={handleOnStartDeleteClick}
+								></lightning-button-icon>
+						</lightning-button-group>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="slds-var-p-horizontal_large slds-var-p-bottom_large">
+		<div lwc:if={isError}
+			class="slds-var-m-bottom_small">
+			<c-error-panel error-title={errorTitle}
+				error-object={errorObject}></c-error-panel>
+		</div>
+		<slot></slot>
+	</div>
+</div>
+</template>

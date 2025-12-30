@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>StateProvince__c</fullName>
+    <fullName>Product__c</fullName>
     <externalId>false</externalId>
-    <label>State/Province</label>
-    <length>255</length>
+    <formula>IF(ISBLANK( OrderProduct__r.Product2Id ), &quot;&quot;, HYPERLINK(&quot;/&quot; &amp; OrderProduct__r.Product2Id, OrderProduct__r.Product2.Name, &quot;_blank&quot;))</formula>
+    <label>Product</label>
     <required>false</required>
     <trackTrending>false</trackTrending>
     <type>Text</type>

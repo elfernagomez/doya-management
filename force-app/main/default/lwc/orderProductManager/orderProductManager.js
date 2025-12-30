@@ -89,8 +89,8 @@ import ITEM_TOTAL_PRICE_FIELD
 	from "@salesforce/schema/OrderItem.TotalPrice";
 import ITEM_CREATED_DATE_FIELD
 	from "@salesforce/schema/OrderItem.CreatedDate";
-/* import ITEM_FINISH_FIELD
-	from "@salesforce/schema/OrderItem.Finish__c"; */
+import ITEM_WORK_ORDER_STATUS_FIELD
+	from "@salesforce/schema/OrderItem.WorkOrderStatus__c";
 import ITEM_PARENT_ITEM_FIELD
 	from "@salesforce/schema/OrderItem.ParentOrderProduct__c";
 import ITEM_PARENT_PRODUCT_FIELD
@@ -120,7 +120,7 @@ export function getFieldApiNames() {
 		`${ITEM_OBJECT.objectApiName}.${ITEM_PRODUCT_MATERIAL_NAME_FIELD.fieldApiName}`,
 		`${ITEM_OBJECT.objectApiName}.${ITEM_PRODUCT_RECORD_TYPE_ID_FIELD.fieldApiName}`,
 		`${ITEM_OBJECT.objectApiName}.${ITEM_PRODUCT_RECORD_TYPE_NAME_FIELD.fieldApiName}`,
-		// `${ITEM_OBJECT.objectApiName}.${ITEM_FINISH_FIELD.fieldApiName}`,
+		`${ITEM_OBJECT.objectApiName}.${ITEM_WORK_ORDER_STATUS_FIELD.fieldApiName}`,
 		`${ITEM_OBJECT.objectApiName}.${ITEM_UNIT_TYPE_FIELD.fieldApiName}`,
 		`${ITEM_OBJECT.objectApiName}.${ITEM_QTY_FIELD.fieldApiName}`,
 		`${ITEM_OBJECT.objectApiName}.${ITEM_DEPTH_FIELD.fieldApiName}`,
@@ -152,7 +152,7 @@ export function convertFromRecord(r) {
 		materialName: getFieldValue(r, ITEM_PRODUCT_MATERIAL_NAME_FIELD),
 		productTypeId: getFieldValue(r, ITEM_PRODUCT_RECORD_TYPE_ID_FIELD),
 		productTypeName: getFieldValue(r, ITEM_PRODUCT_RECORD_TYPE_NAME_FIELD),
-		// finish: getFieldValue(r, ITEM_FINISH_FIELD),
+		workOrderStatus: getFieldValue(r, ITEM_WORK_ORDER_STATUS_FIELD),
 		unitType: getFieldValue(r, ITEM_UNIT_TYPE_FIELD),
 		qty: getFieldValue(r, ITEM_QTY_FIELD),
 		depth: getFieldValue(r, ITEM_DEPTH_FIELD),
@@ -191,6 +191,7 @@ export function convertFromApexRecord(r) {
 		materialName: r.Product2.Material__r?.Name,
 		productTypeId: r.Product2.RecordTypeId,
 		productTypeName: r.Product2.RecordType?.DeveloperName,
+		workOrderStatus: r.WorkOrderStatus__c,
 		unitType: r.UnitType__c,
 		qty: r.Quantity,
 		depth: r.Depth__c,

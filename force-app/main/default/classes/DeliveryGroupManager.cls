@@ -58,6 +58,7 @@ public with sharing class DeliveryGroupManager {
 						TotalPrice,
 						UnitPrice,
 						UnitType__c,
+						WorkOrderStatus__c,
 						OrderId,
 						PricebookEntryId,
 						ParentOrderProduct__c,

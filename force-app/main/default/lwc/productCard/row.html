@@ -125,18 +125,23 @@
 							</div>
 						</div>
 					</lightning-layout-item>
-					<!-- <lightning-layout-item>
+					<lightning-layout-item lwc:if={_product.workOrderStatus}
+						class="slds-var-m-right_xx-large
+							slds-var-m-bottom_x-small
+							slds-col_bump-left">
 						<div class="slds-form-element">
 							<label class="slds-form-element__label slds-p-top_none">
-								Finish
+								Production Status
 							</label>
 							<div class="slds-form-element__control">
 								<div class="slds-form-element__static">
-									{_product.finish}&nbsp;
+									<c-status-indicator
+										status={_product.workOrderStatus}>
+									</c-status-indicator>
 								</div>
 							</div>
 						</div>
-					</lightning-layout-item> -->
+					</lightning-layout-item>
 				</lightning-layout>
 			</lightning-layout-item>
 			<lightning-layout-item lwc:if={showTotals}
