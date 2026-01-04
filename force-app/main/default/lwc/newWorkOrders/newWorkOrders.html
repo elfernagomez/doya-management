@@ -212,6 +212,15 @@
 									onclick={handleOnDefaultSopSelectClick}
 									class="slds-var-m-bottom_x-small"></lightning-button>
 							</lightning-button-group>
+							<div>
+								<lightning-input type="date"
+									label="Due Date"
+									value={product.dueDate}
+									data-unique-id={product.uniqueId}
+									disabled={product.isSopDisabled}
+									onchange={handleOnDueDateChange}
+									class="slds-var-m-top_x-small"></lightning-input>
+							</div>
 						</div>
 						<div lwc:if={product.showWorkOrderRecordPicker}>
 							<div lwc:if={product.workOrderRecord}

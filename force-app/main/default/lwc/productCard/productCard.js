@@ -3,7 +3,7 @@ import { api, wire, track } from 'lwc';
 import { getFieldValue } from "lightning/uiRecordApi";
 import { getPicklistValues } from "lightning/uiObjectInfoApi";
 import rowMode from "./row.html";
-import cardMode from "./card.html";
+import listItemMode from "./listItem.html";
 import styles from "./productCard.css";
 
 import PRODUCT_NAME_FIELD from "@salesforce/schema/Product2.Name";
@@ -112,7 +112,7 @@ export default class ProductCard extends InputBase {
 	}
 
 	@api
-	variant = "row"; // row, card
+	variant = "row"; // row, list-item
 
 	@api
 	hideQty = false;
@@ -211,9 +211,9 @@ export default class ProductCard extends InputBase {
 		switch (this.variant) {
 			case "row":
 				return rowMode;
-			case "card":
+			case "list-item":
 			default:
-				return cardMode;
+				return listItemMode;
 		}
 	}
 
@@ -335,6 +335,10 @@ export default class ProductCard extends InputBase {
 				bubbles: true
 			}
 		);
+	}
+
+	handleOnGroupClick() {
+		// 
 	}
 
 	editProduct(changes) {

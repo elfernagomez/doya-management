@@ -1,5 +1,5 @@
 <template>
-<c-badge>
+<c-badge variant={variant}>
 	<span slot="iconLeft">
 		<lightning-icon lwc:if={icon}
 			icon-name={icon.name}
@@ -9,28 +9,4 @@
 	<lightning-formatted-text slot="body"
 		value={status}></lightning-formatted-text>
 </c-badge>
-<!-- <div data-status={status}
-	class="status-indicator">
-	<div class="slds-media slds-media_small">
-		<div class="slds-media__figure">
-			<lightning-icon icon-name="utility:record"
-				class="status-icon status-pending"
-				size="x-small"
-				variant="info"></lightning-icon>
-			<lightning-icon icon-name="utility:record"
-				class="status-icon status-in-progress"
-				size="x-small"
-				variant="warning"></lightning-icon>
-			<lightning-icon icon-name="utility:success"
-				class="status-icon status-completed"
-				size="x-small"
-				variant="success"></lightning-icon>
-		</div>
-		<div class="slds-media__body">
-			<lightning-formatted-text
-				value={status}
-				class="status-text"></lightning-formatted-text>&nbsp;
-		</div>
-	</div>
-</div> -->
 </template>

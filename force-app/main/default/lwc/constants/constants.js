@@ -33,6 +33,8 @@ import WORK_ORDER_LIST_VIEW_COMPLETE_ALL_STEPS_TITLE
 	from "@salesforce/label/c.WorkOrderListView_completeAllStepsTitle";
 import WORK_ORDER_LIST_VIEW_COMPLETE_ALL_STEPS_MESSAGE
 	from "@salesforce/label/c.WorkOrderListView_completeAllStepsMessage";
+import WORK_ORDER_LIST_VIEW_ORDER_PRODUCTS_BUTTON_LABEL
+	from "@salesforce/label/c.WorkOrderListView_orderProductsButtonLabel";
 
 import ORDER_PRODUCT_PARTS_SELECTION_MODAL_PARTS_AVAILABLE_TITLE
 	from "@salesforce/label/c.OrderProductPartsSelectionModal_partsAvailableTitle";
@@ -72,6 +74,7 @@ export const workOrderListViewLabels = {
 	setAllAsCurrentStepTitle: WORK_ORDER_LIST_VIEW_SET_ALL_AS_CURRENT_STEP_TITLE,
 	completeAllStepsTitle: WORK_ORDER_LIST_VIEW_COMPLETE_ALL_STEPS_TITLE,
 	completeAllStepsMessage: WORK_ORDER_LIST_VIEW_COMPLETE_ALL_STEPS_MESSAGE,
+	orderProductsButtonLabel: WORK_ORDER_LIST_VIEW_ORDER_PRODUCTS_BUTTON_LABEL
 };
 
 export const orderProductPartsSelectionModalLabels = {

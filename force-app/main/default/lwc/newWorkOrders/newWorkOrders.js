@@ -2,7 +2,6 @@ import { api, wire, track } from 'lwc';
 import LwcBase from 'c/lwcBase';
 import { NavigationMixin } from 'lightning/navigation';
 
-
 import getSingleOrderProduct
 	from "@salesforce/apex/OrderProductManagerCtrl.getSingleOrderProduct";
 import getOrderProductsByProductType
@@ -29,12 +28,14 @@ export function calculateAggregations(items) {
 }
 
 export function convertFromApexRecord(r, orderId) {
+	const dueDate = r.DeliveryGroup__r?.DueDate__c || r.Order?.DueDate__c;
 	return {
 		...createNewProduct(),
 		uniqueId: r.Id,
 		orderId,
 		itemNo: r.OrderItemNumber,
 		createdDate: new Date(r.CreatedDate),
+		dueDate: dueDate || null,
 		parentItemId: r.ParentOrderProduct__c,
 		parentItemProductName: r.ParentOrderProduct__r?.Product2?.Name,
 		groupId: r.DeliveryGroup__c,
@@ -415,6 +416,12 @@ export default class NewWorkOrders extends NavigationMixin(LwcBase) {
 			product.isDefaultSopSelected = true;
 			this.setSelectionStatus(product, true);
 		}
+	}
+
+	handleOnDueDateChange(event) {
+		const product = this.productGroups.find(p =>
+			p.uniqueId == event.target.dataset.uniqueId);
+		product.dueDate = event.target.value;
 	}
 
 	handleOnSelectWorkOrderChange(uniqueId, selectedRecord) {

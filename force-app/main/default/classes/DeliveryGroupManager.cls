@@ -8,6 +8,8 @@ public with sharing class DeliveryGroupManager {
 
 	} */
 
+	
+
 	/**
 	 * @param orderIds
 	 * @return Map<Id, List<DeliveryGroup__c>>
@@ -84,6 +86,110 @@ public with sharing class DeliveryGroupManager {
 		}
 
 		return result;
+	}
+
+	/**
+	 * Returns delivery groups (with their order products) that contain order items
+	 * linked to the specified Work Order Id.
+	 * @param workOrderId Id of the work order
+	 * @return List<DeliveryGroup__c> with OrderProducts__r filtered to the work order
+	 */
+	@AuraEnabled(cacheable=true)
+	public static List<DeliveryGroup__c> getDeliveryGroupsByWorkOrder(Id workOrderId) {
+		try {
+			if (workOrderId == null) {
+				return new List<DeliveryGroup__c>();
+			}
+			// get linking records to determine delivery groups 
+			// and order items to include
+			List<OrderItemWorkOrder__c> links = [
+				SELECT OrderItem__c, OrderItem__r.DeliveryGroup__c
+				FROM OrderItemWorkOrder__c
+				WHERE WorkOrder__c = :workOrderId
+			];
+
+			if (links.isEmpty()) {
+				return new List<DeliveryGroup__c>();
+			}
+
+			Set<Id> deliveryGroupIds = new Set<Id>();
+			Set<Id> orderItemIds = new Set<Id>();
+			for (OrderItemWorkOrder__c l : links) {
+				if (l.OrderItem__r.DeliveryGroup__c != null) {
+					deliveryGroupIds.add(l.OrderItem__r.DeliveryGroup__c);
+				}
+
+				if (l.OrderItem__c != null) {
+					orderItemIds.add(l.OrderItem__c);
+				}
+			}
+
+			if (deliveryGroupIds.isEmpty()) {
+				return new List<DeliveryGroup__c>();
+			}
+
+			List<DeliveryGroup__c> groups = [
+				SELECT Name,
+					AddressLabel__c,
+					AddressHtml__c,
+					Address__City__s,
+					Address__CountryCode__s,
+					Address__GeocodeAccuracy__s,
+					Address__Latitude__s,
+					Address__Longitude__s,
+					Address__PostalCode__s,
+					Address__StateCode__s,
+					Address__Street__s,
+					DueDate__c,
+					DeliveryType__c,
+					LocationType__c,
+					Order__c,
+					Venue__c,
+					Venue__r.Name,
+					(
+						SELECT AvailableQuantity,
+							BasePrice__c,
+							CreatedDate,
+							DeliveryGroup__c,
+							DeliveryType__c,
+							Width__c,
+							Height__c,
+							Depth__c,
+							Description,
+							DiscountType__c,
+							DiscountAmount__c,
+							EndDate,
+							ListPrice,
+							Notes__c,
+							Quantity,
+							TotalPrice,
+							UnitPrice,
+							UnitType__c,
+							WorkOrderStatus__c,
+							OrderId,
+							PricebookEntryId,
+							ParentOrderProduct__c,
+							ParentOrderProduct__r.Product2.Name,
+							Product2Id,
+							Product2.Name,
+							Product2.ProductCode,
+							Product2.Finish__c,
+							Product2.Material__c,
+							Product2.Material__r.Name,
+							Product2.RecordTypeId,
+							Product2.RecordType.DeveloperName
+						FROM OrderProducts__r
+						WHERE Id IN :orderItemIds
+						ORDER BY CreatedDate
+					)
+				FROM DeliveryGroup__c
+				WHERE Id IN :deliveryGroupIds
+				ORDER BY DueDate__c NULLS LAST, CreatedDate
+			];
+			return groups;
+		} catch (Exception ex) {
+			throw new AuraHandledException(ex.getMessage());
+		}
 	}
 
 	/**

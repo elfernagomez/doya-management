@@ -137,7 +137,6 @@ export default class DeliveryGroupCard extends InputBase {
 		this.locationTypeChoice = this.group.locationType;
 	}
 
-	@api
 	group = {};
 
 	isLoading = false;
@@ -158,7 +157,7 @@ export default class DeliveryGroupCard extends InputBase {
 	}
 
 	get showDeleteButton() {
-		return !this.group.isPlaceHolder;
+		return this.isEdit && !this.group.isPlaceHolder;
 	}
 
 	get headerIconName() {

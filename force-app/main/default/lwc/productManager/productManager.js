@@ -1,5 +1,4 @@
 import ProductManagerBase from 'c/productManagerBase';
-import { api, wire, track } from 'lwc';
 
 /**
  * @author Fernando Gomez
@@ -19,12 +18,4 @@ export default class ProductManager extends ProductManagerBase {
 		}],
 		filterLogic: '1 AND 2'
 	};
-
-	get isList() {
-		return this.variant == "list";
-	}
-
-	get isCard() {
-		return this.variant == "card";
-	}
 }

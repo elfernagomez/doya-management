@@ -77,6 +77,10 @@ import ITEM_HEIGHT_FIELD
 	from "@salesforce/schema/OrderItem.Height__c";
 import ITEM_DELIVERY_GROUP_FIELD
 	from "@salesforce/schema/OrderItem.DeliveryGroup__c";
+import ITEM_DELIVERY_GROUP_NAME_FIELD
+	from "@salesforce/schema/OrderItem.DeliveryGroup__r.Name";
+import ITEM_DELIVERY_GROUP_DUE_DATE_FIELD
+	from "@salesforce/schema/OrderItem.DeliveryGroup__r.DueDate__c";
 import ITEM_DISCOUNT_TYPE_FIELD
 	from "@salesforce/schema/OrderItem.DiscountType__c";
 import ITEM_DISCOUNT_AMOUNT_FIELD
@@ -113,6 +117,8 @@ export function getFieldApiNames() {
 		`${ITEM_OBJECT.objectApiName}.${ITEM_NUMBER_FIELD.fieldApiName}`,
 		`${ITEM_OBJECT.objectApiName}.${ITEM_CREATED_DATE_FIELD.fieldApiName}`,
 		`${ITEM_OBJECT.objectApiName}.${ITEM_DELIVERY_GROUP_FIELD.fieldApiName}`,
+		`${ITEM_OBJECT.objectApiName}.${ITEM_DELIVERY_GROUP_NAME_FIELD.fieldApiName}`,
+		`${ITEM_OBJECT.objectApiName}.${ITEM_DELIVERY_GROUP_DUE_DATE_FIELD.fieldApiName}`,
 		`${ITEM_OBJECT.objectApiName}.${ITEM_PRODUCT_ID_FIELD.fieldApiName}`,
 		`${ITEM_OBJECT.objectApiName}.${ITEM_PRODUCT_NAME_FIELD.fieldApiName}`,
 		`${ITEM_OBJECT.objectApiName}.${ITEM_PRODUCT_CODE_FIELD.fieldApiName}`,
@@ -145,6 +151,8 @@ export function convertFromRecord(r) {
 		parentItemId: getFieldValue(r, ITEM_PARENT_ITEM_FIELD),
 		parentItemProductName: getFieldValue(r, ITEM_PARENT_PRODUCT_FIELD),
 		groupId: getFieldValue(r, ITEM_DELIVERY_GROUP_FIELD),
+		groupName: getFieldValue(r, ITEM_DELIVERY_GROUP_NAME_FIELD),
+		groupDueDate: new Date(getFieldValue(r, ITEM_DELIVERY_GROUP_DUE_DATE_FIELD)),
 		productId: getFieldValue(r, ITEM_PRODUCT_ID_FIELD),
 		productName: getFieldValue(r, ITEM_PRODUCT_NAME_FIELD),
 		productCode: getFieldValue(r, ITEM_PRODUCT_CODE_FIELD),
@@ -184,6 +192,8 @@ export function convertFromApexRecord(r) {
 		parentItemId: r.ParentOrderProduct__c,
 		parentItemProductName: r.ParentOrderProduct__r?.Product2?.Name,
 		groupId: r.DeliveryGroup__c,
+		groupName: r.DeliveryGroup__r?.Name,
+		groupDueDate: new Date(r.DeliveryGroup__r?.DueDate__c),
 		productId: r.Product2Id,
 		productName: r.Product2.Name,
 		productCode: r.Product2.ProductCode,

@@ -123,6 +123,89 @@ public with sharing class WorkOrderListViewCtrl {
 		}
 	}
 
+	/**
+	 * Gets OrderItem records related to WorkOrders through the junction object
+	 * @param workOrderIds List of WorkOrder Ids
+	 * @return Map<Id, List<OrderItem>> Map of WorkOrder Id to related OrderItems
+	 * @throws AuraHandledException
+	 */
+	@AuraEnabled(cacheable=true)
+	public static Map<Id, List<OrderItem>> getOrderItemsByWorkOrders(
+		List<Id> workOrderIds
+	) {
+		Map<Id, List<OrderItem>> workOrderToOrderItems = new Map<Id, List<OrderItem>>();
+		
+		try {
+			if (workOrderIds == null || workOrderIds.isEmpty()) {
+				return workOrderToOrderItems;
+			}
+
+			// Query junction records to get OrderItems related to WorkOrders
+			List<OrderItemWorkOrder__c> junctionRecords = [
+				SELECT Id,
+					WorkOrder__c,
+					OrderItem__c,
+					OrderItem__r.Id,
+					OrderItem__r.OrderItemNumber,
+					OrderItem__r.AvailableQuantity,
+					OrderItem__r.BasePrice__c,
+					OrderItem__r.CreatedDate,
+					OrderItem__r.DeliveryType__c,
+					OrderItem__r.Width__c,
+					OrderItem__r.Height__c,
+					OrderItem__r.Depth__c,
+					OrderItem__r.Description,
+					OrderItem__r.DiscountType__c,
+					OrderItem__r.DiscountAmount__c,
+					OrderItem__r.EndDate,
+					OrderItem__r.ListPrice,
+					OrderItem__r.Notes__c,
+					OrderItem__r.Quantity,
+					OrderItem__r.TotalPrice,
+					OrderItem__r.UnitPrice,
+					OrderItem__r.UnitType__c,
+					OrderItem__r.WorkOrderStatus__c,
+					OrderItem__r.DeliveryGroup__c,
+					OrderItem__r.DeliveryGroup__r.Name,
+					OrderItem__r.DeliveryGroup__r.DueDate__c,
+					OrderItem__r.OrderId,
+					OrderItem__r.Order.DueDate__c,
+					OrderItem__r.PricebookEntryId,
+					OrderItem__r.ParentOrderProduct__c,
+					OrderItem__r.ParentOrderProduct__r.Product2.Name,
+					OrderItem__r.Product2Id,
+					OrderItem__r.Product2.Name,
+					OrderItem__r.Product2.ProductCode,
+					OrderItem__r.Product2.Material__c,
+					OrderItem__r.Product2.Material__r.Name,
+					OrderItem__r.Product2.RecordTypeId,
+					OrderItem__r.Product2.RecordType.DeveloperName
+				FROM OrderItemWorkOrder__c
+				WHERE WorkOrder__c IN :workOrderIds
+				ORDER BY OrderItem__r.DeliveryGroup__r.DueDate__c DESC,
+					OrderItem__r.CreatedDate DESC
+			];
+
+			// Build the map
+			for (OrderItemWorkOrder__c junction : junctionRecords) {
+				if (!workOrderToOrderItems.containsKey(junction.WorkOrder__c)) {
+					workOrderToOrderItems.put(
+						junction.WorkOrder__c,
+						new List<OrderItem>());
+				}
+
+				workOrderToOrderItems
+					.get(junction.WorkOrder__c)
+					.add(junction.OrderItem__r);
+			}
+
+			return workOrderToOrderItems;
+		} catch (Exception ex) {
+			System.debug(ex.getMessage() + '\n' + ex.getStackTraceString());
+			throw new AuraHandledException(ex.getMessage());
+		}
+	}
+
 	/* private static List<WorkOrderWrapper> wrap(List<WorkOrder> workOrders) {
 		List<WorkOrderWrapper> wrappers = new List<WorkOrderWrapper>();
 		for (WorkOrder wo : workOrders)

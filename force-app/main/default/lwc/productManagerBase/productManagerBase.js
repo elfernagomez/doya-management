@@ -1,5 +1,5 @@
 import InputBase from 'c/inputBase';
-import { api, wire, track } from 'lwc';
+import { api, track } from 'lwc';
 import { createNewProduct } from "c/productCard";
 import { refreshApex } from "@salesforce/apex";
 import { ShowToastEvent } from "lightning/platformShowToastEvent";
@@ -21,7 +21,7 @@ export default class ProductManagerBase extends InputBase {
 	priceBookId = null;
 
 	@api
-	variant = "list"; // row, card
+	variant = "row"; // row, card
 
 	@api
 	hideAddProducts = false;

@@ -140,6 +140,7 @@ public with sharing class NewWorkOrdersCtrl {
 							Order__c = item.orderId,
 							Product__c = item.productId,
 							SOP__c = item.sopId,
+							DueDate__c = item.dueDate,
 							Material__c = item.materialId,
 							Width__c = item.width,
 							Height__c = item.height,
@@ -240,6 +241,9 @@ public with sharing class NewWorkOrdersCtrl {
 
 		@AuraEnabled
 		public String sopId { get; set; }
+
+		@AuraEnabled
+		public Date dueDate { get; set; }
 
 		@AuraEnabled
 		public String orderId { get; set; }

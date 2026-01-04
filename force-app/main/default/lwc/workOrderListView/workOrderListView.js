@@ -3,8 +3,9 @@ import { NavigationMixin } from "lightning/navigation";
 import LightningConfirm from 'lightning/confirm';
 import styles from "./styles.css";
 import { api, track, wire } from 'lwc';
-import { getRecords } from 'lightning/uiRecordApi';
+import { getRecords, getFieldValue } from 'lightning/uiRecordApi';
 import { workOrderListViewLabels } from 'c/constants';
+import { convertFromApexRecord } from 'c/orderProductManager';
 
 import largeView from './largeView.html';
 import mediumView from './mediumView.html';
@@ -13,8 +14,11 @@ import getWorkOrderPage
 	from "@salesforce/apex/WorkOrderListViewCtrl.getWorkOrderPage";
 import getFieldDetailsFromFieldSet
 	from "@salesforce/apex/FieldSetManager.getFieldDetailsFromFieldSet";
+import getOrderItemsByWorkOrders
+	from "@salesforce/apex/WorkOrderListViewCtrl.getOrderItemsByWorkOrders";
 
 import WORK_ORDER_OBJECT from '@salesforce/schema/WorkOrder';
+import WORK_ORDER_STATUS_FIELD from '@salesforce/schema/WorkOrder.Status';
 
 export default class WorkOrderListView
 		extends NavigationMixin(WorkOrderListViewEventBus) {
@@ -90,6 +94,7 @@ export default class WorkOrderListView
 	}
 
 	get workOrderFields() {
+		const status = `${this.objectApiName}.${WORK_ORDER_STATUS_FIELD.fieldApiName}`
 		const result = [`${this.objectApiName}.Id`];
 		this.columns.forEach(c => {
 			result.push(`${this.objectApiName}.${c.fieldName}`);
@@ -101,6 +106,11 @@ export default class WorkOrderListView
 				].join("."));
 			}
 		});
+
+		if (result.find(r => r == status) == null) {
+			result.push(status);
+		}
+
 		return result;
 	}
 
@@ -179,8 +189,10 @@ export default class WorkOrderListView
 		} else if (error) {
 			this.isLoading = false;
 			this.addError(
-				["We encountered an issue while retrieving the work orders",
-					...this.getDmlErrors(error)].join(". "),
+				[
+					"We encountered an issue while retrieving the work orders",
+					...this.getDmlErrors(error)
+				].join(". "),
 				error);
 		}
 	}
@@ -203,18 +215,27 @@ export default class WorkOrderListView
 				uniqueId: r.result.id,
 				selectedItemId: null,
 				data: r.result.fields,
+				orderProducts: [],
+				showOrderProducts: false,
+				orderProductsButtonLabel:
+					this.labels.orderProductsButtonLabel.replace("{0}", "No"),
+				isSelected: false,
+				status: getFieldValue(r.result, WORK_ORDER_STATUS_FIELD),
 				columns: this.columns.map(c => ({
 					key: `${c.fieldName}_${r.result.id}`,
-					column: c
+					column: c,
+					isNotBlank: r.result.fields[c.fieldName]?.value != null,
 				})),
 				mediumTopColumns: this.mediumTopColumns.map((c, i) => ({
 					key: `${c.fieldName}_${r.result.id}`,
 					column: c,
+					isNotBlank: r.result.fields[c.fieldName]?.value != null,
 					isNotLast: (i + 1) < topColumnCount
 				})),
-				mediumBottomColumns: this.mediumBottomColumns.map((c, i) => ({
+				mediumBottomColumns: this.mediumBottomColumns.map((c) => ({
 					key: `${c.fieldName}_${r.result.id}`,
-					column: c
+					column: c,
+					isNotBlank: r.result.fields[c.fieldName]?.value != null
 				}))
 			})));
 			
@@ -225,10 +246,42 @@ export default class WorkOrderListView
 					rowNumber: row.rowNumber,
 					uniqueId: row.uniqueId
 				})));
+
+			this.fetchPageOrderItems(data.results.map(r => r.result.id));
 		} else if (error) {
 			this.error = error;
 			this.records = [];
 		}
+	}
+
+	fetchPageOrderItems(workOrderIds) {
+		getOrderItemsByWorkOrders({
+			workOrderIds
+		})
+		.then(result => {
+			this.data.forEach(row => {
+				const items = result[row.uniqueId];
+				if (items) {
+					const ops = items.map(oi => convertFromApexRecord(oi));
+					row.orderProducts = ops;
+					row.orderProductsButtonLabel =
+						this.labels.orderProductsButtonLabel
+							.replace("{0}", ops.length);
+				} else {
+					row.orderProducts = [];
+					row.orderProductsButtonLabel =
+						this.labels.orderProductsButtonLabel
+							.replace("{0}", "No");
+				}
+			});
+		})
+		.catch(error => {
+			this.addError([
+					"We encountered an issue while retrieving the Order Products",
+					...this.getDmlErrors(error)
+				].join(". "),
+				error);
+		});
 	}
 
 	connectedCallback() {
@@ -420,6 +473,15 @@ export default class WorkOrderListView
 				.filter(o => o.isSelected)
 				.map(o => o.value);
 		this.handleRefreshAction();
+	}
+
+	handleOnOrderProductLinkClick(event) {
+		const index = parseInt(event.currentTarget.dataset.index, 10);
+		this.editDataRow(
+			index,
+			{
+				showOrderProducts: !this.data[index].showOrderProducts
+			});
 	}
 
 	editDataRow(index, changes, updateDataRefence = true) {

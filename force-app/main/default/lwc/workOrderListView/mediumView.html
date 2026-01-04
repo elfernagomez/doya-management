@@ -33,8 +33,8 @@
 								key={col.key}
 								class="slds-page-header__name">
 								<div class="slds-page-header__name-title">
-									<h1><span class="slds-truncate
-											slds-page-header__title">
+									<h1><span class="slds-page-header__title
+										slds-truncate">
 									<c-output-field record={row.data}
 										object-api-name={objectApiName}
 										is-name-field={col.column.isNameField}
@@ -52,11 +52,12 @@
 						</template>
 						<div class="slds-page-header__name-meta">
 							<ul class="slds-list_horizontal slds-has-dividers_left">
-								<li for:each={row.mediumTopColumns}
-									for:item="col"
-									for:index="j"
+							<template for:each={row.mediumTopColumns}
+								for:item="col"
+								for:index="j">
+								<template lwc:if={j}>
+								<li lwc:if={col.isNotBlank}
 									key={col.key}
-									lwc:if={j}
 									class="slds-item">
 									<c-output-field record={row.data}
 										object-api-name={objectApiName}
@@ -70,8 +71,18 @@
 										minimum-integer-digits={col.column.minInt}
 										type={col.column.type}></c-output-field>
 								</li>
+								</template>
+							</template>
 							</ul>
 						</div>
+					</div>
+				</div>
+			</div>
+			<div class="slds-page-header__col-actions">
+				<div class="slds-page-header__controls">
+					<div class="slds-page-header__control">
+						<c-status-indicator
+							status={row.status}></c-status-indicator>
 					</div>
 				</div>
 			</div>
@@ -176,6 +187,41 @@
 						</div>
 					</lightning-layout-item>
 				</lightning-layout>
+			</lightning-layout-item>
+		</lightning-layout>
+		<lightning-layout vertical-align="stretch"
+			multiple-rows="true"
+			class="slds-box
+				slds-p-around_none
+				slds-theme_default
+				slds-var-m-top_medium">
+			<lightning-layout-item size="12">
+				<lightning-button lwc:if={row.showOrderProducts}
+					label={row.orderProductsButtonLabel}
+					variant="base"
+					stretch="true"
+					icon-name="utility:chevronup"
+					icon-position="right"
+					data-index={i}
+					record-id={row.uniqueId}
+					onclick={handleOnOrderProductLinkClick}></lightning-button>
+				<lightning-button lwc:else
+					label={row.orderProductsButtonLabel}
+					variant="base"
+					stretch="true"
+					icon-name="utility:chevrondown"
+					icon-position="right"
+					data-index={i}
+					record-id={row.uniqueId}
+					onclick={handleOnOrderProductLinkClick}></lightning-button>
+			</lightning-layout-item>
+			<lightning-layout-item lwc:if={row.showOrderProducts}
+				size="12"
+				class="slds-var-p-around_small">
+				<c-product-manager products={row.orderProducts}
+					mode="view"
+					variant="list-item"
+					hide-add-products=true></c-product-manager>
 			</lightning-layout-item>
 		</lightning-layout>
 	</div>
