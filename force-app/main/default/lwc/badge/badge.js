@@ -2,7 +2,7 @@ import { api, LightningElement } from 'lwc';
 
 export default class Badge extends LightningElement {
 	@api
-	iconPosition = "left"; // left, right, both
+	iconPosition = "left"; // left, right, both, none
 
 	@api
 	variant = "default"; // default, success, warning, error, info

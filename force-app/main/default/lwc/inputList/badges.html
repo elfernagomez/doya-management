@@ -1,0 +1,143 @@
+<template>
+<div lwc:if={isView}
+	class="">
+	<div lwc:if={items.length}>
+		<c-badge for:each={items}
+			for:item="item"
+			for:index="index"
+			key={item}
+			icon-position="none"
+			class="slds-var-m-right_small">
+			<span slot="body">{item}</span>
+		</c-badge>
+	</div>
+	<p lwc:else
+		class="slds-var-p-horizontal_small
+			slds-text-color_inverse-weak">{noItemsMessage}</p>
+</div>
+<div lwc:if={isEdit}
+	class="slds-box slds-box_xx-small">
+	<lightning-layout class="slds-var-m-bottom_xx-small">
+		<lightning-layout-item flexibility="grow">
+			<div>
+				<c-badge for:each={items}
+					for:item="item"
+					for:index="index"
+					key={item}
+					icon-position="right"
+					class="slds-var-m-right_small">
+					<lightning-icon icon-name="utility:close"
+						size="x-small"
+						class="slds-m-right_xx-small"
+						slot="iconRight"
+						data-index={index}
+						onclick={handleOnDeleteItemClick}></lightning-icon>
+					<span slot="body">{item}</span>
+				</c-badge>
+				<div class="slds-is-relative
+						slds-show_inline-block">
+					<lightning-input name="newElement"
+						variant="label-hidden"
+						value={newValue}
+						maxlength="80"
+						onchange={handleOnNewValueChange}
+						onkeypress={handleOnNewValueKeyPress}
+						placeholder="Add item..."
+						class="newElementInput "></lightning-input>
+					<lightning-button-icon icon-name="utility:add"
+						variant="container"
+						disabled={isAddBtnDisabled}
+						onclick={handleOnAddClick}
+						class="slds-is-absolute"
+						style="right:0;top:0;"></lightning-button-icon>
+				</div>
+			</div>
+		</lightning-layout-item>
+		<lightning-layout-item>
+			<lightning-button-group>
+				<lightning-button-icon-stateful
+					for:each={orderingTypeOptions}
+					for:item="option"
+					for:index="index"
+					key={option.value}
+					size="small"
+					icon-name={option.iconName}
+					selected={option.isSelected}
+					data-value={option.value}
+					onclick={handleSortOptionClick}
+					alternative-text={option.label}></lightning-button-icon-stateful>
+			</lightning-button-group>
+		</lightning-layout-item>
+	</lightning-layout>
+	<!-- <ul data-dragging={isDragging}
+		class="item-container
+			slds-has-dividers_bottom
+			slds-var-m-bottom_small
+			slds-scrollable_y">
+		<li for:each={items}
+			for:item="item"
+			for:index="index"
+			key={item}
+			data-index={index}
+			draggable={isDraggingAllowed}
+			ondragstart={handleOnDragStart}
+			ondragend={handleOnDragEnd}
+			class="slds-is-relative
+				slds-item
+				slds-media
+				slds-media_small
+				slds-media_center
+				slds-var-p-vertical_xx-small">
+			<div lwc:if={isDraggingAllowed}
+				class="slds-media__figure slds-var-p-left_xxx-small">
+				<lightning-button-icon icon-name="utility:drag_and_drop"
+					variant="bare"
+					label="Order"
+					data-index={index}
+					onmousedown={handleOnHandlerMouseDown}
+					onmouseup={handleOnHandlerMouseUp}></lightning-button-icon>
+			</div>
+			<div class="slds-media__body">
+				<p class="slds-scrollable_none item-text">{item}</p>
+			</div>
+			<div class="slds-media__figure slds-media__figure_reverse">
+				<lightning-button-icon icon-name="utility:delete"
+					variant="bare"
+					label="Delete Value"
+					data-index={index}
+					onclick={handleOnDeleteItemClick}></lightning-button-icon>
+			</div>
+			<div data-index={index}
+				data-position="before"
+				ondragover={handleOnDragOver}
+				ondragleave={handleOnDragLeave}
+				ondrop={handleOnDrop}
+				class="slds-is-absolute slds-size_2-of-2 drop-before"></div>
+			<div data-index={index}
+				data-position="after"
+				ondragover={handleOnDragOver}
+				ondragleave={handleOnDragLeave}
+				ondrop={handleOnDrop}
+				class="slds-is-absolute slds-size_2-of-2 drop-after"></div>
+		</li>
+	</ul>
+	<div class="slds-media">
+		<div class="slds-media__body">
+			<lightning-input name="newElement"
+				variant="label-hidden"
+				value={newValue}
+				maxlength="80"
+				onchange={handleOnNewValueChange}
+				onkeypress={handleOnNewValueKeyPress}
+				placeholder="Add item..."
+				class="newElementInput"></lightning-input>
+		</div>
+		<div class="slds-media__figure slds-media__figure_reverse">
+			<lightning-button-icon icon-name="utility:add"
+				variant="neutral"
+				disabled={isAddBtnDisabled}
+				onclick={handleOnAddClick}></lightning-button-icon>
+		</div>
+	</div> -->
+</div>
+</template>

@@ -93,9 +93,6 @@ export default class WorkOrderLineItemManager extends WorkOrderLineItemManagerBa
 				// we got data so, we are ready
 				data.map(record => {
 					let procedureRecord = record.Procedure__r;
-					console.log("Loaded line items:", 
-						JSON.stringify(record),
-						JSON.stringify(procedureRecord));
 					
 					// we convert the record into an item
 					let item = this.getFromRecord(record);
@@ -163,14 +160,16 @@ export default class WorkOrderLineItemManager extends WorkOrderLineItemManagerBa
 
 	handleItemCreated(event) {
 		let item = event.detail.item;
-		if (this.isItemReadyToSave(item))
+		if (this.isItemReadyToSave(item)) {
 			this.saveItem(item);
+		}
 	}
 
 	handleItemDelete(event) {
 		let item = event.detail.item;
-		if (!isItemNew(item))
+		if (!isItemNew(item)) {
 			this.deleteItem(item);
+		}
 	}
 
 	handleOnItemSelected(event) {
@@ -179,10 +178,11 @@ export default class WorkOrderLineItemManager extends WorkOrderLineItemManagerBa
 			this.details.items.find(
 				item => item.uniqueId == selectedItemId);
 
-		if (selectedItem.isSelected)
+		if (selectedItem.isSelected) {
 			this._selectedItemId = null;
-		else
+		} else {
 			this._selectedItemId = selectedItemId;
+		}
 			
 		this.setSelectedItem();
 	}

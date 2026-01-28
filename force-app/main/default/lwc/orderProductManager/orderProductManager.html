@@ -25,19 +25,31 @@
 		</lightning-layout-item>
 		<lightning-layout-item
 			class="slds-var-m-left_small">
+			<template for:each={modeOptions}
+				for:item="modeOption"
+				for:index="index">
+				<lightning-button lwc:if={modeOption.isNotChecked}
+					icon-name={modeOption.iconName}
+					key={modeOption.value}
+					data-value={modeOption.value}
+					label={modeOption.label}
+					onclick={handleOnModeClick}></lightning-button>
+			</template>
+			<!-- <lightning-button-group for:each={modeOptions}
+				for:item="option"
+				key={option.value}
+				value={option.value}
+				label={option.label}
+				checked={option.isChecked}
+				icon-name={option.iconName}></lightning-button> -->
+		</lightning-layout-item>
+		<lightning-layout-item
+			class="slds-var-m-left_small">
 			<lightning-button-menu icon-name="utility:settings"
 				alternative-text="View Options"
 				menu-alignment="right"
 				variant="border-filled"
 				onselect={handleOnViewChange}>
-				<lightning-menu-item for:each={modeOptions}
-					for:item="option"
-					key={option.value}
-					value={option.value}
-					label={option.label}
-					checked={option.isChecked}
-					icon-name={option.iconName}></lightning-menu-item>
-				<lightning-menu-divider></lightning-menu-divider>
 				<lightning-menu-item for:each={listViewOptions}
 					for:item="option"
 					key={option.value}

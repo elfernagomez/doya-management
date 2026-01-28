@@ -2,22 +2,17 @@
 <div class="procedure-panel compact">
 <div role="group"
 	class="slds-is-relative slds-button-group prod">
-	<button lwc:if={_item.isComplete}
-		class={compactProcedureClass}
+	<button class={compactProcedureClass}
 		type="button"
 		onclick={handleOnItemClick}
 		style="min-width:6rem;">
-		&nbsp;
-		<lightning-icon icon-name="utility:check"
+		<lightning-icon lwc:if={_item.isComplete}
+			icon-name="utility:check"
 			size="x-small"
-			variant="inverse"></lightning-icon>
-		&nbsp;
+			variant="inverse"
+			class="slds-button__icon slds-button__icon_left"></lightning-icon>
+		{_item.procedureName}
 	</button>
-	<button lwc:else
-		class={compactProcedureClass}
-		type="button"
-		onclick={handleOnItemClick}
-		style="min-width:6rem;">{_item.procedureName}</button>
 </div>
 </div>
 <div lwc:if={_item.hasError}

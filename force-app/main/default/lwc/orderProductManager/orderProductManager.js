@@ -85,6 +85,8 @@ import ITEM_DISCOUNT_TYPE_FIELD
 	from "@salesforce/schema/OrderItem.DiscountType__c";
 import ITEM_DISCOUNT_AMOUNT_FIELD
 	from "@salesforce/schema/OrderItem.DiscountAmount__c";
+import ITEM_DESCRIPTION_FIELD
+	from "@salesforce/schema/OrderItem.Description";
 import ITEM_BASE_PRICE_FIELD
 	from "@salesforce/schema/OrderItem.BasePrice__c";
 import ITEM_UNIT_PRICE_FIELD
@@ -99,6 +101,8 @@ import ITEM_PARENT_ITEM_FIELD
 	from "@salesforce/schema/OrderItem.ParentOrderProduct__c";
 import ITEM_PARENT_PRODUCT_FIELD
 	from "@salesforce/schema/OrderItem.ParentOrderProduct__r.Product2.Name";
+import ITEM_NOTES_FIELD
+	from "@salesforce/schema/OrderItem.Notes__c";
 
 import WO_ACCOUNT_ID_FIELD from "@salesforce/schema/WorkOrder.AccountId";
 import WO_DUE_DATE_FIELD from "@salesforce/schema/WorkOrder.DueDate__c";
@@ -134,11 +138,13 @@ export function getFieldApiNames() {
 		`${ITEM_OBJECT.objectApiName}.${ITEM_HEIGHT_FIELD.fieldApiName}`,
 		`${ITEM_OBJECT.objectApiName}.${ITEM_DISCOUNT_TYPE_FIELD.fieldApiName}`,
 		`${ITEM_OBJECT.objectApiName}.${ITEM_DISCOUNT_AMOUNT_FIELD.fieldApiName}`,
+		`${ITEM_OBJECT.objectApiName}.${ITEM_DESCRIPTION_FIELD.fieldApiName}`,
 		`${ITEM_OBJECT.objectApiName}.${ITEM_BASE_PRICE_FIELD.fieldApiName}`,
 		`${ITEM_OBJECT.objectApiName}.${ITEM_UNIT_PRICE_FIELD.fieldApiName}`,
 		`${ITEM_OBJECT.objectApiName}.${ITEM_TOTAL_PRICE_FIELD.fieldApiName}`,
 		`${ITEM_OBJECT.objectApiName}.${ITEM_PARENT_ITEM_FIELD.fieldApiName}`,
-		`${ITEM_OBJECT.objectApiName}.${ITEM_PARENT_PRODUCT_FIELD.fieldApiName}`
+		`${ITEM_OBJECT.objectApiName}.${ITEM_PARENT_PRODUCT_FIELD.fieldApiName}`,
+		`${ITEM_OBJECT.objectApiName}.${ITEM_NOTES_FIELD.fieldApiName}`
 	];
 }
 
@@ -168,6 +174,7 @@ export function convertFromRecord(r) {
 		height: getFieldValue(r, ITEM_HEIGHT_FIELD),
 		discountType: getFieldValue(r, ITEM_DISCOUNT_TYPE_FIELD),
 		discountAmount: getFieldValue(r, ITEM_DISCOUNT_AMOUNT_FIELD),
+		description: getFieldValue(r, ITEM_DESCRIPTION_FIELD),
 		unitPrice: getFieldValue(r, ITEM_BASE_PRICE_FIELD),
 		listPrice: getFieldValue(r, ITEM_UNIT_PRICE_FIELD),
 		totalPrice: getFieldValue(r, ITEM_TOTAL_PRICE_FIELD),
@@ -179,7 +186,8 @@ export function convertFromRecord(r) {
 		hasParts: false,
 		showParts: false,
 		isNew: false,
-		isVisible: getFieldValue(r, ITEM_PARENT_ITEM_FIELD) == null
+		isVisible: getFieldValue(r, ITEM_PARENT_ITEM_FIELD) == null,
+		notes: getFieldValue(r, ITEM_NOTES_FIELD)
 	};
 }
 
@@ -209,6 +217,7 @@ export function convertFromApexRecord(r) {
 		height: r.Height__c,
 		discountType: r.DiscountType__c,
 		discountAmount: r.DiscountAmount__c,
+		description: r.Description,
 		unitPrice: r.BasePrice__c,
 		listPrice: r.UnitPrice,
 		totalPrice: r.TotalPrice,
@@ -220,7 +229,8 @@ export function convertFromApexRecord(r) {
 		hasParts: false,
 		showParts: false,
 		isNew: false,
-		isVisible: r.ParentOrderProduct__c == null
+		isVisible: r.ParentOrderProduct__c == null,
+		notes: r.Notes__c
 	};
 }
 
@@ -257,6 +267,22 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 	isLoading = false;
 	searchProductsKey = null;
 	parentItemIds = [];
+
+	get modeOptions() {
+		return [{
+			label: "Edit",
+			value: "edit",
+			iconName: "utility:edit",
+			isChecked: this.mode == "edit",
+			isNotChecked: this.mode != "edit"
+		}, {
+			label: "Done Editing",
+			value: "view",
+			iconName: "utility:close",
+			isChecked: this.mode == "view",
+			isNotChecked: this.mode != "view"
+		}];
+	}
 
 	get listViewOptions() {
 		return [{
@@ -314,18 +340,8 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 		this.getDiscounts();
 	}
 
-	handleOnViewChange(event) {
-		switch (event.detail.value) {
-			case "view":
-			case "edit":
-				this.handleOnModeChange(event);
-				break;
-			case "tiles":
-			case "list":
-				break;
-			default:
-				break;
-		}
+	handleOnModeClick(event) {
+		this.mode = event.target.dataset.value;
 	}
 
 	handleOnAddGroupClick() {
@@ -334,7 +350,10 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 
 	handleOnProductCreated(event) {
 		const groupId = event.target.dataset.groupId;
-		const product = event.detail;
+		const product = {
+			...event.detail,
+			description: this.getDefaultDescription(event.detail)
+		};
 
 		if (product.hasParts) {
 			OrderProductPartsSelectionModal.open({
@@ -355,6 +374,7 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 									...createNewProduct(),
 									...part,
 									uniqueId: `unsaved_${groupId}${i}`,
+									description: this.getDefaultDescription(newProduct),
 									parentItemId: newProduct.uniqueId,
 									parentItemProductName: newProduct.productName,
 									isPart: true
@@ -371,7 +391,8 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 							const np = {
 								...createNewProduct(),
 								...part,
-								uniqueId: `unsaved_${groupId}${i}`
+								uniqueId: `unsaved_${groupId}${i}`,
+								description: this.getDefaultDescription(part)
 							};
 							this.addProduct(groupId, np);
 						});
@@ -721,6 +742,22 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 					isDisabled: true
 				});
 
+			// disable any part if needed
+			if (product.hasParts) {
+				this.groups.forEach(g =>
+					g.products
+						.filter(p => p.parentItemId == product.uniqueId)
+						.forEach(p =>
+							this.applyChangesToProduct(
+								p.groupId,
+								p.uniqueId,
+								p.isProduct,
+								p.isDiscount,
+								{
+									isDisabled: true
+								})));
+			}
+
 			removeErrorFromProduct(product);
 			saveOrderProducts({
 				itemsToUpsert: [],
@@ -761,6 +798,7 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 					p.isDiscount,
 					{
 						isHidden: key ?
+							!p.description?.toLowerCase().includes(key) &&
 							!p.productName?.toLowerCase().includes(key) &&
 							!p.productCode?.toLowerCase().includes(key) : false
 					})));
@@ -801,6 +839,7 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 		if (product.isProduct) {
 			record[ITEM_PARENT_ITEM_FIELD.fieldApiName] = product.parentItemId;
 			record[ITEM_DELIVERY_GROUP_FIELD.fieldApiName] = product.groupId;
+			record[ITEM_DESCRIPTION_FIELD.fieldApiName] = product.description;
 			record[ITEM_QTY_FIELD.fieldApiName] = product.qty;
 			record[ITEM_UNIT_TYPE_FIELD.fieldApiName] = product.unitType;
 			record[ITEM_DEPTH_FIELD.fieldApiName] = product.depth;
@@ -808,6 +847,7 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 			record[ITEM_HEIGHT_FIELD.fieldApiName] = product.height;
 			record[ITEM_BASE_PRICE_FIELD.fieldApiName] = product.unitPrice;
 			record[ITEM_UNIT_PRICE_FIELD.fieldApiName] = product.listPrice;
+			record[ITEM_NOTES_FIELD.fieldApiName] = product.notes;
 		}
 		
 		// discount fields
@@ -815,6 +855,7 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 			record[ITEM_QTY_FIELD.fieldApiName] = 1;
 			record[ITEM_DISCOUNT_TYPE_FIELD.fieldApiName] = product.discountType;
 			record[ITEM_DISCOUNT_AMOUNT_FIELD.fieldApiName] = product.discountAmount;
+			// record[ITEM_DESCRIPTION_FIELD.fieldApiName] = product.description ;
 
 			if (product.isFixed) {
 				record[ITEM_BASE_PRICE_FIELD.fieldApiName] =
@@ -935,8 +976,7 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 		}
 
 		if (isDiscount) {
-			const discountIndex =
-				this.discounts.findIndex(d => d.uniqueId == uniqueId);
+			const discountIndex = this.discounts.findIndex(d => d.uniqueId == uniqueId);
 			this.discounts.splice(discountIndex, 1);
 			this.discounts = [...this.discounts];
 		}
@@ -952,5 +992,10 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 		} catch (e) {
 			console.error(e.stack)
 		} */
+	}
+
+	getDefaultDescription(product) {
+		return `${product.productName}, ${
+			product.qty} ${product.unitType} for ${product.groupName}`;
 	}
 }

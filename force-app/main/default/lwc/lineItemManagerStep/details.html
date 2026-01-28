@@ -111,24 +111,16 @@
 <div lwc:if={isProd}
 	class="slds-is-relative prod">
 	<header class={detailsProcedureClass}>
-		<lightning-layout lwc:if={_item.isComplete}
-			vertical-align="center"
-			horizontal-align="center"
-			class="slds-var-p-vertical_small">
-			<lightning-layout-item padding="around-medium">
-				<lightning-icon icon-name="utility:check"
-					size="small"
-					variant="inverse"></lightning-icon>
-			</lightning-layout-item>
-			<!-- <div class="slds-media__body">
-				{_item.procedureName}
-			</div> -->
-		</lightning-layout>
-		<div lwc:else>
+		<div>
 			<div class="slds-media
 					slds-media_center">
 				<div class="slds-media__figure slds-hidden">
-					<span class="slds-badge">{_item.order}</span>
+					<lightning-icon lwc:if={_item.isComplete}
+						icon-name="utility:check"
+						size="small"
+						variant="inverse"></lightning-icon>
+					<span lwc:else
+						class="slds-badge">{_item.order}</span>
 				</div>
 				<div class="slds-media__body">
 					<div class="slds-form-element procedureField">
@@ -142,13 +134,15 @@
 					slds-media_center
 					slds-var-p-bottom_x-large">
 				<div class="slds-media__figure">
-					<span class="slds-badge">{_item.order}</span>
+					<lightning-icon lwc:if={_item.isComplete}
+						icon-name="utility:check"
+						size="small"
+						variant="inverse"></lightning-icon>
+					<span lwc:else
+						class="slds-badge">{_item.order}</span>
 				</div>
 				<div class="slds-media__body">
 					<div class="slds-form-element procedureField">
-						<!-- <label class="slds-form-element__label">
-							{labels.procedureFieldLabel}
-						</label> -->
 						<div class="slds-form-element__control">
 							<span class="slds-input">{_item.procedureName}</span>
 						</div>
@@ -159,7 +153,7 @@
 	</header>
 	<div lwc:if={_item.procedureId}
 		class="slds-var-p-horizontal_x-large
-			slds-var-p-top_medium">
+			slds-var-p-vertical_medium">
 		<div lwc:if={_item.isMachineNeeded}
 			class="slds-var-m-bottom_small">
 			<c-production-field field={machineField}
@@ -167,16 +161,22 @@
 				mode="view"
 				object-api-name={objectApiName}></c-production-field>
 		</div>
-		<div for:each={_item.productionFields}
-			for:item="field"
-			for:index="index"
-			key={field.order}
-			class="slds-var-m-bottom_small">
-			<c-production-field field={field}
-				record={_item.record}
-				mode="view"
-				object-api-name={objectApiName}
-				onchange={handleRecordFieldChange}></c-production-field>
+		<template lwc:if={_item.productionFields.length}>
+			<div for:each={_item.productionFields}
+				for:item="field"
+				for:index="index"
+				key={field.order}
+				class="slds-var-m-bottom_small">
+				<c-production-field field={field}
+					record={_item.record}
+					mode="view"
+					object-api-name={objectApiName}
+					onchange={handleRecordFieldChange}></c-production-field>
+			</div>
+		</template>
+		<div lwc:else
+			class="slds-var-m-vertical_small">
+			<p>No additional details for this step.</p>
 		</div>
 		<template lwc:if={_item.isInProgress}>
 			<div class="slds-var-m-bottom_small">
@@ -218,14 +218,14 @@
 				object-api-name={objectApiName}
 				onchange={handleRecordFieldChange}></c-production-field>
 		</div>
-		<div class="slds-var-p-bottom_small">
+		<!-- <div class="slds-var-p-bottom_small">
 			<c-production-field field={productionNotesField}
 				record={_item.record}
 				mode="view"
 				object-api-name={objectApiName}
 				is-edit-allowed-override=true
 				onchange={handleRecordFieldChange}></c-production-field>
-		</div>
+		</div> -->
 		<div lwc:if={showDetailsActionsPanel}
 			class="slds-border_top">
 			<div lwc:if={isDetailActionsOpen}

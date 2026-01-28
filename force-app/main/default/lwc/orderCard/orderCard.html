@@ -1,0 +1,62 @@
+<template>
+<div class="slds-box
+		slds-theme_shade
+		slds-var-m-bottom_small
+		slds-p-around_none">
+	<div class="slds-page-header"
+		style="background:none;">
+		<div class="slds-page-header__row">
+			<div class="slds-page-header__col-title">
+				<div class="slds-media">
+					<div class="slds-media__figure">
+						<lightning-icon icon-name="standard:orders"
+							alternative-text="Order"></lightning-icon>
+					</div>
+					<div class="slds-media__body">
+						<div class="slds-page-header__name">
+							<div class="slds-page-header__name-title">
+								<h1>
+									<lightning-formatted-rich-text
+										value={order.orderNumber}
+										class="slds-page-header__title
+											slds-truncate"
+											></lightning-formatted-rich-text>
+									<!-- <a href="#"
+										onclick={handleNavigateToOrder} 
+										class="slds-page-header__title slds-truncate">
+										{order.orderNumber}
+									</a> -->
+								</h1>
+							</div>
+						</div>
+						<div class="slds-page-header__name-meta">
+							<ul class="slds-list_horizontal slds-has-dividers_left">
+								<li lwc:if={order.accountName}
+									class="slds-item">{order.accountName}</li>
+								<li lwc:if={order.status}
+									class="slds-item">{order.status}</li>
+								<li lwc:if={order.dueDate}
+									class="slds-item">
+									<lightning-formatted-date-time
+										value={order.dueDate}
+										year="numeric"
+										month="numeric"
+										day="numeric"></lightning-formatted-date-time>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="slds-var-p-horizontal_large slds-var-p-bottom_large">
+		<div lwc:if={isError}
+			class="slds-var-m-bottom_small">
+			<c-error-panel error-title={errorTitle}
+				error-object={errorObject}></c-error-panel>
+		</div>
+		<slot></slot>
+	</div>
+</div>
+</template>

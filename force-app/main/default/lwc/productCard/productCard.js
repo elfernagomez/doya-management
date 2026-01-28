@@ -4,6 +4,7 @@ import { getFieldValue } from "lightning/uiRecordApi";
 import { getPicklistValues } from "lightning/uiObjectInfoApi";
 import rowMode from "./row.html";
 import listItemMode from "./listItem.html";
+import tileMode from "./tile.html";
 import styles from "./productCard.css";
 
 import PRODUCT_NAME_FIELD from "@salesforce/schema/Product2.Name";
@@ -41,6 +42,7 @@ export function createNewProduct() {
 		height: null,
 		depth: null,
 		finish: null,
+		notes: null,
 		discountType: null,
 		discountAmount: null,
 		unitPrice: 0.01,
@@ -67,11 +69,11 @@ export function getProductFromProductRecord(record) {
 		productId: record.id,
 		productName: getFieldValue(record, PRODUCT_NAME_FIELD),
 		productCode: getFieldValue(record, PRODUCT_CODE_FIELD),
+		unitType: getFieldValue(record, UNIT_TYPE_FIELD),
 		depth: getFieldValue(record, PRODUCT_DEPTH_FIELD),
 		width: getFieldValue(record, PRODUCT_WIDTH_FIELD),
 		height: getFieldValue(record, PRODUCT_HEIGHT_FIELD),
 		finish: getFieldValue(record, PRODUCT_FINISH_FIELD),
-		unitType: getFieldValue(record, UNIT_TYPE_FIELD),
 		discountType: getFieldValue(record, PRODUCT_DISCOUNT_TYPE_FIELD),
 		discountAmount: getFieldValue(record, PRODUCT_DISCOUNT_AMOUNT_FIELD),
 		productTypeId: getFieldValue(record, RECORD_TYPE_ID_FIELD),
@@ -109,10 +111,11 @@ export default class ProductCard extends InputBase {
 
 	set product(value) {
 		this._product = {...value};
+		this.showNotes = this._product.notes ? true : false;
 	}
 
 	@api
-	variant = "row"; // row, list-item
+	variant = "row"; // row, list-item, tile
 
 	@api
 	hideQty = false;
@@ -129,9 +132,13 @@ export default class ProductCard extends InputBase {
 	@api
 	hideTotals = false;
 
+	@api
+	hidePartsToggle = false;
+
 	@track
 	_product;
 
+	showNotes = false;
 	isDeleting = false;
 	isDraggingActive = false;
 
@@ -160,13 +167,14 @@ export default class ProductCard extends InputBase {
 		return !this.hideTotals;
 	}
 
+	get showPartsToggle() {
+		return !this.hidePartsToggle && this._product.hasParts;
+	}
+
 	get mainViewClass() {
 		return [
 			"slds-box",
-			"slds-box_x-small",
-			"slds-is-relative",
-			"slds-media",
-			"slds-media_small",
+			"slds-box_xx-small",
 			"slds-theme_default",
 			this._product.isHidden ? "slds-hide" : ""
 		].join(" ");
@@ -175,7 +183,7 @@ export default class ProductCard extends InputBase {
 	get mainEditClass() {
 		return [
 			"slds-box",
-			"slds-box_x-small",
+			"slds-box_xx-small",
 			"slds-is-relative",
 			"slds-media",
 			"slds-media_small",
@@ -212,8 +220,10 @@ export default class ProductCard extends InputBase {
 			case "row":
 				return rowMode;
 			case "list-item":
-			default:
 				return listItemMode;
+			case "tile":
+			default:
+				return tileMode;
 		}
 	}
 
@@ -242,6 +252,16 @@ export default class ProductCard extends InputBase {
 		}
 	}
 
+	/**
+	 * Triggered when inputs are changed
+	 * @param {*} event 
+	 */
+	handleOnNotesChange(event) {
+		let notes = event.detail.value;
+		let product = { notes };
+		this.editProduct(product);
+	}
+
 	handleOnDeleteProductClick() {
 		// new products that have not been saved can be deleted
 		// without confirmation to save time...
@@ -257,11 +277,11 @@ export default class ProductCard extends InputBase {
 		this.customEvent("productdelete", this._product);
 	}
 
-	handleOnCancelDeleteProductClic(index) {
+	handleOnCancelDeleteProductClic() {
 		this.isDeleting = false;
 	}
 
-	handleOnHandlerMouseDown(event) {
+	handleOnHandlerMouseDown() {
 		const draggable = this.getComponent(".draggable");
 		draggable.setAttribute("draggable", true);
 
@@ -270,7 +290,7 @@ export default class ProductCard extends InputBase {
 			e.dataTransfer.setData("text/json", JSON.stringify(this._product));
 		};
 
-		const handleDragEnd = (e) => {
+		const handleDragEnd = () => {
 			draggable.removeAttribute("draggable");
 			draggable.removeEventListener("dragstart", handleDragStart);
 			draggable.removeEventListener("dragend", handleDragEnd);
@@ -339,6 +359,10 @@ export default class ProductCard extends InputBase {
 
 	handleOnGroupClick() {
 		// 
+	}
+
+	handleOnAddNotesClick() {
+		this.showNotes = true;
 	}
 
 	editProduct(changes) {

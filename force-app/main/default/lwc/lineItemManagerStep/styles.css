@@ -29,11 +29,11 @@
 	--lwc-colorTextLabel: var(--slds-g-color-neutral-base-100);
 }
 
-.procedure-panel .prod header.complete .procedureField {
+/* .procedure-panel .prod header.complete .procedureField {
 	--slds-c-input-text-color: var(--slds-g-color-neutral-base-100);
 	--slds-g-color-neutral-base-30: transparent;
 	--lwc-colorTextLabel: transparent;
-}
+} */
 
 .procedure-panel:after {
 	z-index: inherit !important;

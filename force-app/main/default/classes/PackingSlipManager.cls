@@ -37,8 +37,37 @@ public with sharing class PackingSlipManager {
 	public static List<OrderItem> getOrderProductsForOrder(Id orderId) {
 		try {
 			return [
-				SELECT Id, OrderItemNumber, Product2Id, Product2.Name, 
-					Quantity, UnitPrice, TotalPrice, Description
+				SELECT AvailableQuantity,
+					BasePrice__c,
+					CreatedDate,
+					DeliveryGroup__c,
+					DeliveryType__c,
+					Width__c,
+					Height__c,
+					Depth__c,
+					Description,
+					DiscountType__c,
+					DiscountAmount__c,
+					EndDate,
+					ListPrice,
+					Notes__c,
+					Quantity,
+					TotalPrice,
+					UnitPrice,
+					UnitType__c,
+					WorkOrderStatus__c,
+					OrderId,
+					PricebookEntryId,
+					ParentOrderProduct__c,
+					ParentOrderProduct__r.Product2.Name,
+					Product2Id,
+					Product2.Name,
+					Product2.ProductCode,
+					Product2.Finish__c,
+					Product2.Material__c,
+					Product2.Material__r.Name,
+					Product2.RecordTypeId,
+					Product2.RecordType.DeveloperName
 				FROM OrderItem
 				WHERE OrderId = :orderId
 				ORDER BY OrderItemNumber

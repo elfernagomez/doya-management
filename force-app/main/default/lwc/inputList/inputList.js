@@ -1,5 +1,7 @@
 import LwcBase from "c/lwcBase";
-import { track, api, wire } from "lwc";
+import { track, api } from "lwc";
+import verticalListTemplate from "./verticalList.html";
+import badgesTemplate from "./badges.html";
 
 export default class InputList extends LwcBase {
 	@api
@@ -12,22 +14,35 @@ export default class InputList extends LwcBase {
 	label = "Items";
 
 	@api
+	variant = "vertical-list"; // default, vertical-list, badges
+
+	@api
+	noItemsMessage = "No items.";
+
+	@api
 	get value() {
 		return [...this.items];
 	}
 
 	set value(n) {
-		this.items = [...n] || [];
-	};
+		this.items = n ? [...n] : [];
+	}
 
 	@api
 	allowDuplicates = false;
 
 	@api
-	orderingType = "custom"; // acs, desc, custom
+	get orderingType() {
+		return this._orderingType;
+	}
+
+	set orderingType(n) {
+		this._orderingType = n;
+	}
 
 	@track
 	items = [];
+	_orderingType = "custom"; // asc, desc, custom
 
 	newValue;
 	isDragging = false;
@@ -47,7 +62,7 @@ export default class InputList extends LwcBase {
 	}
 
 	get isDraggingAllowed() {
-		return this.isEdit && this.orderingType == "custom";
+		return this.isEdit && this._orderingType == "custom";
 	}
 
 	get orderingTypeOptions() {
@@ -55,22 +70,32 @@ export default class InputList extends LwcBase {
 			label: "AZ",
 			value: "asc",
 			iconName: "utility:arrowup",
-			isSelected: this.orderingType == "asc"
+			isSelected: this._orderingType == "asc"
 		}, {
 			label: "ZA",
 			value: "desc",
 			iconName: "utility:arrowdown",
-			isSelected: this.orderingType == "desc"
+			isSelected: this._orderingType == "desc"
 		}, {
 			label: "Custom",
 			value: "custom",
 			iconName: "utility:sort",
-			isSelected: this.orderingType == "custom"
+			isSelected: this._orderingType == "custom"
 		}]
 	}
 
 	get isValid() {
 		return !this.isRequired || this.items.length > 0;
+	}
+
+	render() {
+		switch (this.variant) {
+			case "badges":
+				return badgesTemplate;
+			case "vertical-list":
+			default:
+				return verticalListTemplate;
+		}
 	}
 
 	@api
@@ -87,7 +112,7 @@ export default class InputList extends LwcBase {
 
 	handleSortOptionClick(event) {
 		event.stopPropagation();
-		this.orderingType = event.target.dataset.value;
+		this._orderingType = event.target.dataset.value;
 		this.processItemsChanged();
 	}
 
@@ -99,7 +124,7 @@ export default class InputList extends LwcBase {
 	}
 
 	handleOnDeleteItemClick(event) {
-		let index = parseInt(event.target.dataset.index);
+		let index = parseInt(event.target.dataset.index, 10);
 		this.deleteValue(index);
 	}
 
@@ -203,7 +228,7 @@ export default class InputList extends LwcBase {
 	}
 
 	sort() {
-		switch (this.orderingType) {
+		switch (this._orderingType) {
 			case "asc":
 				this.items.sort();
 				break;

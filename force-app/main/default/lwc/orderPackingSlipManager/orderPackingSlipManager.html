@@ -16,7 +16,7 @@
 </div>
 <div class="slds-card__body slds-card__body_inner">
 <lightning-layout>
-	<lightning-layout-item flexibility="auto"></lighgning-layout-item>
+	<lightning-layout-item flexibility="auto">
 		<template lwc:if={isLoading}>
 			<div class="slds-text-align_center slds-p-around_medium">
 				<lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
@@ -30,7 +30,8 @@
 		</template>
 
 		<template lwc:if={hasPackingSlips}>
-			<template for:each={packingSlips} for:item="packingSlip">
+			<template for:each={packingSlips}
+				for:item="packingSlip">
 				<c-packing-slip-card
 					key={packingSlip.id}
 					record-id={packingSlip.id}
@@ -85,14 +86,19 @@
 	</lightning-layout-item>
 	<!-- Order Products Side Panel -->
 	<lightning-layout-item lwc:if={showOrderProducts}
-		flexibility="auto">
-		<div class="slds-p-around_medium">
-			<lightning-datatable
-				key-field="Id"
-				data={orderProducts}
-				columns={orderProductColumns}
-				hide-checkbox-column
-			></lightning-datatable>
+		size="6">
+		<div class="slds-var-p-left_medium">
+			<div for:each={orderProducts}
+				for:item="product"
+				for:index="index"
+				key={product.uniqueId}
+				class="slds-var-m-bottom_small">
+				<c-product-card product={product}
+					data-index={index}
+					mode="view"
+					variant="tile"
+					hide-totals=false></c-product-card>
+			</div>
 		</div>
 	</lightning-layout-item>
 </lightning-layout>

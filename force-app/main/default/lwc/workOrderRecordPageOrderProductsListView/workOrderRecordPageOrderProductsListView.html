@@ -1,20 +1,23 @@
 <template>
 <article class="slds-card">
 <div class="slds-card__body">
-	<div for:each={groups}
-		for:item="group"
+	<div for:each={orders}
+		for:item="order"
 		for:index="index"
-		key={group.uniqueId}
+		key={order.uniqueId}
 		class="slds-var-m-top_small">
-		<c-delivery-group-card
-			record-id={group.uniqueId}
-			product-count={group.products.length}
+		<c-order-card
+			record-id={order.uniqueId}
+			product-count={order.products.length}
 			mode="view">
-			<c-product-manager products={group.products}
+			<c-product-manager products={order.products}
 				mode="view"
 				variant="row"
-				hide-add-products=true></c-product-manager>
-		</c-delivery-group-card>
+				hide-add-products=true
+				hide-totals=true
+				hide-unit-type=true
+				hide-unit-price=true></c-product-manager>
+		</c-order-card>
 	</div>
 </div>
 </article>

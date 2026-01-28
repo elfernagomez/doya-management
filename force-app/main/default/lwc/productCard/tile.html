@@ -1,0 +1,140 @@
+<template>
+<div class={mainViewClass}>
+	<div class="slds-media__figure slds-var-p-vertical_xx-small">
+		<lightning-button-icon icon-name="utility:drag_and_drop"
+			title="Drag to move to another delivery group"
+			variant="bare"
+			small="small"
+			onmousedown={handleOnHandlerMouseDown}></lightning-button-icon>
+	</div>
+	<div class="slds-media__body">
+		<lightning-layout>
+			<lightning-layout-item flexibility="grow"
+				class="slds-var-p-right_small">
+				<div class="slds-media slds-media_small slds-var-m-bottom_small">
+					<div class="slds-media__figure">
+						<lightning-icon icon-name="standard:product"
+							title={_product.productName}
+							size="x-small"></lightning-icon>
+					</div>
+					<div class="slds-media__body">
+						<ul class="slds-list_horizontal slds-has-dividers_left">
+							<li class="slds-item">
+								<h3><b>{_product.productName}</b></h3>
+							</li>
+							<li class="slds-item">
+								<span>{_product.productCode}</span>
+							</li>
+							<li lwc:if={_product.isPart}
+								class="slds-item">
+								<lightning-badge label="Part"></lightning-badge>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<dl class="slds-list_inline slds-var-m-bottom_x-small">
+					<dt title="Qty"
+						class="slds-item_label
+							slds-text-color_weak
+							slds-truncate">Qty</dt>
+					<dd title="Qty"
+						class="slds-item_detail
+							slds-truncate">
+						<lightning-formatted-number
+							maximum-fraction-digits="2"
+							value={_product.qty}
+							></lightning-formatted-number>&nbsp;
+					</dd>
+					<dt title="Unit Type"
+						class="slds-item_label
+							slds-text-color_weak
+							slds-truncate">Unit Type</dt>
+					<dd title="Unit Type"
+						class="slds-item_detail
+							slds-truncate">
+						{_product.unitType}&nbsp;
+					</dd>
+					<dt title="Dimensions"
+						class="slds-item_label
+							slds-text-color_weak
+							slds-truncate">Dimensions</dt>
+					<dd title="Dimensions"
+						class="slds-item_detail
+							slds-truncate">
+						<span class="slds-show_inline-block
+								slds-var-p-right_xx-small">
+							<span class="slds-text-body_small">W</span>
+							<lightning-formatted-number
+								maximum-fraction-digits="2"
+								value={_product.width}
+								class="slds-var-p-right_xx-small"
+								></lightning-formatted-number>
+						</span>
+						<label class="slds-text-body_small
+							slds-var-p-right_xx-small">&times;</label>
+						<span class="slds-show_inline-block
+								slds-var-p-right_xx-small">
+							<span class="slds-text-body_small">H</span>
+							<lightning-formatted-number
+								maximum-fraction-digits="2"
+								value={_product.height}
+								class="slds-var-p-right_xx-small"
+								></lightning-formatted-number>
+						</span>
+						<template lwc:if={_product.depth}>
+							<label class="slds-text-body_small
+								slds-var-p-right_xx-small">&times;</label>
+							<span class="slds-show_inline-block
+									slds-var-p-right_xx-small">
+								<span class="slds-text-body_small">D</span>
+								<lightning-formatted-number
+									maximum-fraction-digits="2"
+									value={_product.depth}
+									class="slds-var-p-right_xx-small"
+									></lightning-formatted-number>
+							</span>
+						</template>
+					</dd>
+				</dl>
+				<dl class="slds-list_inline">
+					<dt title="Unit Price"
+						class="slds-item_label
+							slds-text-color_weak
+							slds-truncate">Unit Price</dt>
+					<dd title="Unit Price"
+						class="slds-item_detail
+							slds-truncate">
+						<lightning-formatted-number 
+							format-style="currency"
+							currency-code="USD"
+							value={_product.unitPrice}
+							></lightning-formatted-number>&nbsp;
+					</dd>
+					<dt title="Delivery Group"
+						class="slds-item_label
+							slds-text-color_weak
+							slds-truncate">Delivery Group</dt>
+					<dd title="Delivery Group"
+						class="slds-item_detail
+							slds-truncate">
+						<a href="#"
+							onclick={handleOnGroupClick}
+							class="">{_product.groupName}</a>&nbsp;
+					</dd>
+				</dl>
+			</lightning-layout-item>
+			<lightning-layout-item lwc:if={_product.workOrderStatus}>
+				<div class="slds-form-element">
+					<div class="slds-form-element__control">
+						<div class="slds-form-element__static">
+							<c-status-indicator
+								status={_product.workOrderStatus}>
+							</c-status-indicator>
+						</div>
+					</div>
+				</div>
+			</lightning-layout-item>
+		</lightning-layout>
+	</div>
+</div>
+</template>

@@ -17,6 +17,67 @@ public with sharing class OrderManager {
 	}
 
 	/**
+	 * Returns Orders with their related OrderItems
+	 * @param workOrderId The Work Order Id to query OrderItems from
+	 * @return List of Orders with related OrderItems
+	 */
+	@AuraEnabled(cacheable=true)
+	public static List<Order> getOrderAndOrderItemsByWorkOrder(Id workOrderId) {
+		Set<Id> orderIds = new Set<Id>();
+		Set<Id> orderItemIds = new Set<Id>();
+		
+		for (OrderItemWorkOrder__c woi : [
+			SELECT OrderItem__r.OrderId,
+				OrderItem__c 
+			FROM OrderItemWorkOrder__c 
+			WHERE WorkOrder__c = :workOrderId
+		]) {
+			orderIds.add(woi.OrderItem__r.OrderId);
+			orderItemIds.add(woi.OrderItem__c);
+		}
+		
+		return [
+			SELECT Name,
+				BusinessNumber__c,
+				DueDate__c,
+				OrderNumber,
+				Status,
+				TotalAmount,
+				AccountId,
+				Account.Name,
+				(
+					SELECT OrderId,
+						OrderItemNumber,
+						AvailableQuantity,
+						BasePrice__c,
+						CreatedDate,
+						DeliveryGroup__c,
+						DeliveryType__c,
+						Width__c,
+						Height__c,
+						Depth__c,
+						Description,
+						EndDate,
+						ListPrice,
+						Notes__c,
+						PricebookEntryId,
+						Product2Id,
+						Product2.Name,
+						Product2.ProductCode,
+						Product2.Finish__c,
+						Quantity,
+						TotalPrice,
+						UnitPrice,
+						UnitType__c
+					FROM OrderItems
+					WHERE Id = :orderItemIds
+				)
+			FROM Order
+			WHERE Id IN :orderIds
+		];
+	}
+
+	/**
 	 * Creates Work Orders based on the Order Products
 	 * in the current Orders.
 	 */

@@ -26,6 +26,21 @@ export default class ProductManagerBase extends InputBase {
 	@api
 	hideAddProducts = false;
 
+	@api
+	hideQty = false;
+
+	@api
+	hideUnitType = false;
+
+	@api
+	hideUnitPrice = false;
+
+	@api
+	hideDimensions = false;
+
+	@api
+	hideTotals = false;
+
 	@track
 	_products = [];
 
