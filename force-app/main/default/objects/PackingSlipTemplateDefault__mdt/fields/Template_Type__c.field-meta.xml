@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+	<fullName>Template_Type__c</fullName>
+	<fieldManageability>DeveloperControlled</fieldManageability>
+	<label>Template Type</label>
+	<required>true</required>
+	<type>Picklist</type>
+	<valueSet>
+		<restricted>true</restricted>
+		<valueSetDefinition>
+			<value>
+				<fullName>HTML</fullName>
+				<default>true</default>
+				<label>HTML</label>
+			</value>
+			<value>
+				<fullName>PDF</fullName>
+				<default>false</default>
+				<label>PDF</label>
+			</value>
+			<value>
+				<fullName>ZPL</fullName>
+				<default>false</default>
+				<label>ZPL</label>
+			</value>
+		</valueSetDefinition>
+	</valueSet>
+</CustomField>

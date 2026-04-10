@@ -1,0 +1,14 @@
+/* Ensure modal appears above other content */
+.slds-modal {
+	z-index: 9001;
+}
+
+.slds-backdrop {
+	z-index: 9000;
+}
+
+/* Ensure modal content scrolls if needed */
+.slds-modal__content {
+	max-height: calc(100vh - 200px);
+	overflow-y: auto;
+}

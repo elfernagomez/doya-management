@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<label>Default PDF Packing Slip</label>
+	<protected>false</protected>
+	<values>
+		<field>Template_Key__c</field>
+		<value xsi:type="xsd:string">DefaultPdf</value>
+	</values>
+	<values>
+		<field>Template_Type__c</field>
+		<value xsi:type="xsd:string">PDF</value>
+	</values>
+	<values>
+		<field>Output_Mode__c</field>
+		<value xsi:type="xsd:string">PDF</value>
+	</values>
+	<values>
+		<field>Provider_Key__c</field>
+		<value xsi:type="xsd:string">SHIPMENT</value>
+	</values>
+	<values>
+		<field>Is_Active__c</field>
+		<value xsi:type="xsd:boolean">true</value>
+	</values>
+	<values>
+		<field>Description__c</field>
+		<value xsi:type="xsd:string">Default PDF template optimized for Visualforce PDF rendering.</value>
+	</values>
+	<values>
+		<field>Body__c</field>
+		<value xsi:type="xsd:string"><![CDATA[<div style="width:100%;">
+<table style="width:100%;border-collapse:collapse;">
+	<tr>
+		<td style="width:60%;vertical-align:top;">
+			{{#if LogoUrl}}<img src="{{LogoUrl}}" alt="Logo" style="max-height:54px;max-width:180px;margin-bottom:8px;" />{{/if}}
+			<h1>Packing Slip</h1>
+		</td>
+		<td style="width:40%;vertical-align:top;">
+			<div><strong>Order:</strong> {{OrderNumber}}</div>
+			<div><strong>Tracking:</strong> {{TrackingNumber}}</div>
+			{{#if Carrier}}<div><strong>Carrier:</strong> {{Carrier}}</div>{{/if}}
+		</td>
+	</tr>
+</table>
+<div style="margin-bottom:18px;">
+	<h2>Ship To</h2>
+	<div>{{ShipToName}}</div>
+	{{#if ShipToAddress}}<div style="white-space:pre-line;">{{ShipToAddress}}</div>{{/if}}
+</div>
+<table style="width:100%;margin:16px 0;border-collapse:collapse;">
+	<tr>
+		<td style="width:50%;vertical-align:top;padding:8px;">
+			{{#if BarcodeImageUrl}}<img src="{{BarcodeImageUrl}}" alt="Barcode" style="max-width:220px;max-height:72px;width:auto;height:auto;" />{{/if}}
+		</td>
+		<td style="width:50%;vertical-align:top;padding:8px;">
+			{{#if QrImageUrl}}<img src="{{QrImageUrl}}" alt="QR Code" style="width:110px;height:110px;" />{{/if}}
+		</td>
+	</tr>
+</table>
+<table style="width:100%;border-collapse:collapse;margin-top:16px;">
+	<thead>
+		<tr>
+			<th style="border:1px solid #d8dde6;padding:8px;vertical-align:top;background:#f3f6f9;text-align:left;">Product Code</th>
+			<th style="border:1px solid #d8dde6;padding:8px;vertical-align:top;background:#f3f6f9;text-align:left;">Product</th>
+			<th style="border:1px solid #d8dde6;padding:8px;vertical-align:top;background:#f3f6f9;text-align:left;">Description</th>
+			<th style="border:1px solid #d8dde6;padding:8px;vertical-align:top;background:#f3f6f9;text-align:right;width:80px;">Qty</th>
+		</tr>
+	</thead>
+	<tbody>
+		{{#each Items}}
+		<tr>
+			<td style="border:1px solid #d8dde6;padding:8px;vertical-align:top;">{{ProductCode}}</td>
+			<td style="border:1px solid #d8dde6;padding:8px;vertical-align:top;">{{ProductName}}</td>
+			<td style="border:1px solid #d8dde6;padding:8px;vertical-align:top;">{{Description}}</td>
+			<td style="border:1px solid #d8dde6;padding:8px;vertical-align:top;text-align:right;width:80px;">{{Quantity}}</td>
+		</tr>
+		{{/each}}
+	</tbody>
+</table>
+{{#if FooterNotes}}<div style="margin-top:16px;color:#54698d;font-size:12px;">{{FooterNotes}}</div>{{/if}}
+</div>]]></value>
+	</values>
+</CustomMetadata>

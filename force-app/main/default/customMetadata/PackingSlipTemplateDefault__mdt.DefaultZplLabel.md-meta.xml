@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<label>Default ZPL Label</label>
+	<protected>false</protected>
+	<values>
+		<field>Template_Key__c</field>
+		<value xsi:type="xsd:string">DefaultZpl</value>
+	</values>
+	<values>
+		<field>Template_Type__c</field>
+		<value xsi:type="xsd:string">ZPL</value>
+	</values>
+	<values>
+		<field>Output_Mode__c</field>
+		<value xsi:type="xsd:string">ZPL</value>
+	</values>
+	<values>
+		<field>Provider_Key__c</field>
+		<value xsi:type="xsd:string">SHIPMENT</value>
+	</values>
+	<values>
+		<field>Is_Active__c</field>
+		<value xsi:type="xsd:boolean">true</value>
+	</values>
+	<values>
+		<field>Description__c</field>
+		<value xsi:type="xsd:string">Default Zebra label with Code128 barcode and QR code.</value>
+	</values>
+	<values>
+		<field>Body__c</field>
+		<value xsi:type="xsd:string"><![CDATA[^XA
+^PW812
+^LL406
+^CF0,28
+^FO40,30^FDOrder: {{OrderNumber}}^FS
+^FO40,70^FDTracking: {{TrackingNumber}}^FS
+{{#if Carrier}}^FO40,110^FDCarrier: {{Carrier}}^FS{{/if}}
+^BY2,2,90
+^FO40,150^BCN,90,Y,N,N
+^FD{{BarcodeValue}}^FS
+^FO430,145^BQN,2,6
+^FDLA,{{QrValue}}^FS
+^FO40,270^A0N,28,28^FDShip To:^FS
+^FO40,305^A0N,30,30^FD{{ShipToName}}^FS
+^XZ]]></value>
+	</values>
+</CustomMetadata>

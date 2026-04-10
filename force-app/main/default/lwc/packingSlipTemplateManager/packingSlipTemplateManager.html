@@ -1,0 +1,36 @@
+<template>
+	<lightning-card title="Packing Slip Template Manager" icon-name="standard:template">
+		<div class="manager-shell">
+			<lightning-spinner lwc:if={isLoading} alternative-text="Loading"></lightning-spinner>
+
+			<template lwc:if={hasTemplates}>
+				<div class="table-header row">
+					<div>Name</div>
+					<div>Output Mode</div>
+					<div>Type</div>
+					<div>Status</div>
+					<div>Action</div>
+				</div>
+				<template for:each={templates} for:item="template">
+					<div key={template.id} class="row table-row">
+						<div>{template.name}</div>
+						<div>{template.outputMode}</div>
+						<div>{template.templateType}</div>
+						<div>{template.statusLabel}</div>
+						<div>
+							<lightning-button
+								label={template.actionLabel}
+								data-template-id={template.id}
+								data-active={template.isActive}
+								onclick={handleActivateClick}>
+							</lightning-button>
+						</div>
+					</div>
+				</template>
+			</template>
+			<template lwc:else>
+				<div class="empty-state">Clone a packaged template to create a subscriber-managed override.</div>
+			</template>
+		</div>
+	</lightning-card>
+</template>

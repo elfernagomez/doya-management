@@ -268,22 +268,6 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 	searchProductsKey = null;
 	parentItemIds = [];
 
-	get modeOptions() {
-		return [{
-			label: "Edit",
-			value: "edit",
-			iconName: "utility:edit",
-			isChecked: this.mode == "edit",
-			isNotChecked: this.mode != "edit"
-		}, {
-			label: "Done Editing",
-			value: "view",
-			iconName: "utility:close",
-			isChecked: this.mode == "view",
-			isNotChecked: this.mode != "view"
-		}];
-	}
-
 	get listViewOptions() {
 		return [{
 			label: "Tiles",
@@ -338,10 +322,6 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 	connectedCallback() {
 		this.getDeliveryGroupsAndProducts();
 		this.getDiscounts();
-	}
-
-	handleOnModeClick(event) {
-		this.mode = event.target.dataset.value;
 	}
 
 	handleOnAddGroupClick() {
@@ -535,9 +515,9 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 			calculateAggregations(this.groups.flatMap(g => g.products));
 
 			// if the order is in draft, we enable edit
-			if (this.isDraft) {
+			/* if (this.isDraft) {
 				this.mode = "edit";
-			}
+			} */
 		})
 		.catch(error => {
 			console.error(error);

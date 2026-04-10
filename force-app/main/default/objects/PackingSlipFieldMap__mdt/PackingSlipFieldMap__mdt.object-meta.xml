@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+	<description>Field token mapping metadata used to bind renderer tokens to provider DTO paths.</description>
+	<label>Packing Slip Field Map</label>
+	<pluralLabel>Packing Slip Field Maps</pluralLabel>
+	<visibility>Public</visibility>
+</CustomObject>

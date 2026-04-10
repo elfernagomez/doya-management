@@ -1,0 +1,18 @@
+<apex:page controller="PackingSlipPdfController"
+	showHeader="false"
+	sidebar="false"
+	standardStylesheets="false"
+	applyHtmlTag="false"
+	applyBodyTag="false"
+	cache="true">
+	<script>
+		window.addEventListener('message', function(event) {
+			if (!event || !event.data || event.data.type !== 'packing-slip-print')
+				return;
+
+			window.focus();
+			window.print();
+		});
+	</script>
+	<apex:outputText value="{!mergedHtml}" escape="false" />
+</apex:page>

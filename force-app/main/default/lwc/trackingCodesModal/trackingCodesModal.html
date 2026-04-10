@@ -1,0 +1,57 @@
+<template>
+	<lightning-modal-header label={modalTitle}></lightning-modal-header>
+	<lightning-modal-body>
+		<div class="slds-var-p-around_small">
+			<div class="slds-var-m-bottom_medium">
+				<p class="slds-text-title_caps slds-var-m-bottom_x-small">Tracking Number</p>
+				<div class="tracking-number-row">
+					<span class="tracking-number">{normalizedTrackingNumber}</span>
+					<lightning-button-icon icon-name="utility:copy_to_clipboard"
+						alternative-text="Copy tracking number"
+						title="Copy tracking number"
+						onclick={handleCopyClick}></lightning-button-icon>
+				</div>
+			</div>
+
+			<div class="codes-grid">
+				<section class="code-panel">
+					<h3 class="slds-text-heading_small slds-var-m-bottom_small">Barcode</h3>
+					<template lwc:if={showBarcodeImage}>
+						<img src={barcodeImageUrl}
+							alt="Barcode preview"
+							class="code-image barcode-image"
+							data-preview-type="barcode"
+							onerror={handlePreviewError} />
+					</template>
+					<template lwc:else>
+						<div class="code-fallback">Barcode preview unavailable.</div>
+					</template>
+				</section>
+
+				<section class="code-panel">
+					<h3 class="slds-text-heading_small slds-var-m-bottom_small">QR Code</h3>
+					<template lwc:if={showQrImage}>
+						<img src={qrImageUrl}
+							alt="QR code preview"
+							class="code-image qr-image"
+							data-preview-type="qr"
+							onerror={handlePreviewError} />
+					</template>
+					<template lwc:else>
+						<div class="code-fallback">QR code preview unavailable.</div>
+					</template>
+				</section>
+			</div>
+
+			<p lwc:if={previewHelpText}
+				class="slds-text-body_small slds-text-color_weak slds-var-m-top_medium">
+				{previewHelpText}
+			</p>
+		</div>
+	</lightning-modal-body>
+	<lightning-modal-footer>
+		<lightning-button label="Close"
+			variant="neutral"
+			onclick={handleCloseClick}></lightning-button>
+	</lightning-modal-footer>
+</template>

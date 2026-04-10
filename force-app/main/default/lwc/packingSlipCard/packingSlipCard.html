@@ -1,9 +1,12 @@
 <template>
-<div class="slds-box
-		slds-theme_shade
-		slds-var-m-bottom_small
-		slds-p-around_none">
-	<div class="slds-page-header"
+<article class="slds-card
+		slds-card__body_inner
+		slds-card_boundary
+		slds-card_related-list-fix">
+	<div class="slds-page-header
+			slds-page-header_joined
+			slds-page-header_bleed
+			slds-shrink-none"
 		style="background:none;">
 		<div class="slds-page-header__row">
 			<div class="slds-page-header__col-title">
@@ -11,32 +14,49 @@
 					<div class="slds-media__figure">
 						<template lwc:if={isIconUrl}>
 							<span class="slds-icon_container">
-								<img src={headerIconName} alt="Packing Slip" class="slds-icon slds-icon_small" />
+								<img src={headerIconName}
+									alt="Packing Slip"
+									class="slds-icon slds-icon_x-small" />
 							</span>
 						</template>
 						<template lwc:else>
 							<lightning-icon icon-name={headerIconName}
-								alternative-text="Packing Slip"></lightning-icon>
+								alternative-text="Packing Slip"
+								size="small"></lightning-icon>
 						</template>
 					</div>
 					<div class="slds-media__body">
 						<div class="slds-page-header__name">
 							<div class="slds-page-header__name-title">
-								<h1>
-									<a href="#" onclick={handleOnNavigateToRecord} class="slds-page-header__title slds-truncate" title={_packingSlip.name}>
-										{_packingSlip.name}
+								<h2 class="slds-truncate">
+									<a href="#"
+										onclick={handleOnNavigateToRecord}
+										class="slds-card__header-link slds-text-heading_medium">
+										<span class="slds-truncate slds-m-right_xx-small" 
+											title="Packing Slips">{_packingSlip.name}</span>
 									</a>
-								</h1>
+								</h2>
 							</div>
 						</div>
 						<div class="slds-page-header__name-meta">
 							<ul class="slds-list_horizontal slds-has-dividers_left">
-							<li lwc:if={_packingSlip.deliveryGroupName}
-								class="slds-item">{_packingSlip.deliveryGroupName}</li>
-							<li lwc:if={_packingSlip.trackingNumber}
-								class="slds-item">{_packingSlip.trackingNumber}</li>
+								<li lwc:if={_packingSlip.deliveryGroupName}
+									class="slds-item">
+									{_packingSlip.deliveryGroupName}
+								</li>
+								<li lwc:if={_packingSlip.trackingNumber}
+									class="slds-item">
+									<span class="slds-m-right_x-small">{_packingSlip.trackingNumber}</span>
+									<lightning-button-icon icon-name="utility:scan"
+										size="x-small"
+										alternative-text="View barcode and QR code"
+										title="View barcode and QR code"
+										onclick={handleOnShowTrackingCodesModal}></lightning-button-icon>
+								</li>
 								<li lwc:if={itemCount}
-									class="slds-item">{itemCount} items</li>
+									class="slds-item">
+									{itemCount} items
+								</li>
 							</ul>
 						</div>
 					</div>
@@ -46,6 +66,31 @@
 				<div class="slds-page-header__controls">
 					<div class="slds-page-header__control">
 						<lightning-button-group slot="actions">
+							<template for:each={normalizedCustomActions}
+								for:item="a">
+								<template lwc:if={a._isIcon}>
+									<lightning-button-icon key={a._key}
+										title={a.label}
+										alternative-text={a.label}
+										icon-name={a.iconName}
+										variant={a._iconVariant}
+										data-action-index={a._index}
+										data-action-value={a.value}
+										data-action-name={a.name}
+										onclick={handleOnCustomActionClick}></lightning-button-icon>
+								</template>
+								<template lwc:else>
+									<lightning-button key={a._key}
+										title={a.label}
+										label={a.label}
+										icon-name={a.iconName}
+										variant={a.variant}
+										data-action-index={a._index}
+										data-action-value={a.value}
+										data-action-name={a.name}
+										onclick={handleOnCustomActionClick}></lightning-button>
+								</template>
+							</template>
 							<lightning-button-icon lwc:if={showDeleteButton}
 								title="Delete"
 								icon-name="utility:delete"
@@ -58,7 +103,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="slds-var-p-horizontal_large slds-var-p-bottom_large">
+	<div class="slds-var-p-bottom_large">
 		<div lwc:if={isError}
 			class="slds-var-m-bottom_small">
 			<c-error-panel error-title={errorTitle}
@@ -66,5 +111,5 @@
 		</div>
 		<slot></slot>
 	</div>
-</div>
+</article>
 </template>

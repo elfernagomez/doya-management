@@ -1,0 +1,61 @@
+<template>
+	<lightning-card title="Custom Rich Combobox Demo" icon-name="custom:custom63">
+		<div class="slds-p-around_medium">
+			<!-- Example 1: Customer Selection with Icons and Badges (Standard/Stacked) -->
+			<div class="slds-m-bottom_large">
+				<c-custom-combobox-rich
+					label="Select Customer"
+					name="customerCombo"
+					placeholder="Search customers..."
+					variant="standard"
+					options={customerOptions}
+					value={selectedCustomer}
+					onchange={handleCustomerChange}
+					required
+				></c-custom-combobox-rich>
+				
+				<div lwc:if={selectedCustomer} class="slds-m-top_small slds-text-color_success">
+					Selected: {selectedCustomer}
+				</div>
+			</div>
+
+			<!-- Example 2: Product Selection (Inline Variant) -->
+			<div class="slds-m-bottom_large">
+				<c-custom-combobox-rich
+					label="Select Product"
+					name="productCombo"
+					placeholder="Search products..."
+					variant="label-inline"
+					options={productOptions}
+					value={selectedProduct}
+					onchange={handleProductChange}
+				></c-custom-combobox-rich>
+			</div>
+
+			<!-- Example 3: Status Selection (Hidden Label) -->
+			<div class="slds-m-bottom_large">
+				<c-custom-combobox-rich
+					label="Order Status"
+					name="statusCombo"
+					placeholder="Select status..."
+					variant="label-hidden"
+					options={statusOptions}
+					value={selectedStatus}
+					onchange={handleStatusChange}
+				></c-custom-combobox-rich>
+			</div>
+
+			<!-- Example 4: Staff Selection -->
+			<div class="slds-m-bottom_large">
+				<c-custom-combobox-rich
+					label="Assign Staff"
+					name="staffCombo"
+					placeholder="Search staff members..."
+					options={staffOptions}
+					value={selectedStaff}
+					onchange={handleStaffChange}
+				></c-custom-combobox-rich>
+			</div>
+		</div>
+	</lightning-card>
+</template>

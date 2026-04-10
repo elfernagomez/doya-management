@@ -1,4 +1,5 @@
 import InputBase from 'c/inputBase';
+import { NavigationMixin } from 'lightning/navigation';
 import { api, wire, track } from 'lwc';
 import { getFieldValue } from "lightning/uiRecordApi";
 import { getPicklistValues } from "lightning/uiObjectInfoApi";
@@ -101,7 +102,7 @@ export function removeErrorFromProduct(product) {
 	return product;
 }
 
-export default class ProductCard extends InputBase {
+export default class ProductCard extends NavigationMixin(InputBase) {
 	static stylesheets = [styles];
 
 	@api
@@ -122,6 +123,9 @@ export default class ProductCard extends InputBase {
 
 	@api
 	hideUnitType = false;
+
+	@api
+	hideDeliveryGroup = false;
 
 	@api
 	hideUnitPrice = false;
@@ -169,6 +173,10 @@ export default class ProductCard extends InputBase {
 
 	get showPartsToggle() {
 		return !this.hidePartsToggle && this._product.hasParts;
+	}
+
+	get showDeliveryGroup() {
+		return !this.hideDeliveryGroup && this._product.groupId;
 	}
 
 	get mainViewClass() {
@@ -358,7 +366,14 @@ export default class ProductCard extends InputBase {
 	}
 
 	handleOnGroupClick() {
-		// 
+		this[NavigationMixin.Navigate]({
+			type: 'standard__recordPage',
+			attributes: {
+				recordId: this._product.groupId,
+				objectApiName: 'DeliveryGroup__c',
+				actionName: 'view'
+			}
+		});
 	}
 
 	handleOnAddNotesClick() {

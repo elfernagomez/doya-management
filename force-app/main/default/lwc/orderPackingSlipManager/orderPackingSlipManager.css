@@ -25,3 +25,12 @@
 .item-subsection:hover {
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
 }
+
+.print-preview-frame {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border: 0;
+    visibility: hidden;
+    pointer-events: none;
+}

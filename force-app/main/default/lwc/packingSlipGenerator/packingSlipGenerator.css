@@ -1,0 +1,60 @@
+.shell {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+	padding: 1rem;
+	min-height: 24rem;
+}
+
+.controls {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+	gap: 1rem;
+}
+
+.actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75rem;
+}
+
+.preview-section,
+.zpl-section {
+	border: 1px solid #d8dde6;
+	border-radius: 0.75rem;
+	background: #fff;
+	padding: 1rem;
+}
+
+.section-title {
+	font-size: 1rem;
+	font-weight: 700;
+	margin-bottom: 0.75rem;
+}
+
+.preview-frame {
+	width: 100%;
+	min-height: 30rem;
+	border: 1px solid #d8dde6;
+	border-radius: 0.5rem;
+	background: #fff;
+}
+
+.empty-state {
+	padding: 2rem;
+	background: #f8f9fb;
+	border-radius: 0.5rem;
+	color: #54698d;
+	text-align: center;
+}
+
+.zpl-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 0.75rem;
+}
+
+.zpl-output {
+	--slds-c-textarea-sizing-min-height: 18rem;
+}

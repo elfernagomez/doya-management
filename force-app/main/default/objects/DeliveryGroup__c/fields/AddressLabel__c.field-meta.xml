@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AddressLabel__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF (
+  ISPICKVAL( LocationType__c, &apos;Venue&apos; ),
+  DeliveryCenter__r.ShippingStreet &amp;
+  IF (
+    NOT(ISBLANK( DeliveryCenter__r.ShippingCity )),
+    &apos;, &apos; &amp; DeliveryCenter__r.ShippingCity,
+    &apos;&apos;
+  )&amp;
+  IF (
+    NOT(ISBLANK(DeliveryCenter__r.ShippingState )),
+    &apos; &apos; &amp; DeliveryCenter__r.ShippingState,
+    &apos;&apos;
+  ) &amp;
+  IF (
+    NOT(ISBLANK( DeliveryCenter__r.ShippingPostalCode )),
+    &apos;, &apos; &amp; DeliveryCenter__r.ShippingPostalCode,
+    &apos;&apos;
+  ),
+  Address__Street__s &amp;
+  IF (
+    NOT(ISBLANK( Address__City__s )),
+    &apos;, &apos; &amp; Address__City__s,
+    &apos;&apos;
+  ) &amp;
+  IF (
+    NOT(ISBLANK(TEXT(Address__StateCode__s ))),
+    &apos; &apos; &amp; TEXT(Address__StateCode__s),
+    &apos;&apos;
+  ) &amp;
+  IF (
+    NOT(ISBLANK( Address__PostalCode__s )),
+    &apos;, &apos; &amp; Address__PostalCode__s,
+    &apos;&apos;
+  )
+)</formula>
+    <label>Address Label</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

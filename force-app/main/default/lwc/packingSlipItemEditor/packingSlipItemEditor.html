@@ -1,0 +1,271 @@
+<template>
+<lightning-card hide-header=true>
+<div class="slds-card__body slds-card__body_inner">
+<template lwc:if={isLoading}>
+	<lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+</template>
+
+<template lwc:if={error}>
+	<div class="slds-text-color_error slds-p-around_medium">
+		Error loading packing slip: {error}
+	</div>
+</template>
+
+<!-- VIEW -->
+<template lwc:if={isView}>
+	<c-packing-slip-card lwc:if={showContent}
+		record-id={packingSlip.uniqueId}
+		packing-slip={packingSlip}
+		item-count={itemCount}
+		mode="view"
+		custom-actions={viewCustomActions}
+		oncustomactionclick={handleOnPackingSlipCustomActionClick}>
+		<!-- Items Table -->
+		<div class="slds-table slds-table_cell-buffer slds-is-relative">
+			<!-- Table Header -->
+			<lightning-layout 
+				vertical-align="stretch"
+				class="slds-theme_shade slds-border_top slds-border_bottom">
+				<lightning-layout-item 
+					size="1"
+					class="slds-is-resizable slds-is-sortable slds-cell_action-mode slds-border_left">
+					<span class="slds-th__action slds-text-link_reset">Qty</span>
+				</lightning-layout-item>
+				<lightning-layout-item 
+					size="11"
+					scope="col"
+					class="slds-is-resizable slds-is-sortable slds-cell_action-mode slds-border_left">
+					<span class="slds-th__action slds-text-link_reset">Product</span>
+				</lightning-layout-item>
+			</lightning-layout>
+
+			<!-- Items Rows -->
+			<div lwc:if={itemCount}>
+				<lightning-layout for:each={items}
+					for:item="item"
+					for:index="i"
+					vertical-align="stretch"
+					key={item.uniqueId}
+					class="slds-border_bottom">
+					<!-- Quantity -->
+					<lightning-layout-item size="1"
+						class="slds-cell_action-mode">
+						<div class="slds-var-p-vertical_xx-small
+								slds-var-p-horizontal_small">
+							<lightning-formatted-number
+								maximum-fraction-digits="2"
+								value={item.qty}
+								class="slds-text-heading_small"
+								></lightning-formatted-number>&nbsp;
+						</div>
+					</lightning-layout-item>
+					<!-- Product Selection -->
+					<lightning-layout-item size="11"
+						class="slds-cell_action-mode">
+						<div class="slds-var-p-vertical_xx-small
+								slds-var-p-horizontal_small">
+							<c-product-card product={item.product}
+								mode="view"
+								variant="list-item"
+								hide-totals=false
+								hide-unit-price=true
+								hide-delivery-group=true></c-product-card>
+						</div>
+					</lightning-layout-item>
+				</lightning-layout>
+			</div>
+			<div lwc:else
+				class="slds-text-color_weak slds-p-around_x-small">
+				Nothing packed yet.
+			</div>
+		</div>
+	</c-packing-slip-card>
+</template>
+
+<!-- EDIT -->
+<template lwc:if={isEdit}>
+	<c-packing-slip-card lwc:if={showContent}
+		record-id={packingSlip.uniqueId}
+		packing-slip={packingSlip}
+		item-count={itemCount}
+		mode="view"
+		custom-actions={editCustomActions}
+		oncustomactionclick={handleOnPackingSlipCustomActionClick}>
+		<!-- Items Table -->
+		<div class="slds-table slds-table_cell-buffer slds-is-relative">
+			<!-- Table Header -->
+			<lightning-layout 
+				vertical-align="stretch"
+				class="slds-theme_shade slds-border_top slds-border_bottom">
+				<lightning-layout-item 
+					size="2"
+					class="slds-is-resizable slds-is-sortable slds-cell_action-mode slds-border_left">
+					<span class="slds-th__action slds-text-link_reset">Qty</span>
+				</lightning-layout-item>
+				<lightning-layout-item 
+					size="7"
+					scope="col"
+					class="slds-is-resizable slds-is-sortable slds-cell_action-mode slds-border_left">
+					<span class="slds-th__action slds-text-link_reset">Packed</span>
+				</lightning-layout-item>
+				<lightning-layout-item 
+					size="3"
+					scope="col"
+					class="slds-is-resizable slds-is-sortable slds-cell_action-mode slds-border_left">
+					<span class="slds-th__action slds-text-link_reset">&nbsp;</span>
+				</lightning-layout-item>
+			</lightning-layout>
+
+			<!-- Items Rows -->
+			<div lwc:if={itemCount}>
+				<lightning-layout for:each={items}
+					for:item="item"
+					for:index="i"
+					vertical-align="stretch"
+					key={item.uniqueId}
+					class="slds-border_bottom">
+					<!-- Quantity -->
+					<lightning-layout-item size="2"
+						class="slds-cell_action-mode">
+						<div class="slds-var-p-vertical_xx-small
+								slds-var-p-horizontal_small
+								slds-media">
+							<div class="slds-media__figure">
+								<lightning-input 
+									type="checkbox"
+									variant="label-hidden"
+									checked={item.isSelected}
+									onchange={handleItemSelect}
+									data-unique-id={item.uniqueId}
+								></lightning-input>
+							</div>
+							<div class="slds-media__body">
+								<lightning-input 
+									type="number"
+									label="Qty"
+									variant="label-hidden"
+									value={item.qty}
+									onchange={handleItemQuantityChange}
+									data-unique-id={item.uniqueId}
+									max={item.maxQty}
+									disabled={item.isQuantityDisabled}
+									min="1"></lightning-input>
+								<div class="slds-text-body_small slds-text-color_weak slds-var-m-top_xx-small">
+									Max available: {item.maxQty}
+								</div>
+							</div>
+						</div>
+					</lightning-layout-item>
+					<!-- Product Selection -->
+					<lightning-layout-item size="10" class="slds-cell_action-mode">
+						<div class="slds-var-p-vertical_xx-small
+								slds-var-p-horizontal_small">
+							<c-product-card product={item.product}
+								mode="view"
+								variant="list-item"
+								hide-totals=false
+								hide-unit-price=true
+								hide-delivery-group=true></c-product-card>
+						</div>
+					</lightning-layout-item>
+				</lightning-layout>
+			</div>
+			<div lwc:else
+				class="slds-text-color_weak slds-p-around_x-small">
+				Nothing packed yet.
+			</div>
+
+			<!-- Table Header -->
+			<lightning-layout 
+				vertical-align="stretch"
+				class="slds-theme_shade slds-border_top slds-border_bottom">
+				<lightning-layout-item 
+					size="2"
+					class="slds-is-resizable slds-is-sortable slds-cell_action-mode slds-border_left">
+					<span class="slds-th__action slds-text-link_reset">Qty</span>
+				</lightning-layout-item>
+				<lightning-layout-item 
+					size="7"
+					scope="col"
+					class="slds-is-resizable slds-is-sortable slds-cell_action-mode slds-border_left">
+					<span class="slds-th__action slds-text-link_reset">Available</span>
+				</lightning-layout-item>
+				<lightning-layout-item 
+					size="3"
+					scope="col"
+					class="slds-is-resizable slds-is-sortable slds-cell_action-mode slds-border_left">
+					<span class="slds-th__action slds-text-link_reset">&nbsp;</span>
+				</lightning-layout-item>
+			</lightning-layout>
+
+			<!-- Available product Rows -->
+			<template for:each={availableProducts}
+				for:item="product"
+				for:index="i">
+				<lightning-layout 
+					vertical-align="stretch"
+					key={product.uniqueId}
+					class="slds-border_bottom">
+					<!-- Quantity -->
+					<lightning-layout-item size="2" class="slds-cell_action-mode">
+						<div class="slds-var-p-vertical_xx-small
+								slds-var-p-horizontal_small
+								slds-media">
+							<div class="slds-media__figure">
+								<lightning-input 
+									type="checkbox"
+									variant="label-hidden"
+									checked={product.isSelected}
+									onchange={handleProductSelect}
+									disabled={product.isSelectionDisabled}
+									data-unique-id={product.uniqueId}
+								></lightning-input>
+							</div>
+							<div class="slds-media__body">
+								<lightning-input 
+									type="number"
+									label="Qty"
+									variant="label-hidden"
+									value={product.selectedQty}
+									onchange={handleProductQuantityChange}
+									data-unique-id={product.uniqueId}
+									max={product.remainingQty}
+									disabled={product.isQuantityDisabled}
+									min="1"></lightning-input>
+								<div class="slds-text-body_small slds-text-color_weak slds-var-m-top_xx-small">
+									Max available: {product.remainingQty}
+								</div>
+							</div>
+						</div>
+					</lightning-layout-item>
+
+					<!-- Product -->
+					<lightning-layout-item size="10" class="slds-cell_action-mode">
+						<div class="slds-var-p-vertical_xx-small slds-var-p-horizontal_small">
+							<c-product-card product={product}
+								mode="view"
+								variant="list-item"
+								hide-totals=false
+								hide-unit-price=true
+								hide-delivery-group=true></c-product-card>
+						</div>
+					</lightning-layout-item>
+				</lightning-layout>
+			</template>
+		</div>
+
+		<!-- Add Item Button -->
+		<div class="slds-var-m-top_small" style="max-width:24rem;">
+			<lightning-button
+				label="Save Changes"
+				variant="success"
+				onclick={handleSave}
+				class="slds-m-left_small"
+				disabled={isSaveDisabled}
+			></lightning-button>
+		</div>
+	</c-packing-slip-card>
+</template>
+</div>
+</lightning-card>
+</template>

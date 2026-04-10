@@ -1,6 +1,6 @@
 <template>
-<lightning-card title="">
-<div slot="actions">
+<lightning-card hide-header=true>
+<!-- <div slot="actions">
 	<lightning-button-group>
 		<lightning-button
 			label="New Packing Slip"
@@ -13,95 +13,123 @@
 			variant="neutral"
 		></lightning-button>
 	</lightning-button-group>
-</div>
+</div> -->
 <div class="slds-card__body slds-card__body_inner">
+<template lwc:if={isLoading}>
+	<div class="slds-text-align_center slds-p-around_medium">
+		<lightning-spinner alternative-text="Loading"
+			size="small"></lightning-spinner>
+	</div>
+</template>
+
+<template lwc:if={error}>
+	<div class="slds-text-color_error slds-p-around_medium">
+		Error loading packing slips: {error}
+	</div>
+</template>
+
 <lightning-layout>
-	<lightning-layout-item flexibility="auto">
-		<template lwc:if={isLoading}>
-			<div class="slds-text-align_center slds-p-around_medium">
-				<lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
-			</div>
-		</template>
-
-		<template lwc:if={error}>
-			<div class="slds-text-color_error slds-p-around_medium">
-				Error loading packing slips: {error}
-			</div>
-		</template>
-
-		<template lwc:if={hasPackingSlips}>
-			<template for:each={packingSlips}
-				for:item="packingSlip">
-				<c-packing-slip-card
-					key={packingSlip.id}
-					record-id={packingSlip.id}
-					packing-slip={packingSlip}
-					item-count={packingSlip.itemCount}
-					onpackingslipdelete={handlePackingSlipDelete}
-					onpackingslipedit={handlePackingSlipEdit}>
-					<!-- Packing Slip Items (Subsections) -->
-					<template lwc:if={packingSlip.items}>
-						<template for:each={packingSlip.items} for:item="item">
-							<div key={item.id} class="item-subsection slds-box slds-m-bottom_x-small">
-								<div class="slds-grid slds-wrap">
-									<div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
-										<div class="slds-text-body_small slds-text-color_weak">Item Name</div>
-										<div class="slds-text-body_regular">{item.name}</div>
-									</div>
-									<div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
-										<div class="slds-text-body_small slds-text-color_weak">Product</div>
-										<div class="slds-text-body_regular">{item.product}</div>
-									</div>
-									<div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
-										<div class="slds-text-body_small slds-text-color_weak">Quantity</div>
-										<div class="slds-text-body_regular">{item.quantity}</div>
-									</div>
-								</div>
-							</div>
-						</template>
-					</template>
-					<template if:false={packingSlip.items}>
-						<div class="slds-text-align_center slds-text-color_weak slds-p-around_medium">
-							No items found
-						</div>
-					</template>
-				</c-packing-slip-card>
-			</template>
-		</template>
-		<template lwc:else>
-			<template lwc:if={isLoading}>
-			</template>
-			<template lwc:else>
-				<div class="slds-text-align_center slds-text-color_weak slds-p-around_large">
-					<p>No packing slips found for this order.</p>
-					<lightning-button
-						label="Create First Packing Slip"
-						onclick={handleNewPackingSlip}
-						variant="brand"
-						class="slds-m-top_medium"
-					></lightning-button>
-				</div>
-			</template>
-		</template>
+	<lightning-layout-item flexibility="grow">
+		<lightning-input type="search"
+			name="searchSlips"
+			variant="label-hidden"
+			placeholder="Search Packing Slips..."
+			onchange={handleOnSearchSlipsChange}></lightning-input>
 	</lightning-layout-item>
-	<!-- Order Products Side Panel -->
-	<lightning-layout-item lwc:if={showOrderProducts}
-		size="6">
-		<div class="slds-var-p-left_medium">
-			<div for:each={orderProducts}
-				for:item="product"
-				for:index="index"
-				key={product.uniqueId}
-				class="slds-var-m-bottom_small">
-				<c-product-card product={product}
-					data-index={index}
-					mode="view"
-					variant="tile"
-					hide-totals=false></c-product-card>
-			</div>
-		</div>
+	<lightning-layout-item
+		class="slds-var-m-left_small">
+		<template for:each={modeOptions}
+			for:item="modeOption"
+			for:index="index">
+			<lightning-button lwc:if={modeOption.isNotChecked}
+				icon-name={modeOption.iconName}
+				key={modeOption.value}
+				data-value={modeOption.value}
+				label={modeOption.label}
+				onclick={handleOnModeClick}></lightning-button>
+		</template>
 	</lightning-layout-item>
 </lightning-layout>
+
+<div lwc:if={hasGroups}
+	class="slds-var-m-top_small">
+	<template for:each={groups}
+		for:item="group">
+		<c-delivery-group-card key={group.uniqueId}
+			delivery-group={group}
+			mode="view"
+			hide-details-button=true
+			custom-actions={deliveryGroupCardCustomActions}
+			oncustomactionclick={handleOnGroupCustomActionClick}>
+			<div for:each={group.slips}
+				for:item="packingSlip"
+				for:index="index"
+				key={packingSlip.uniqueId}>
+				<c-packing-slip-item-editor
+					record-id={packingSlip.uniqueId}
+					mode="view"
+					view-custom-actions={packingSlipCardCustomActions}
+					onitemsaved={handleItemsSaved}
+					onpackingslipcustomactionclick={handleOnPackingSlipCustomActionClick}></c-packing-slip-item-editor>
+			</div>
+		</c-delivery-group-card>
+	</template>
+
+	<!-- <template for:each={packingSlips}
+		for:item="packingSlip">
+		<c-packing-slip-card
+			key={packingSlip.unqieId}
+			record-id={packingSlip.unqieId}
+			packing-slip={packingSlip}
+			item-count={packingSlip.itemCount}
+			onpackingslipdelete={handlePackingSlipDelete}
+			onpackingslipedit={handlePackingSlipEdit}>
+			<template lwc:if={packingSlip.items}>
+				<template for:each={packingSlip.items} for:item="item">
+					<div key={item.unqieId} class="item-subsection slds-box slds-m-bottom_x-small">
+						<div class="slds-grid slds-wrap">
+							<div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+								<div class="slds-text-body_small slds-text-color_weak">Item Name</div>
+								<div class="slds-text-body_regular">{item.name}</div>
+							</div>
+							<div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
+								<div class="slds-text-body_small slds-text-color_weak">Product</div>
+								<div class="slds-text-body_regular">{item.product}</div>
+							</div>
+							<div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
+								<div class="slds-text-body_small slds-text-color_weak">Quantity</div>
+								<div class="slds-text-body_regular">{item.quantity}</div>
+							</div>
+						</div>
+					</div>
+				</template>
+			</template>
+			<template if:false={packingSlip.items}>
+				<div class="slds-text-align_center slds-text-color_weak slds-p-around_medium">
+					No items found
+				</div>
+			</template>
+		</c-packing-slip-card>
+	</template> -->
 </div>
+<template lwc:else>
+	<template lwc:if={isLoading}>
+	</template>
+	<template lwc:else>
+		<div class="slds-text-align_center slds-text-color_weak
+				slds-p-around_large slds-var-m-top_small">
+			<p>Nothing to pack yet.</p>
+		</div>
+	</template>
+</template>
+</div>
+	<template lwc:if={printPreviewUrl}>
+		<iframe
+			class="print-preview-frame"
+			lwc:ref="printPreviewFrame"
+			title="Packing slip print preview"
+			onload={handlePrintPreviewLoad}
+			src={printPreviewUrl}></iframe>
+	</template>
 </lightning-card>
 </template>

@@ -4,6 +4,7 @@ import { getRecord, getFieldValue } from "lightning/uiRecordApi";
 import { getObjectInfo } from 'lightning/uiObjectInfoApi';
 import { NavigationMixin } from 'lightning/navigation';
 import CustomConfirm from 'c/customConfirm';
+import TrackingCodesModal from 'c/trackingCodesModal';
 
 import PACKING_SLIP_OBJECT from '@salesforce/schema/PackingSlip__c';
 import NAME_FIELD
@@ -85,6 +86,9 @@ export default class PackingSlipCard extends NavigationMixin(InputBase) {
 	itemCount;
 
 	@api
+	customActions = [];
+
+	@api
 	get packingSlip() {
 		return this._packingSlip;
 	}
@@ -97,7 +101,7 @@ export default class PackingSlipCard extends NavigationMixin(InputBase) {
 	objectInfo;
 
 	get showDeleteButton() {
-		return true;
+		return this.isEdit;
 	}
 
 	get headerIconName() {
@@ -110,6 +114,22 @@ export default class PackingSlipCard extends NavigationMixin(InputBase) {
 		const iconValue = this.headerIconName;
 		return iconValue && (iconValue.startsWith('http') ||
 			iconValue.startsWith('/'));
+	}
+
+	get normalizedCustomActions() {
+		return (this.customActions || []).map((action, index) => {
+			const key = action?.value || action?.name || `action-${index}`;
+			const renderAs = (action?.renderAs || action?.type || 'button').toLowerCase();
+			const isIcon = renderAs === 'icon' || renderAs === 'button-icon';
+
+			return {
+				...action,
+				_key: key,
+				_index: index,
+				_isIcon: isIcon,
+				_iconVariant: action?.iconVariant || 'border-filled'
+			};
+		});
 	}
 
 	@wire(getObjectInfo, { objectApiName: PACKING_SLIP_OBJECT })
@@ -148,6 +168,45 @@ export default class PackingSlipCard extends NavigationMixin(InputBase) {
 				objectApiName: 'PackingSlip__c',
 				actionName: 'view'
 			}
+		});
+	}
+
+	handleOnCustomActionClick(event) {
+		const actionIndex = Number(event.currentTarget.dataset.actionIndex);
+		const actionValue = event.currentTarget.dataset.actionValue;
+		const actionName = event.currentTarget.dataset.actionName;
+		const action = Number.isInteger(actionIndex) ?
+			this.customActions[actionIndex] :
+			this.customActions.find(a =>
+				a.value === actionValue || a.name === actionName);
+		const actionKey = action?.value || action?.name || actionValue || actionName;
+
+		this.customEvent("customactionclick", {
+			recordId: this.recordId,
+			actionIndex,
+			actionValue,
+			actionName,
+			actionKey,
+			action
+		});
+	}
+
+	handleOnShowTrackingCodesModal(event) {
+		event.preventDefault();
+		event.stopPropagation();
+
+		const trackingNumber = this._packingSlip?.trackingNumber?.trim();
+		if (!trackingNumber)
+			return;
+
+		TrackingCodesModal.open({
+			size: 'medium',
+			trackingNumber,
+			packingSlipName: this._packingSlip?.name
+		}).catch(error => {
+			this.addError(
+				'There was an issue while opening the tracking code preview.',
+				error);
 		});
 	}
 

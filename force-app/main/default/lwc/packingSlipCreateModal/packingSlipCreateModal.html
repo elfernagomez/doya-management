@@ -1,0 +1,56 @@
+<template>
+	<lightning-modal-header label={modalTitle}></lightning-modal-header>
+
+	<lightning-modal-body>
+		<lightning-record-edit-form
+			object-api-name="PackingSlip__c"
+			record-id={recordId}
+			onsuccess={handleSuccess}
+			onsubmit={handleSubmit}
+			onerror={handleError}>
+
+			<template lwc:if={errorMessage}>
+				<div class="slds-text-color_error slds-var-m-bottom_small">{errorMessage}</div>
+			</template>
+
+			<template lwc:if={hasSections}>
+				<template for:each={sections}
+					for:item="section">
+					<c-expandable-section key={section.key}
+						heading={section.displayHeading}>
+						<template for:each={section.rows}
+							for:item="row">
+							<div key={row.key}
+								class="slds-grid slds-wrap slds-gutters slds-var-m-bottom_small">
+								<template for:each={row.items}
+									for:item="item">
+									<div key={item.key}
+										class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+										<template for:each={item.fields}
+											for:item="field">
+											<lightning-input-field key={field.key}
+												field-name={field.apiName}
+												value={field.defaultValue}
+												required={item.isRequired}>
+											</lightning-input-field>
+										</template>
+									</div>
+								</template>
+							</div>
+						</template>
+					</c-expandable-section>
+				</template>
+			</template>
+		</lightning-record-edit-form>
+	</lightning-modal-body>
+
+	<lightning-modal-footer>
+		<lightning-button label="Cancel"
+			variant="neutral"
+			onclick={handleCancel}
+			class="slds-var-m-right_small"></lightning-button>
+		<lightning-button label="Save"
+			variant="brand"
+			onclick={handleSave}></lightning-button>
+	</lightning-modal-footer>
+</template>

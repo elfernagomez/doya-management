@@ -161,4 +161,11 @@
 		<shortDescription>NewWorkOrders_noQualifyingWorkOrdersHelpText</shortDescription>
 		<value>Only new work orders for the same product, unit type, and dimensions are available here. Work orders that are already in progress or completed will not appear. You can only add items to a work order before production has started.</value>
 	</labels>
+	<labels>
+		<fullName>OrderPackingSlipManager_deletePackingSlipMessage</fullName>
+		<language>en_US</language>
+		<protected>false</protected>
+		<shortDescription>OrderPackingSlipManager_deletePackingSlipMessage</shortDescription>
+		<value>Are you sure you want to delete this Packing Slip?</value>
+	</labels>
 </CustomLabels>

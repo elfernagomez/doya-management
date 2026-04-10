@@ -1,0 +1,29 @@
+.manager-shell {
+	padding: 1rem;
+	min-height: 12rem;
+}
+
+.row {
+	display: grid;
+	grid-template-columns: 2fr 1fr 1fr 1fr auto;
+	gap: 1rem;
+	align-items: center;
+}
+
+.table-header {
+	font-weight: 700;
+	padding: 0.75rem 0;
+	border-bottom: 1px solid #d8dde6;
+}
+
+.table-row {
+	padding: 0.75rem 0;
+	border-bottom: 1px solid #eef1f6;
+}
+
+.empty-state {
+	padding: 1.25rem;
+	background: #f8f9fb;
+	border-radius: 0.5rem;
+	color: #54698d;
+}

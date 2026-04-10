@@ -47,6 +47,19 @@
 				<div class="slds-page-header__controls">
 					<div class="slds-page-header__control">
 						<lightning-button-group slot="actions">
+							<lightning-button 
+								for:each={customActions}
+								for:item="a"
+								for:index="i"
+								title={a.label}
+								label={a.label}
+								key={a.value}
+								icon-name={a.iconName}
+								data-action-index={i}
+								data-action-value={a.value}
+								data-action-name={a.name}
+								onclick={handleOnCustomActionClick}
+								></lightning-button>
 							<lightning-button lwc:if={showDetailsButton}
 								label="Details"
 								icon-name="utility:new_window"
@@ -135,7 +148,7 @@
 						<div lwc:if={showVenue}>
 							<lightning-output-field
 								variant="label-stacked"
-								field-name="Venue__c"
+								field-name="DeliveryCenter__c"
 								class="slds-form-element
 									slds-form-element_edit
 									slds-form-element_readonly
@@ -150,7 +163,7 @@
 									slds-hint-parent
 									slds-var-m-top_large">
 								<span class="slds-form-element__label">
-									Venue Address
+									Delivery Center Address
 								</span>
 								<div class="slds-form-element__control">
 									<div class="slds-form-element__static">
@@ -233,7 +246,7 @@
 
 						<div lwc:if={showVenue}>
 							<lightning-input-field
-								field-name="Venue__c"
+								field-name="DeliveryCenter__c"
 								variant="label-stacked"
 								onchange={handleOnDetailsFieldChange}
 								required></lightning-input-field>
@@ -246,7 +259,7 @@
 									slds-hint-parent
 									slds-var-m-top_large">
 								<span class="slds-form-element__label">
-									Venue Address
+									Delivery Center Address
 								</span>
 								<div class="slds-form-element__control">
 									<div class="slds-form-element__static">

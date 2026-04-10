@@ -1,0 +1,65 @@
+.clear-icon {
+	cursor: pointer;
+}
+
+.clear-icon:hover {
+	color: var(--slds-g-color-neutral-base-95, #032d60);
+}
+
+/* Ensure proper spacing for multi-line options */
+.slds-listbox__option-text_entity {
+	display: block;
+}
+
+.slds-listbox__option-meta {
+	display: block;
+	margin-top: 0.125rem;
+	color: var(--slds-g-color-neutral-base-50, #706e6b);
+	font-size: 0.875rem;
+}
+
+/* Highlighted option on hover */
+.slds-listbox__item:hover .slds-listbox__option {
+	background-color: var(--slds-g-color-neutral-base-95, #f3f2f2);
+	cursor: pointer;
+}
+
+/* Selected option styling */
+.slds-is-selected {
+	background-color: var(--slds-g-color-brand-base-20, #e8f4ff);
+}
+
+/* Badge positioning */
+.slds-float_right {
+	float: right;
+	margin-left: 0.5rem;
+}
+
+/* Icon alignment */
+.slds-media__figure {
+	margin-right: 0.5rem;
+}
+
+/* Ensure dropdown doesn't overflow */
+.slds-dropdown {
+	max-height: 20rem;
+	overflow-y: auto;
+}
+
+/* Custom scrollbar for dropdown */
+.slds-dropdown::-webkit-scrollbar {
+	width: 0.375rem;
+}
+
+.slds-dropdown::-webkit-scrollbar-track {
+	background: var(--slds-g-color-neutral-base-95, #f3f2f2);
+}
+
+.slds-dropdown::-webkit-scrollbar-thumb {
+	background: var(--slds-g-color-neutral-base-70, #c9c7c5);
+	border-radius: 0.1875rem;
+}
+
+.slds-dropdown::-webkit-scrollbar-thumb:hover {
+	background: var(--slds-g-color-neutral-base-60, #b0adab);
+}

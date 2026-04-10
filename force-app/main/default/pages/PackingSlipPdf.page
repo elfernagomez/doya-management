@@ -1,0 +1,10 @@
+<apex:page controller="PackingSlipPdfController"
+	showHeader="false"
+	sidebar="false"
+	standardStylesheets="false"
+	renderAs="pdf"
+	applyHtmlTag="false"
+	applyBodyTag="false"
+	cache="true">
+	<apex:outputText value="{!mergedHtml}" escape="false" />
+</apex:page>

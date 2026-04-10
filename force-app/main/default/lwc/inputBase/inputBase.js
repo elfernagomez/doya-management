@@ -15,15 +15,17 @@ export default class InputBase extends LwcBase {
 
 	get modeOptions() {
 		return [{
-			label: "View",
-			value: "view",
-			iconName: "utility:preview",
-			isChecked: this.isView
-		}, {
 			label: "Edit",
 			value: "edit",
 			iconName: "utility:edit",
-			isChecked: this.isEdit
+			isChecked: this.isEdit,
+			isNotChecked: !this.isEdit
+		}, {
+			label: "Done Editing",
+			value: "view",
+			iconName: "utility:close",
+			isChecked: this.isView,
+			isNotChecked: !this.isView
 		}];
 	}
 
@@ -37,5 +39,9 @@ export default class InputBase extends LwcBase {
 
 	handleOnModeChange(event) {
 		this.mode = event.detail.value;
+	}
+
+	handleOnModeClick(event) {
+		this.mode = event.target.dataset.value;
 	}
 }

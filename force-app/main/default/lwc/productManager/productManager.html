@@ -47,21 +47,19 @@
 	</div>
 </div>
 <div lwc:else>
-	<div class="slds-var-p-around_large">
-		<c-illustration variant="desert"
-			heading="No products yet."></c-illustration>
-		<div lwc:if={showAddProduct}
-			class="slds-grid slds-grid_align-center">
-			<div class="slds-size_full"
-				style="max-width:24rem;">
-				<lightning-record-picker
-					label="Add Product"
-					variant="label-hidden"
-					placeholder="Add Product..."
-					object-api-name="Product2"
-					filter={productFilter}
-					onchange={handleOnSelectedProductChange}></lightning-record-picker>
-			</div>
+	<!-- <c-illustration variant="desert"
+		heading="No products yet."></c-illustration> -->
+	<div lwc:if={showAddProduct}
+		class="slds-var-p-around_large slds-grid slds-grid_align-center">
+		<div class="slds-size_full"
+			style="max-width:24rem;">
+			<lightning-record-picker
+				label="Add Product"
+				variant="label-hidden"
+				placeholder="Add Product..."
+				object-api-name="Product2"
+				filter={productFilter}
+				onchange={handleOnSelectedProductChange}></lightning-record-picker>
 		</div>
 	</div>
 </div>

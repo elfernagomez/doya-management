@@ -8,8 +8,6 @@ public with sharing class DeliveryGroupManager {
 
 	} */
 
-	
-
 	/**
 	 * @param orderIds
 	 * @return Map<Id, List<DeliveryGroup__c>>
@@ -39,8 +37,15 @@ public with sharing class DeliveryGroupManager {
 				DeliveryType__c,
 				LocationType__c,
 				Order__c,
-				Venue__c,
-				Venue__r.Name,
+				DeliveryCenter__c,
+				DeliveryCenter__r.Name,
+				(
+					SELECT Name,
+						Description__c,
+						TrackingNumber__c
+					FROM PackingSlips__r
+					ORDER BY Name
+				),
 				(
 					SELECT AvailableQuantity,
 						BasePrice__c,
@@ -87,6 +92,25 @@ public with sharing class DeliveryGroupManager {
 
 		return result;
 	}
+
+	/**
+	 * Returns delivery groups (with their order products) for the specified Order Id.
+	 * @param orderId Id of the order
+	 * @return List<DeliveryGroup__c>
+	 */
+	@AuraEnabled(cacheable=true)
+	public static List<DeliveryGroup__c> getDeliveryGroupsByOrder(Id orderId) {
+		try {
+			if (orderId == null) {
+				return new List<DeliveryGroup__c>();
+			}
+
+			return getDeliveryGroups(new List<Id> { orderId }).get(orderId);
+		} catch (Exception ex) {
+			throw new AuraHandledException(ex.getMessage());
+		}
+	}
+
 
 	/**
 	 * Returns delivery groups (with their order products) that contain order items
@@ -144,8 +168,15 @@ public with sharing class DeliveryGroupManager {
 					DeliveryType__c,
 					LocationType__c,
 					Order__c,
-					Venue__c,
-					Venue__r.Name,
+					DeliveryCenter__c,
+					DeliveryCenter__r.Name,
+					(
+						SELECT Name,
+							Description__c,
+							TrackingNumber__c
+						FROM PackingSlips__r
+						ORDER BY Name
+					),
 					(
 						SELECT AvailableQuantity,
 							BasePrice__c,
@@ -234,7 +265,14 @@ public with sharing class DeliveryGroupManager {
 				DeliveryType__c,
 				LocationType__c,
 				Order__c,
-				Venue__c,
+				DeliveryCenter__c,
+				(
+					SELECT Name,
+						Description__c,
+						TrackingNumber__c
+					FROM PackingSlips__r
+					ORDER BY Name
+				),
 				(
 					SELECT AvailableQuantity,
 						BasePrice__c,
@@ -317,7 +355,14 @@ public with sharing class DeliveryGroupManager {
 					DeliveryType__c,
 					LocationType__c,
 					Order__c,
-					Venue__c,
+					DeliveryCenter__c,
+					(
+						SELECT Name,
+							Description__c,
+							TrackingNumber__c
+						FROM PackingSlips__r
+						ORDER BY Name
+					),
 					(
 						SELECT AvailableQuantity,
 							BasePrice__c,

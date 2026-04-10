@@ -1,0 +1,88 @@
+<template>
+	<lightning-card title="Packing Slip Generator" icon-name="standard:shipment">
+		<div class="shell">
+			<lightning-spinner lwc:if={isLoading} alternative-text="Loading"></lightning-spinner>
+
+			<div class="controls">
+				<lightning-combobox
+					name="outputMode"
+					label="Output Mode"
+					value={selectedOutputMode}
+					options={outputModeOptions}
+					onchange={handleOutputModeChange}>
+				</lightning-combobox>
+
+				<lightning-combobox
+					name="template"
+					label="Template"
+					value={selectedTemplateKey}
+					options={filteredTemplateOptions}
+					onchange={handleTemplateChange}>
+				</lightning-combobox>
+			</div>
+
+			<div class="actions">
+				<lightning-button-icon
+					icon-name="utility:refresh"
+					alternative-text="Refresh preview"
+					title="Refresh preview"
+					disabled={disableActionButtons}
+					onclick={handlePreviewClick}>
+				</lightning-button-icon>
+				<lightning-button-icon
+					icon-name="utility:print"
+					alternative-text="Print"
+					title="Print"
+					disabled={disableActionButtons}
+					onclick={handlePrintClick}>
+				</lightning-button-icon>
+				<lightning-button
+					label="PDF"
+					disabled={disableActionButtons}
+					onclick={handleOpenPdfClick}>
+				</lightning-button>
+				<lightning-button
+					label="Show ZPL"
+					disabled={disableActionButtons}
+					onclick={handleShowZplClick}>
+				</lightning-button>
+				<lightning-button
+					label="Clone Default Template"
+					disabled={disableActionButtons}
+					onclick={handleCloneDefaultClick}>
+				</lightning-button>
+			</div>
+
+			<c-error-panel lwc:if={errorMessage}
+				error-title="Packing slip error"
+				error-object={errorMessage}>
+			</c-error-panel>
+
+			<section>
+				<template lwc:if={hasPreview}>
+					<iframe class="preview-frame"
+						lwc:ref="previewFrame"
+						title="Packing slip preview"
+						onload={handlePreviewLoad}
+						src={previewUrl}></iframe>
+				</template>
+				<template lwc:else>
+					<div class="empty-state">Generate a preview to inspect the rendered packing slip.</div>
+				</template>
+			</section>
+
+			<section class="zpl-section" lwc:if={hasZplOutput}>
+				<div class="zpl-header">
+					<h2 class="section-title">ZPL Output</h2>
+					<lightning-button-icon
+						icon-name="utility:copy_to_clipboard"
+						alternative-text="Copy ZPL"
+						title="Copy ZPL"
+						onclick={handleCopyZplClick}>
+					</lightning-button-icon>
+				</div>
+				<lightning-textarea value={zplOutput} readonly class="zpl-output"></lightning-textarea>
+			</section>
+		</div>
+	</lightning-card>
+</template>

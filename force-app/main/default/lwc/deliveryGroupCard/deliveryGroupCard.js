@@ -13,9 +13,9 @@ import DELIVERY_TYPE_FIELD
 import LOCATION_TYPE_FIELD
 	from "@salesforce/schema/DeliveryGroup__c.LocationType__c";
 import VENUE_ID_FIELD
-	from "@salesforce/schema/DeliveryGroup__c.Venue__c";
+	from "@salesforce/schema/DeliveryGroup__c.DeliveryCenter__c";
 import VENUE_NAME_FIELD
-	from "@salesforce/schema/DeliveryGroup__c.Venue__r.Name";
+	from "@salesforce/schema/DeliveryGroup__c.DeliveryCenter__r.Name";
 import ADDRESS_LABEL_FIELD
 	from "@salesforce/schema/DeliveryGroup__c.AddressLabel__c";
 import ADDRESS_HTML_FIELD
@@ -82,8 +82,8 @@ export function createGroupFromApexRecord(record) {
 		dueDate: record.DueDate__c,
 		deliveryType: record.DeliveryType__c || "Delivery",
 		locationType: record.LocationType__c || "Venue",
-		venueId: record.Venue__c,
-		venueName: record.Venue__r?.Name,
+		venueId: record.DeliveryCenter__c,
+		venueName: record.DeliveryCenter__r?.Name,
 		addressLabel: record.AddressLabel__c,
 		addressHtml: record.AddressHtml__c,
 		isNew: false,
@@ -94,7 +94,7 @@ export function createGroupFromApexRecord(record) {
 
 export function createGroupRecord(deliveryGroup) {
 	let record = {
-		Venue__c: deliveryGroup.venueId,
+		DeliveryCenter__c: deliveryGroup.venueId,
 		Name: deliveryGroup.name,
 		DeliveryType__c: deliveryGroup.deliveryType,
 		DueDate__c: deliveryGroup.dueDate
@@ -114,8 +114,9 @@ export function createGroupRecord(deliveryGroup) {
 		record.Address__CountryCode__s = deliveryGroup.address?.countryCode;
 	} */
 
-	if (!deliveryGroup.isNew)
+	if (!deliveryGroup.isNew) {
 		record.Id = deliveryGroup.uniqueId;
+	}
 
 	return record;
 }
@@ -126,6 +127,12 @@ export default class DeliveryGroupCard extends InputBase {
 
 	@api
 	productCount;
+
+	@api
+	customActions = [];
+
+	@api
+	hideDetailsButton = false;
 
 	@api
 	get deliveryGroup() {
@@ -153,7 +160,7 @@ export default class DeliveryGroupCard extends InputBase {
 	}
 
 	get showDetailsButton() {
-		return !this.group.isPlaceHolder;
+		return !this.group.isPlaceHolder && !this.hideDetailsButton;
 	}
 
 	get showDeleteButton() {
@@ -288,7 +295,7 @@ export default class DeliveryGroupCard extends InputBase {
 
 	handleOnDetailsFieldChange(event) {
 		switch (event.target.fieldName) {
-			case "Venue__c":
+			case "DeliveryCenter__c":
 				this.venueId = event.target.value;
 				break;
 			default:
@@ -306,6 +313,26 @@ export default class DeliveryGroupCard extends InputBase {
 			default:
 				break;
 		} */
+	}
+
+	handleOnCustomActionClick(event) {
+		const actionIndex = Number(event.currentTarget.dataset.actionIndex);
+		const actionValue = event.currentTarget.dataset.actionValue;
+		const actionName = event.currentTarget.dataset.actionName;
+		const action = Number.isInteger(actionIndex) ?
+			this.customActions[actionIndex] :
+			this.customActions.find(a =>
+				a.value === actionValue || a.name === actionName);
+		const actionKey = action?.value || action?.name || actionValue || actionName;
+
+		this.customEvent("customactionclick", {
+			recordId: this.group.uniqueId,
+			actionIndex,
+			actionValue,
+			actionName,
+			actionKey,
+			action
+		});
 	}
 
 	handleOnSaveClick(event) {
@@ -334,7 +361,7 @@ export default class DeliveryGroupCard extends InputBase {
 		}).then(result => {
 			if (result?.name == "delete")
 				this.customEvent("groupdelete", {
-					recordId: this.recordId
+					recordId: this.group.uniqueId
 				});
 		});
 	}

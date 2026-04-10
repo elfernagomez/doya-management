@@ -55,7 +55,7 @@
 				class="slds-border_left
 					slds-var-p-horizontal_large">
 				<lightning-layout multiple-rows="true">
-					<lightning-layout-item>
+					<lightning-layout-item lwc:if={showQty}>
 					<dl class="slds-dl_inline slds-var-m-right_medium">
 						<dt title="Qty"
 							class="slds-dl_inline__label
@@ -69,25 +69,23 @@
 						</dd>
 					</dl>
 					</lightning-layout-item>
-					<lightning-layout-item>
+					<lightning-layout-item lwc:if={showUnitType}>
 					<dl class="slds-dl_inline slds-var-m-right_medium">
-						<dt lwc:if={showUnitType}
-							title="Unit Type"
+						<dt title="Unit Type"
 							class="slds-dl_inline__label
 								slds-text-color_weak">Unit Type</dt>
-						<dd lwc:if={showUnitType} title="Unit Type"
+						<dd title="Unit Type"
 							class="slds-dl_inline__detail">
 							{_product.unitType}&nbsp;
 						</dd>
 					</dl>
 					</lightning-layout-item>
-					<lightning-layout-item>
+					<lightning-layout-item lwc:if={showDimensions}>
 					<dl class="slds-dl_inline slds-var-m-right_medium">
-						<dt lwc:if={showDimensions}
-							title="Dimensions"
+						<dt title="Dimensions"
 							class="slds-dl_inline__label
 								slds-text-color_weak">Dimensions</dt>
-						<dd lwc:if={showDimensions} title="Dimensions"
+						<dd title="Dimensions"
 							class="slds-dl_inline__detail">
 							<span class="slds-show_inline-block
 									slds-var-p-right_xx-small">
@@ -125,13 +123,12 @@
 						</dd>
 					</dl>
 					</lightning-layout-item>
-					<lightning-layout-item>
+					<lightning-layout-item lwc:if={showUnitPrice}>
 					<dl class="slds-dl_inline slds-var-m-right_medium">
-						<dt lwc:if={showUnitPrice}
-							title="Unit Price"
+						<dt title="Unit Price"
 							class="slds-dl_inline__label
 								slds-text-color_weak">Unit Price</dt>
-						<dd lwc:if={showUnitPrice} title="Unit Price"
+						<dd title="Unit Price"
 							class="slds-dl_inline__detail">
 							<lightning-formatted-number 
 								format-style="currency"
@@ -141,7 +138,7 @@
 						</dd>
 					</dl>
 					</lightning-layout-item>
-					<lightning-layout-item>
+					<lightning-layout-item lwc:if={showDeliveryGroup}>
 					<dl class="slds-dl_inline slds-var-m-right_medium">
 						<dt title="Delivery Group"
 							class="slds-dl_inline__label

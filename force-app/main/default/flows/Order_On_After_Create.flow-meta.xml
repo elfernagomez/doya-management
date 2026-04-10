@@ -100,7 +100,7 @@
             </value>
         </inputAssignments>
         <inputAssignments>
-            <field>Venue__c</field>
+            <field>DeliveryCenter__c</field>
             <value>
                 <elementReference>$Record.AccountId</elementReference>
             </value>

@@ -1,0 +1,112 @@
+<template>
+	<div class={formElementClass}>
+		<label class={labelClass} for={comboboxId}>
+			<abbr lwc:if={required} class="slds-required" title="required">* </abbr>
+			{label}
+		</label>
+		<div class="slds-form-element__control">
+			<div class={containerClass}>
+				<div class={comboboxClass} aria-expanded={isOpen} aria-haspopup="listbox" role="combobox">
+					<!-- Selected Value Display -->
+					<div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+						<input
+							type="text"
+							class="slds-input slds-combobox__input"
+							id={comboboxId}
+							aria-controls={listboxId}
+							autocomplete="off"
+							role="textbox"
+							placeholder={placeholder}
+							readonly={isReadonly}
+							value={searchTerm}
+							onfocus={handleFocus}
+							oninput={handleInput}
+							onblur={handleBlur}
+						/>
+						<!-- Icon for selected item or dropdown -->
+						<span class="slds-icon_container slds-icon-utility-down slds-input__icon slds-input__icon_right">
+							<lightning-icon
+								lwc:if={showClearButton}
+								icon-name="utility:clear"
+								size="x-small"
+								alternative-text="Clear"
+								title="Clear Selection"
+								onclick={handleClear}
+								class="slds-button__icon slds-icon-text-light clear-icon"
+							></lightning-icon>
+							<lightning-icon
+								lwc:else
+								icon-name="utility:down"
+								size="x-small"
+								alternative-text="Show options"
+								class="slds-icon slds-icon_x-small slds-icon-text-default"
+							></lightning-icon>
+						</span>
+					</div>
+
+					<!-- Dropdown List -->
+					<div lwc:if={isOpen} id={listboxId} role="listbox" class="slds-dropdown slds-dropdown_length-5 slds-dropdown_fluid">
+						<ul class="slds-listbox slds-listbox_vertical" role="presentation">
+							<!-- No Results Message -->
+							<li lwc:if={showNoResults} role="presentation" class="slds-listbox__item">
+								<div class="slds-align_absolute-center slds-p-vertical_medium slds-text-color_weak">
+									<lightning-icon icon-name="utility:search" size="small"></lightning-icon>
+									<span class="slds-m-left_small">No results found</span>
+								</div>
+							</li>
+
+							<!-- Options List -->
+							<template for:each={filteredOptions} for:item="option">
+								<li
+									key={option.value}
+									role="presentation"
+									class="slds-listbox__item"
+									data-value={option.value}
+									onclick={handleSelect}
+								>
+									<div class={option.itemClass} role="option" aria-selected={option.isSelected}>
+										<!-- Icon (optional) -->
+										<span lwc:if={option.iconName} class="slds-media__figure">
+											<span class={option.iconContainerClass}>
+												<lightning-icon
+													icon-name={option.iconName}
+													size="small"
+													alternative-text={option.iconAlt}
+												></lightning-icon>
+											</span>
+										</span>
+
+										<!-- Content: Title + Description -->
+										<span class="slds-media__body">
+											<!-- Subtitle (optional) -->
+											<span lwc:if={option.subtitle}
+												class="slds-listbox__option-meta slds-truncate"
+												title={option.label}>
+												{option.label}
+											</span>
+											<span class="slds-listbox__option-text slds-listbox__option-text_entity">
+												<!-- Main Title -->
+												<span class="slds-truncate"
+													title={option.subtitle}>{option.subtitle}</span>
+											</span>
+										</span>
+
+										<!-- Custom Badge/Mark (optional) -->
+										<span lwc:if={option.badge} class="slds-media__figure slds-media__figure_reverse">
+											<lightning-badge label={option.badge} class={option.badgeClass}></lightning-badge>
+										</span>
+									</div>
+								</li>
+							</template>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Field-level Error Message -->
+		<div lwc:if={errorMessage} class="slds-form-element__help" id={helpTextId}>
+			{errorMessage}
+		</div>
+	</div>
+</template>
