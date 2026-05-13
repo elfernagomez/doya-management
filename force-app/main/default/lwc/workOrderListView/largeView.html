@@ -9,69 +9,6 @@
 <div class="slds-table
 		slds-table_cell-buffer
 		slds-is-relative">
-	<lightning-layout vertical-align="stretch"
-		class="slds-theme_shade slds-border_bottom">
-		<lightning-layout-item size="8">
-			<lightning-layout vertical-align="stretch">
-				<lightning-layout-item scope="col"
-					style={rowNumberColumnStyle}
-					class="slds-is-resizable
-						slds-is-sortable
-						slds-cell_action-mode">&nbsp;</lightning-layout-item>
-				<lightning-layout-item scope="col"
-					flexibility="no-flex"
-					style={rowCheckboxColumnStyle}>
-					<div class="slds-th__action">
-						<div class="slds-checkbox">
-							<lightning-input type="checkbox"
-								variant="label-hidden"
-								checked={isAllSelected}
-								onchange={handleOnSelectAllChange}></lightning-input>
-						</div>
-					</div>
-				</lightning-layout-item>
-				<lightning-layout-item scope="col"
-					for:each={columns}
-					for:item="col"
-					for:index="i"
-					key={col.fieldName}
-					title={col.label}
-					style={col.styles.header.style}
-					class={col.styles.header.class}>
-					<a role="button"
-						href="#"
-						data-field-name={col.fieldName}
-						onclick={handleOnColmunClick}
-						class="slds-th__action
-							slds-text-link_reset">
-						<span class="slds-assistive-text">Sort by: </span>
-						<div class="slds-grid
-								slds-grid_vertical-align-center
-								slds-has-flexi-truncate">
-							<b class="slds-truncate"
-								title={col.label}>{col.label}</b>
-							<lightning-icon lwc:if={col.isSortDesc}
-								icon-name="utility:arrowdown"
-								size="xx-small"
-								class="slds-is-sortable__icon"></lightning-icon>
-							<lightning-icon lwc:else
-								icon-name="utility:arrowup"
-								size="xx-small"
-								class="slds-is-sortable__icon"></lightning-icon>
-						</div>
-					</a>
-				</lightning-layout-item>
-			</lightning-layout>
-		</lightning-layout-item>
-		<lightning-layout-item size="4">
-			<lightning-layout vertical-align="stretch">
-				<lightning-layout-item scope="col"
-					class="slds-is-resizable
-						slds-is-sortable
-						slds-cell_action-mode">&nbsp;</lightning-layout-item>
-			</lightning-layout>
-		</lightning-layout-item>
-	</lightning-layout>
 	<template for:each={data}
 		for:item="row"
 		for:index="i">

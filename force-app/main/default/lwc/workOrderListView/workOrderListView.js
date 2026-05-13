@@ -302,10 +302,7 @@ export default class WorkOrderListView
 				}));
 	}
 
-	handleOnColmunClick(event) {
-		event.preventDefault();
-		const fieldName = event.currentTarget.dataset.fieldName;
-		const column = this.columns.find(c => c.fieldName == fieldName);
+	handleOnColmunClick(column) {
 		this.sortByColumn(column);
 	}
 
@@ -442,6 +439,9 @@ export default class WorkOrderListView
 			case "completeAllStepsRequested":
 				this.handleOnCompleteAllStepsRequested();
 				break;
+			case "columnClicked":
+				this.handleOnColmunClick(message.payload);
+				break;
 			default:
 				break;
 		}
@@ -505,6 +505,9 @@ export default class WorkOrderListView
 		this.mediumBottomColumns.forEach(
 			c => (c.styles = this.getMediumBottomColumnStyle(c)));
 		this.mediumBottomColumns = [...this.mediumBottomColumns];
+		this.publishEvent(
+			"columnsUpdated",
+			this.columns);
 	}
 
 	updateDataRefence() {

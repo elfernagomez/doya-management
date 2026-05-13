@@ -282,6 +282,10 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 		}];
 	}
 
+	get showAddGroupButton() {
+		return this.isDraft || this.isEdit;
+	}
+
 	get title() {
 		return "Products";
 	}

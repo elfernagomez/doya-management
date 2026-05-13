@@ -33,6 +33,9 @@ export default class WorkOrderListViewHeader extends WorkOrderListViewEventBus {
 		name: "new"
 	}];
 
+	noColumnWidth = "3.5rem";
+	checkboxColumnWidth = "32px";
+
 	get subtitle() {
 		return `${this.data.length} items • Updated ${this.timeAgo}`;
 	}
@@ -55,6 +58,18 @@ export default class WorkOrderListViewHeader extends WorkOrderListViewEventBus {
 
 	get selectedStatuses() {
 		return this.statusOptions?.filter(o => o.isSelected) || [];
+	}
+
+	get rowNumberColumnStyle() {
+		return `width:${this.noColumnWidth};`;
+	}
+
+	get rowCheckboxColumnStyle() {
+		return `width:${this.checkboxColumnWidth};`;
+	}
+
+	get tableHeaderRowStyle() {
+		return `padding-right:${20}px;`;
 	}
 
 	connectedCallback() {
@@ -146,6 +161,13 @@ export default class WorkOrderListViewHeader extends WorkOrderListViewEventBus {
 
 	handleOnDeselectAllClick() {
 		this.publishEvent("deselectAllItemsRequested");
+	}
+
+	handleOnColmunClick(event) {
+		event.preventDefault();
+		const fieldName = event.currentTarget.dataset.fieldName;
+		const column = this.columns.find(c => c.fieldName == fieldName);
+		this.publishEvent("columnClicked", column);
 	}
 
 	handleWorkOrderListViewEventMessage(message) {

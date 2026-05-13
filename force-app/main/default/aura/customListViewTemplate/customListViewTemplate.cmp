@@ -9,7 +9,7 @@
 	<lightning:layout class="slds-grid_vertical height-full">
 		<lightning:layoutItem>{! v.header }</lightning:layoutItem>
 		<lightning:layoutItem flexibility="grow"
-			class="slds-is-relative">
+			class="slds-is-relative slds-scrollable_y">
 			<div>{! v.dataTable }</div>
 			<!-- <div>{! v.filterList }</div> -->
 		</lightning:layoutItem>
