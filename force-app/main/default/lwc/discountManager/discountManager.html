@@ -5,11 +5,10 @@
 -->
 <template>
 <div class="slds-box
-		slds-box_x-small
+		slds-box_small
 		slds-is-relative
 		slds-theme_default">
-	<div slot="title"
-		class="slds-media">
+	<div class="slds-media">
 		<div class="slds-media__figure">
 			<lightning-icon icon-name="utility:discounts"
 				size="small"></lightning-icon>
@@ -48,6 +47,7 @@
 			<c-discount-card discount={discount}
 				data-index={index}
 				mode={mode}
+				allow-delete-on-view={allowDeleteOnView}
 				onproductchange={handleOnProductChange}
 				onproductdelete={handleOnProductDelete}></c-discount-card>
 		</div>

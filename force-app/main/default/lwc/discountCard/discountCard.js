@@ -14,6 +14,9 @@ export default class DiscountCard extends InputBase {
 		this._discount = {...value};
 	}
 
+	@api
+	allowDeleteOnView = false;
+
 	@track
 	_discount;
 
@@ -34,10 +37,14 @@ export default class DiscountCard extends InputBase {
 		if (this._discount.isFixed)
 			return "currency";
 
-		if (this._discount.isPercent)
+		if (this._discount.isPercentage)
 			return "percent";
 
 		return "number";
+	}
+
+	get showDeleteButton() {
+		return this.isEdit || this.allowDeleteOnView;
 	}
 
 	@wire(getPicklistValues, {
@@ -88,6 +95,14 @@ export default class DiscountCard extends InputBase {
 		// for existing products we need confirmation
 		else
 			this.isDeleting = true;
+
+		this.customEvent(
+			"productdeleterequest",
+			this._discount,
+			{
+				composed: true,
+				bubbles: true
+			});
 	}
 
 	handleOnConfirmDeleteDiscountClick() {

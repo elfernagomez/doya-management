@@ -135,6 +135,9 @@ export default class DeliveryGroupCard extends InputBase {
 	hideDetailsButton = false;
 
 	@api
+	allowDeleteOnView = false;
+
+	@api
 	get deliveryGroup() {
 		return this.group;
 	}
@@ -164,7 +167,7 @@ export default class DeliveryGroupCard extends InputBase {
 	}
 
 	get showDeleteButton() {
-		return this.isEdit && !this.group.isPlaceHolder;
+		return (this.isEdit || this.allowDeleteOnView) && !this.group.isPlaceHolder;
 	}
 
 	get headerIconName() {

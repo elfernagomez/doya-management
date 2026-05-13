@@ -1,5 +1,5 @@
 import ProductManagerBase from 'c/productManagerBase';
-import { api, wire, track } from 'lwc';;
+import { api } from 'lwc';;
 
 export default class DiscountManager extends ProductManagerBase {
 	@api

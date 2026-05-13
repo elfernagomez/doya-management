@@ -35,30 +35,7 @@
 					label={modeOption.label}
 					onclick={handleOnModeClick}></lightning-button>
 			</template>
-			<!-- <lightning-button-group for:each={modeOptions}
-				for:item="option"
-				key={option.value}
-				value={option.value}
-				label={option.label}
-				checked={option.isChecked}
-				icon-name={option.iconName}></lightning-button> -->
 		</lightning-layout-item>
-		<!-- <lightning-layout-item
-			class="slds-var-m-left_small">
-			<lightning-button-menu icon-name="utility:settings"
-				alternative-text="View Options"
-				menu-alignment="right"
-				variant="border-filled"
-				onselect={handleOnViewChange}>
-				<lightning-menu-item for:each={listViewOptions}
-					for:item="option"
-					key={option.value}
-					value={option.value}
-					label={option.label}
-					checked={option.isChecked}
-					icon-name={option.iconName}></lightning-menu-item>
-			</lightning-button-menu>
-		</lightning-layout-item> -->
 	</lightning-layout>
 	<div for:each={groups}
 		for:item="group"
@@ -69,17 +46,22 @@
 			<c-delivery-group-card lwc:if={group.products.length}
 				delivery-group={group}
 				product-count={group.products.length}
-				mode={mode}>
+				mode={mode}
+				allow-delete-on-view={isDraft}>
 				<c-product-manager products={group.products}
 					mode={mode}
 					hide-add-products={hideAddProducts}
+					allow-add-products-on-view={isDraft}
+					allow-delete-on-view={isDraft}
 					onproductcreate={handleOnProductCreated}
 					onproductchange={handleOnProductChange}
 					onproductdelete={handleOnProductDelete}
 					onproductdragstart={handleOnProductDragStart}
 					onproductdragend={handleOnProductDragEnd}
 					oncreateworkorder={handleOnCreateWorkOrder}
-					onshowpartstoggle={handleOnShowPartsToggle}></c-product-manager>
+					onshowpartstoggle={handleOnShowPartsToggle}
+					onproductdeleterequest={handleOnProductDeleteRequest}
+					></c-product-manager>
 			</c-delivery-group-card>
 		</template>
 		<div lwc:else
@@ -88,12 +70,15 @@
 				record-id={group.uniqueId}
 				product-count={group.products.length}
 				mode={mode}
+				allow-delete-on-view={isDraft}
 				ongroupedit={handleOnGroupEdit}
 				ongroupclone={handleOnGroupClone}
 				ongroupdelete={handleOnGroupDelete}>
 				<c-product-manager products={group.products}
 					mode={mode}
 					hide-add-products={hideAddProducts}
+					allow-add-products-on-view={isDraft}
+					allow-delete-on-view={isDraft}
 					data-group-id={group.uniqueId}
 					onproductcreate={handleOnProductCreated}
 					onproductchange={handleOnProductChange}
@@ -101,7 +86,9 @@
 					onproductdragstart={handleOnProductDragStart}
 					onproductdragend={handleOnProductDragEnd}
 					oncreateworkorder={handleOnCreateWorkOrder}
-					onshowpartstoggle={handleOnShowPartsToggle}></c-product-manager>
+					onshowpartstoggle={handleOnShowPartsToggle}
+					onproductdeleterequest={handleOnProductDeleteRequest}
+					></c-product-manager>
 			</c-delivery-group-card>
 			<div lwc:if={group.isDropEnabled}
 				data-group-id={group.uniqueId}
@@ -119,9 +106,12 @@
 			products={discounts}
 			mode={mode}
 			hide-add-products={hideAddProducts}
+			allow-add-products-on-view={isDraft}
+			allow-delete-on-view={isDraft}
 			onproductcreate={handleOnProductCreated}
 			onproductchange={handleOnProductChange}
-			onproductdelete={handleOnProductDelete}></c-discount-manager>
+			onproductdelete={handleOnProductDelete}
+			onproductdeleterequest={handleOnProductDeleteRequest}></c-discount-manager>
 	</div>
 </div>
 <lightning-spinner lwc:if={isLoading}

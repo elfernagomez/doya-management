@@ -59,6 +59,12 @@ public class ProductWrapper {
 	public Boolean isDiscount { get; set; }
 	
 	@AuraEnabled
+	public Boolean isPercentage { get; set; }
+	
+	@AuraEnabled
+	public Boolean isFixed { get; set; }
+	
+	@AuraEnabled
 	public Boolean hasParts { get; set; }
 	
 	/* @AuraEnabled
@@ -77,7 +83,10 @@ public class ProductWrapper {
 		height = product.Height__c;
 		finish = product.Finish__c;
 		unitType = product.QuantityUnitOfMeasure;
-		unitPrice = pbe.UnitPrice;
+		unitPrice =
+			pbe.UnitPrice != null && pbe.UnitPrice > 0 ?
+				pbe.UnitPrice :
+				0.01;
 		discountType = product.DiscountType__c;
 		discountAmount = product.DiscountAmount__c;
 		materialId = product.Material__c;
@@ -86,6 +95,8 @@ public class ProductWrapper {
 		productTypeName = product.RecordType.DeveloperName;
 		isProduct = product.RecordType.DeveloperName == PRODUCT_RT_NAME;
 		isDiscount = product.RecordType.DeveloperName == DISCOUNT_RT_NAME;
+		isPercentage = product.DiscountType__c == 'Percentage';
+		isFixed = product.DiscountType__c == 'Fixed Amount';
 		hasParts = product.ProductParts__r.size() > 0;
 		// parts = new List<ProductWrapper>();
 	}

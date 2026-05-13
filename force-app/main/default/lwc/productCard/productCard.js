@@ -139,6 +139,9 @@ export default class ProductCard extends NavigationMixin(InputBase) {
 	@api
 	hidePartsToggle = false;
 
+	@api
+	allowDeleteOnView = false;
+
 	@track
 	_product;
 
@@ -181,6 +184,7 @@ export default class ProductCard extends NavigationMixin(InputBase) {
 
 	get mainViewClass() {
 		return [
+			"slds-media",
 			"slds-box",
 			"slds-box_xx-small",
 			"slds-theme_default",
@@ -212,6 +216,10 @@ export default class ProductCard extends NavigationMixin(InputBase) {
 
 	get isDraggingAllowed() {
 		return this.isEdit;
+	}
+
+	get showDeleteButton() {
+		return this.isEdit || this.allowDeleteOnView;
 	}
 
 	@wire(getPicklistValues, {
@@ -278,6 +286,14 @@ export default class ProductCard extends NavigationMixin(InputBase) {
 		// for existing products we need confirmation
 		else
 			this.isDeleting = true;
+
+		this.customEvent(
+			"productdeleterequest",
+			this._product,
+			{
+				composed: true,
+				bubbles: true
+			});
 	}
 
 	handleOnConfirmDeleteProductClick() {

@@ -329,10 +329,12 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 	}
 
 	handleOnAddGroupClick() {
+		this.handleOnEditClick();
 		this.addNewGroup();
 	}
 
 	handleOnProductCreated(event) {
+		this.handleOnEditClick();
 		const groupId = event.target.dataset.groupId;
 		const product = {
 			...event.detail,
@@ -390,6 +392,10 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 
 	handleOnProductChange(event) {
 		this.updateProduct(event.detail);
+	}
+
+	handleOnProductDeleteRequest() {
+		this.handleOnEditClick();
 	}
 
 	handleOnProductDelete(event) {
@@ -846,9 +852,14 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 					product.discountAmount * -1;
 				record[ITEM_UNIT_PRICE_FIELD.fieldApiName] =
 					product.discountAmount * -1;
+			} else if (product.isPercentage) {
+				record[ITEM_BASE_PRICE_FIELD.fieldApiName] = 0.01;
+				record[ITEM_UNIT_PRICE_FIELD.fieldApiName] = 0.01;
 			}
 		}
 
+		console.log(JSON.stringify(product));
+		console.log(JSON.stringify(record));
 		return record;
 	}
 

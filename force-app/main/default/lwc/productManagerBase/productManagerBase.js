@@ -41,6 +41,12 @@ export default class ProductManagerBase extends InputBase {
 	@api
 	hideTotals = false;
 
+	@api
+	allowAddProductsOnView = false;
+
+	@api
+	allowDeleteOnView = false;
+
 	@track
 	_products = [];
 
@@ -55,7 +61,7 @@ export default class ProductManagerBase extends InputBase {
 	}
 
 	get showAddProduct() {
-		return !this.hideAddProducts && this.isEdit;
+		return !this.hideAddProducts && (this.isEdit || this.allowAddProductsOnView);
 	}
 
 	/**

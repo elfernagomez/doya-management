@@ -58,7 +58,7 @@
 							<div class="slds-form-element__control">
 								<div class="slds-form-element__static">
 									<lightning-formatted-number
-										lwc:if={_discount.isPercent}
+										lwc:if={_discount.isPercentage}
 										format-style="percent"
 										maximum-fraction-digits="2"
 										value={percentage}
@@ -75,7 +75,35 @@
 					</lightning-layout-item>
 				</lightning-layout>
 			</lightning-layout-item>
+			<lightning-layout-item style="min-width:12rem;">
+				<lightning-layout multiple-rows="true"
+					horizontal-align="end">
+					<lightning-layout-item size="6"
+						class="slds-var-p-horizontal_small">
+						<div class="slds-form-element">
+							<label class="slds-form-element__label slds-no-flex">
+								Total
+							</label>
+							<div class="slds-text-heading_small">
+								<lightning-formatted-number 
+									format-style="currency"
+									currency-code="USD"
+									value={_discount.totalPrice}
+									></lightning-formatted-number>
+							</div>
+						</div>
+					</lightning-layout-item>
+				</lightning-layout>
+			</lightning-layout-item>
 		</lightning-layout>
+	</div>
+	<div lwc:if={showDeleteButton}
+		class="slds-media__figure slds-media__figure_reverse"
+		style="margin-right:0!important;">
+		<lightning-button-icon icon-name="utility:delete"
+			title="Remove Discount From Current Order"
+			disabled={_discount.isDisabled}
+			onclick={handleOnDeleteDiscountClick}></lightning-button-icon>
 	</div>
 </div>
 <div lwc:if={isEdit}
@@ -203,11 +231,9 @@
 				</lightning-layout>
 			</div>
 		</div>
-		<lightning-button-icon lwc:else
+		<lightning-button-icon lwc:elseif={showDeleteButton}
 			icon-name="utility:delete"
 			title="Remove Discount From Current Order"
-			variant="bare"
-			small="small"
 			disabled={_discount.isDisabled}
 			onclick={handleOnDeleteDiscountClick}></lightning-button-icon>
 	</div>

@@ -10,57 +10,40 @@
 		error-object={errorObject}></c-error-panel>
 </div>
 <div lwc:if={hasProducts}>
-	<div class="">
-		<template for:each={products}
-			for:item="product"
-			for:index="index">
-			<div lwc:if={product.isVisible}
-				key={product.uniqueId}
-				data-is-part={product.isPart}
-				class="product-row slds-var-m-bottom_xx-small">
-				<c-product-card product={product}
-					data-index={index}
-					mode={mode}
-					variant={variant}
-					hide-qty={hideQty}
-					hide-unit-type={hideUnitType}
-					hide-unit-price={hideUnitPrice}
-					hide-dimensions={hideDimensions}
-					hide-totals={hideTotals}
-					onproductchange={handleOnProductChange}
-					onproductdelete={handleOnProductDelete}
-					onproductdragstart={handleOnProductDragStart}
-					onproductdragend={handleOnProductDragEnd}></c-product-card>
-			</div>
-		</template>
-	</div>
-	<div lwc:if={showAddProduct}
-		class="slds-var-m-top_small"
-		style="max-width:24rem;">
-		<lightning-record-picker
-			label="Add Product"
-			variant="label-hidden"
-			placeholder="Add Product..."
-			object-api-name="Product2"
-			filter={productFilter}
-			onchange={handleOnSelectedProductChange}></lightning-record-picker>
-	</div>
-</div>
-<div lwc:else>
-	<!-- <c-illustration variant="desert"
-		heading="No products yet."></c-illustration> -->
-	<div lwc:if={showAddProduct}
-		class="slds-var-p-around_large slds-grid slds-grid_align-center">
-		<div class="slds-size_full"
-			style="max-width:24rem;">
-			<lightning-record-picker
-				label="Add Product"
-				variant="label-hidden"
-				placeholder="Add Product..."
-				object-api-name="Product2"
-				filter={productFilter}
-				onchange={handleOnSelectedProductChange}></lightning-record-picker>
+	<template for:each={products}
+		for:item="product"
+		for:index="index">
+		<div lwc:if={product.isVisible}
+			key={product.uniqueId}
+			data-is-part={product.isPart}
+			class="product-row slds-var-m-bottom_xx-small">
+			<c-product-card product={product}
+				data-index={index}
+				mode={mode}
+				variant={variant}
+				allow-delete-on-view={allowDeleteOnView}
+				hide-qty={hideQty}
+				hide-unit-type={hideUnitType}
+				hide-unit-price={hideUnitPrice}
+				hide-dimensions={hideDimensions}
+				hide-totals={hideTotals}
+				onproductchange={handleOnProductChange}
+				onproductdelete={handleOnProductDelete}
+				onproductdragstart={handleOnProductDragStart}
+				onproductdragend={handleOnProductDragEnd}
+				></c-product-card>
 		</div>
-	</div>
+	</template>
+</div>
+<div lwc:if={showAddProduct}
+	class="slds-var-m-top_small"
+	style="max-width:24rem;">
+	<lightning-record-picker
+		label="Add Product"
+		variant="label-hidden"
+		placeholder="Add Product..."
+		object-api-name="Product2"
+		filter={productFilter}
+		onchange={handleOnSelectedProductChange}></lightning-record-picker>
 </div>
 </template>
