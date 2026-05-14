@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GlobalValueSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customValue>
+        <fullName>Double Sided</fullName>
+        <default>false</default>
+        <label>Double Sided</label>
+    </customValue>
+    <customValue>
+        <fullName>Single Sided</fullName>
+        <default>false</default>
+        <label>Single Sided</label>
+    </customValue>
+    <customValue>
+        <fullName>Mirror</fullName>
+        <default>false</default>
+        <label>Mirror</label>
+    </customValue>
+    <customValue>
+        <fullName>White Ink</fullName>
+        <default>false</default>
+        <label>White Ink</label>
+    </customValue>
+    <customValue>
+        <fullName>Textured</fullName>
+        <default>false</default>
+        <label>Textured</label>
+    </customValue>
+    <customValue>
+        <fullName>Color</fullName>
+        <default>false</default>
+        <label>Color</label>
+    </customValue>
+    <customValue>
+        <fullName>Clear</fullName>
+        <default>false</default>
+        <label>Clear</label>
+    </customValue>
+    <customValue>
+        <fullName>One Color (1/0)</fullName>
+        <default>false</default>
+        <label>One Color (1/0)</label>
+    </customValue>
+    <customValue>
+        <fullName>Two Colors (2/0)</fullName>
+        <default>false</default>
+        <label>Two Colors (2/0)</label>
+    </customValue>
+    <customValue>
+        <fullName>Full Color (4/0)</fullName>
+        <default>false</default>
+        <label>Full Color (4/0)</label>
+    </customValue>
+    <customValue>
+        <fullName>Full Color Double Sided (4/4)</fullName>
+        <default>false</default>
+        <label>Full Color Double Sided (4/4)</label>
+    </customValue>
+    <customValue>
+        <fullName>Other</fullName>
+        <default>false</default>
+        <label>Other</label>
+    </customValue>
+    <masterLabel>Operations Details</masterLabel>
+    <sorted>false</sorted>
+</GlobalValueSet>

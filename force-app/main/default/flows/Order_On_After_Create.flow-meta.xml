@@ -76,6 +76,12 @@
         <locationX>314</locationX>
         <locationY>431</locationY>
         <inputAssignments>
+            <field>DeliveryCenter__c</field>
+            <value>
+                <elementReference>$Record.AccountId</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
             <field>DeliveryType__c</field>
             <value>
                 <stringValue>Installation</stringValue>
@@ -84,7 +90,7 @@
         <inputAssignments>
             <field>LocationType__c</field>
             <value>
-                <stringValue>Venue</stringValue>
+                <stringValue>Delivery Center</stringValue>
             </value>
         </inputAssignments>
         <inputAssignments>
@@ -97,12 +103,6 @@
             <field>Order__c</field>
             <value>
                 <elementReference>$Record.Id</elementReference>
-            </value>
-        </inputAssignments>
-        <inputAssignments>
-            <field>DeliveryCenter__c</field>
-            <value>
-                <elementReference>$Record.AccountId</elementReference>
             </value>
         </inputAssignments>
         <object>DeliveryGroup__c</object>

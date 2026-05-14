@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GlobalValueSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customValue>
+        <fullName>Clear</fullName>
+        <default>false</default>
+        <label>Clear</label>
+    </customValue>
+    <customValue>
+        <fullName>One Color (1/0)</fullName>
+        <default>false</default>
+        <label>One Color (1/0)</label>
+    </customValue>
+    <customValue>
+        <fullName>Two Colors (2/0)</fullName>
+        <default>false</default>
+        <label>Two Colors (2/0)</label>
+    </customValue>
+    <customValue>
+        <fullName>Full Color (4/0)</fullName>
+        <default>false</default>
+        <label>Full Color (4/0)</label>
+    </customValue>
+    <customValue>
+        <fullName>Full Color Double Sided (4/4)</fullName>
+        <default>false</default>
+        <label>Full Color Double Sided (4/4)</label>
+    </customValue>
+    <customValue>
+        <fullName>White Ink printing</fullName>
+        <default>false</default>
+        <label>White Ink printing</label>
+    </customValue>
+    <customValue>
+        <fullName>Other</fullName>
+        <default>false</default>
+        <label>Other</label>
+    </customValue>
+    <masterLabel>Color Option</masterLabel>
+    <sorted>false</sorted>
+</GlobalValueSet>

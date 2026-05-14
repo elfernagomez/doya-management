@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GlobalValueSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customValue>
+        <fullName>Standard</fullName>
+        <default>true</default>
+        <label>Standard</label>
+    </customValue>
+    <customValue>
+        <fullName>Deluxe</fullName>
+        <default>false</default>
+        <label>Deluxe</label>
+    </customValue>
+    <customValue>
+        <fullName>Matte</fullName>
+        <default>false</default>
+        <label>Matte</label>
+    </customValue>
+    <customValue>
+        <fullName>Gloss</fullName>
+        <default>false</default>
+        <label>Gloss</label>
+    </customValue>
+    <customValue>
+        <fullName>Semi-Gloss</fullName>
+        <default>false</default>
+        <label>Semi-Gloss</label>
+    </customValue>
+    <customValue>
+        <fullName>Dry Erase</fullName>
+        <default>false</default>
+        <label>Dry Erase</label>
+    </customValue>
+    <customValue>
+        <fullName>Double Sided</fullName>
+        <default>false</default>
+        <label>Double Sided</label>
+    </customValue>
+    <customValue>
+        <fullName>UV Coating</fullName>
+        <default>false</default>
+        <label>UV Coating</label>
+    </customValue>
+    <customValue>
+        <fullName>No Coating</fullName>
+        <default>false</default>
+        <label>No Coating</label>
+    </customValue>
+    <customValue>
+        <fullName>Spot UV in both sides</fullName>
+        <default>false</default>
+        <label>Spot UV in both sides</label>
+    </customValue>
+    <customValue>
+        <fullName>Spot UV on one side</fullName>
+        <default>false</default>
+        <label>Spot UV on one side</label>
+    </customValue>
+    <customValue>
+        <fullName>Other</fullName>
+        <default>false</default>
+        <label>Other</label>
+    </customValue>
+    <masterLabel>Finishing</masterLabel>
+    <sorted>false</sorted>
+</GlobalValueSet>

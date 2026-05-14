@@ -6,35 +6,38 @@
 <template>
 <article class="slds-card">
 <div class="slds-card__body">
-	<lightning-layout>
-		<lightning-layout-item flexibility="grow">
+	<lightning-layout multiple-rows="true">
+		<lightning-layout-item flexibility="grow"
+			class="slds-var-m-right_small">
 			<lightning-input type="search"
 				name="searchProducts"
 				variant="label-hidden"
 				placeholder="Search Order Products..."
 				onchange={handleOnSearchProductsChange}></lightning-input>
 		</lightning-layout-item>
-		<lightning-layout-item lwc:if={showAddGroupButton}
-			class="slds-var-m-left_small">
-			<lightning-button-group>
-				<lightning-button
-					icon-name="utility:add"
-					label="New Group"
-					onclick={handleOnAddGroupClick}></lightning-button>
-			</lightning-button-group>
-		</lightning-layout-item>
-		<lightning-layout-item
-			class="slds-var-m-left_small">
-			<template for:each={modeOptions}
-				for:item="modeOption"
-				for:index="index">
-				<lightning-button lwc:if={modeOption.isNotChecked}
-					icon-name={modeOption.iconName}
-					key={modeOption.value}
-					data-value={modeOption.value}
-					label={modeOption.label}
-					onclick={handleOnModeClick}></lightning-button>
-			</template>
+		<lightning-layout-item>
+			<lightning-layout>
+				<lightning-button-group>
+					<template lwc:if={showAddGroupButton}>
+						<lightning-button
+							icon-name="utility:add"
+							label="New Group"
+							onclick={handleOnAddGroupClick}></lightning-button>
+					</template>
+					<template lwc:if={showModeButtons}>
+						<template for:each={modeOptions}
+							for:item="modeOption"
+							for:index="index">
+							<lightning-button lwc:if={modeOption.isNotChecked}
+								icon-name={modeOption.iconName}
+								key={modeOption.value}
+								data-value={modeOption.value}
+								label={modeOption.label}
+								onclick={handleOnModeClick}></lightning-button>
+						</template>
+					</template>
+				</lightning-button-group>
+			</lightning-layout>
 		</lightning-layout-item>
 	</lightning-layout>
 	<div for:each={groups}
@@ -77,8 +80,8 @@
 				<c-product-manager products={group.products}
 					mode={mode}
 					hide-add-products={hideAddProducts}
-					allow-add-products-on-view={isDraft}
-					allow-delete-on-view={isDraft}
+					allow-add-products-on-view={allowAddProductsOnView}
+					allow-delete-on-view={allowDeleteOnView}
 					data-group-id={group.uniqueId}
 					onproductcreate={handleOnProductCreated}
 					onproductchange={handleOnProductChange}
@@ -106,8 +109,8 @@
 			products={discounts}
 			mode={mode}
 			hide-add-products={hideAddProducts}
-			allow-add-products-on-view={isDraft}
-			allow-delete-on-view={isDraft}
+			allow-add-products-on-view={allowAddProductsOnView}
+			allow-delete-on-view={allowDeleteOnView}
 			onproductcreate={handleOnProductCreated}
 			onproductchange={handleOnProductChange}
 			onproductdelete={handleOnProductDelete}

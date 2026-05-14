@@ -11,14 +11,20 @@
         <valueSetDefinition>
             <sorted>false</sorted>
             <value>
-                <fullName>Venue</fullName>
-                <default>true</default>
-                <label>Venue</label>
-            </value>
-            <value>
                 <fullName>Address</fullName>
                 <default>false</default>
                 <label>Address</label>
+            </value>
+            <value>
+                <fullName>Delivery Center</fullName>
+                <default>true</default>
+                <label>Delivery Center</label>
+            </value>
+            <value>
+                <fullName>Venue</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Venue</label>
             </value>
         </valueSetDefinition>
     </valueSet>

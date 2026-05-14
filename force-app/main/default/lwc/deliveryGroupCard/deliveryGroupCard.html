@@ -46,7 +46,7 @@
 			<div class="slds-page-header__col-actions">
 				<div class="slds-page-header__controls">
 					<div class="slds-page-header__control">
-						<lightning-button-group slot="actions">
+						<lightning-button-group>
 							<lightning-button 
 								for:each={customActions}
 								for:item="a"
@@ -145,7 +145,7 @@
 								slds-form-element_readonly
 								slds-form-element_stacked
 								slds-hint-parent"></lightning-output-field>
-						<div lwc:if={showVenue}>
+						<div lwc:if={showDeliveryCenter}>
 							<lightning-output-field
 								variant="label-stacked"
 								field-name="DeliveryCenter__c"
@@ -155,7 +155,7 @@
 									slds-form-element_stacked
 									slds-hint-parent
 									slds-var-m-top_large"></lightning-output-field>
-							<div lwc:if={venueAddress}
+							<div lwc:if={deliveryCenterAddress}
 								class="slds-form-element
 									slds-form-element_edit
 									slds-form-element_readonly
@@ -167,11 +167,11 @@
 								</span>
 								<div class="slds-form-element__control">
 									<div class="slds-form-element__static">
-										{venueAddress.street}<br/>
-										{venueAddress.city}
-										{venueAddress.state},
-										{venueAddress.postalCode}<br/>
-										{venueAddress.country}
+										{deliveryCenterAddress.street}<br/>
+										{deliveryCenterAddress.city}
+										{deliveryCenterAddress.state},
+										{deliveryCenterAddress.postalCode}<br/>
+										{deliveryCenterAddress.country}
 									</div>
 								</div>
 							</div>
@@ -232,11 +232,16 @@
 							required
 							class="validate
 								slds-size_full"></lightning-input-field>
+						<lightning-input-field variant="label-stacked"
+							field-name="Notes__c"
+							onchange={handleOnDetailsFieldChange}
+							class="validate
+								slds-size_full"></lightning-input-field>
 					</div>
 					<div role="listitem"
 						class="slds-form__item slds-show">
 						<lightning-radio-group name="locationTypeChoice"
-							label="Location Type (Venue account or address)"
+							label="Location Type"
 							options={locationTypeOptions}
 							value={locationTypeChoice}
 							type="button"
@@ -244,14 +249,14 @@
 							class="validate
 								slds-var-m-bottom_large"></lightning-radio-group>
 
-						<div lwc:if={showVenue}>
+						<div lwc:if={showDeliveryCenter}>
 							<lightning-input-field
 								field-name="DeliveryCenter__c"
 								variant="label-stacked"
 								onchange={handleOnDetailsFieldChange}
 								required></lightning-input-field>
 
-							<div lwc:if={venueAddress}
+							<div lwc:if={deliveryCenterAddress}
 								class="slds-form-element
 									slds-form-element_edit
 									slds-form-element_readonly
@@ -263,11 +268,11 @@
 								</span>
 								<div class="slds-form-element__control">
 									<div class="slds-form-element__static">
-										{venueAddress.street}<br/>
-										{venueAddress.city}
-										{venueAddress.state},
-										{venueAddress.postalCode}<br/>
-										{venueAddress.country}
+										{deliveryCenterAddress.street}<br/>
+										{deliveryCenterAddress.city}
+										{deliveryCenterAddress.state},
+										{deliveryCenterAddress.postalCode}<br/>
+										{deliveryCenterAddress.country}
 									</div>
 								</div>
 							</div>

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GlobalValueSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customValue>
+        <fullName>Printing</fullName>
+        <default>false</default>
+        <label>Printing</label>
+    </customValue>
+    <customValue>
+        <fullName>Cutting</fullName>
+        <default>false</default>
+        <label>Cutting</label>
+    </customValue>
+    <customValue>
+        <fullName>Lamination</fullName>
+        <default>false</default>
+        <label>Lamination</label>
+    </customValue>
+    <customValue>
+        <fullName>Folding</fullName>
+        <default>false</default>
+        <label>Folding</label>
+    </customValue>
+    <customValue>
+        <fullName>Scoring</fullName>
+        <default>false</default>
+        <label>Scoring</label>
+    </customValue>
+    <customValue>
+        <fullName>Creasing</fullName>
+        <default>false</default>
+        <label>Creasing</label>
+    </customValue>
+    <customValue>
+        <fullName>Gluing</fullName>
+        <default>false</default>
+        <label>Gluing</label>
+    </customValue>
+    <customValue>
+        <fullName>Painting</fullName>
+        <default>false</default>
+        <label>Painting</label>
+    </customValue>
+    <customValue>
+        <fullName>Polishing</fullName>
+        <default>false</default>
+        <label>Polishing</label>
+    </customValue>
+    <customValue>
+        <fullName>Pealing</fullName>
+        <default>false</default>
+        <label>Pealing</label>
+    </customValue>
+    <customValue>
+        <fullName>Mounting</fullName>
+        <default>false</default>
+        <label>Mounting</label>
+    </customValue>
+    <customValue>
+        <fullName>Installation</fullName>
+        <default>false</default>
+        <label>Installation</label>
+    </customValue>
+    <customValue>
+        <fullName>Add Double Sided Tape</fullName>
+        <default>false</default>
+        <label>Add Double Sided Tape</label>
+    </customValue>
+    <customValue>
+        <fullName>Add Velcro (Hook and Loop)</fullName>
+        <default>false</default>
+        <label>Add Velcro (Hook and Loop)</label>
+    </customValue>
+    <customValue>
+        <fullName>Add Velcro (Hook)</fullName>
+        <default>false</default>
+        <label>Add Velcro (Hook)</label>
+    </customValue>
+    <customValue>
+        <fullName>Add Velcro (Loop)</fullName>
+        <default>false</default>
+        <label>Add Velcro (Loop)</label>
+    </customValue>
+    <customValue>
+        <fullName>Hem</fullName>
+        <default>false</default>
+        <label>Hem</label>
+    </customValue>
+    <customValue>
+        <fullName>Grommets</fullName>
+        <default>false</default>
+        <label>Grommets</label>
+    </customValue>
+    <customValue>
+        <fullName>Outsource</fullName>
+        <default>false</default>
+        <label>Outsource</label>
+    </customValue>
+    <customValue>
+        <fullName>Assembling</fullName>
+        <default>false</default>
+        <label>Assembling</label>
+    </customValue>
+    <customValue>
+        <fullName>Other</fullName>
+        <default>false</default>
+        <label>Other</label>
+    </customValue>
+    <masterLabel>Operations</masterLabel>
+    <sorted>false</sorted>
+</GlobalValueSet>

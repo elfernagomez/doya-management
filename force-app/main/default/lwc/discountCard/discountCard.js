@@ -1,6 +1,7 @@
 import InputBase from 'c/inputBase';
 import { api, wire, track } from 'lwc';
 import { getPicklistValues } from "lightning/uiObjectInfoApi";
+import CustomConfirm from 'c/customConfirm';
 
 import PRODUCT_DISCOUNT_TYPE_FIELD from "@salesforce/schema/Product2.DiscountType__c";
 
@@ -93,8 +94,32 @@ export default class DiscountCard extends InputBase {
 		if (this._discount.isNew)
 			this.handleOnConfirmDeleteDiscountClick();
 		// for existing products we need confirmation
-		else
+		else {
 			this.isDeleting = true;
+			CustomConfirm.open({
+				content: [
+					`<p style="text-align:center;">`,
+					"Are you sure you want to delete this Discount?",
+					`</p>`
+				].join("\n"),
+				title: "Delete Discount",
+				size: "small",
+				buttons: [{
+					name: "cancel",
+					label: "Cancel",
+					variant: ""
+				}, {
+					name: "delete",
+					label: "Delete",
+					variant: "destructive"
+				}]
+			}).then(result => {
+				if (result?.name == "delete")
+						this.handleOnConfirmDeleteDiscountClick()
+					else
+						this.handleOnCancelDeleteDiscountClick();
+			});
+		}
 
 		this.customEvent(
 			"productdeleterequest",
@@ -110,7 +135,7 @@ export default class DiscountCard extends InputBase {
 		this.customEvent("productdelete", this._discount);
 	}
 
-	handleOnCancelDeleteDiscountClic() {
+	handleOnCancelDeleteDiscountClick() {
 		this.isDeleting = false;
 	}
 

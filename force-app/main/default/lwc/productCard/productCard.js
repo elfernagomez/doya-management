@@ -7,6 +7,7 @@ import rowMode from "./row.html";
 import listItemMode from "./listItem.html";
 import tileMode from "./tile.html";
 import styles from "./productCard.css";
+import CustomConfirm from 'c/customConfirm';
 
 import PRODUCT_NAME_FIELD from "@salesforce/schema/Product2.Name";
 import PRODUCT_CODE_FIELD from "@salesforce/schema/Product2.ProductCode";
@@ -279,13 +280,39 @@ export default class ProductCard extends NavigationMixin(InputBase) {
 	}
 
 	handleOnDeleteProductClick() {
+
+
 		// new products that have not been saved can be deleted
 		// without confirmation to save time...
 		if (this._product.isNew)
 			this.handleOnConfirmDeleteProductClick();
 		// for existing products we need confirmation
-		else
+		else {
 			this.isDeleting = true;
+			CustomConfirm.open({
+				content: [
+					`<p style="text-align:center;">`,
+					"Are you sure you want to delete this Item?",
+					`</p>`
+				].join("\n"),
+				title: "Delete Item",
+				size: "small",
+				buttons: [{
+					name: "cancel",
+					label: "Cancel",
+					variant: ""
+				}, {
+					name: "delete",
+					label: "Delete",
+					variant: "destructive"
+				}]
+			}).then(result => {
+				if (result?.name == "delete")
+					this.handleOnConfirmDeleteProductClick()
+				else
+					this.handleOnCancelDeleteProductClick();
+			});
+		}
 
 		this.customEvent(
 			"productdeleterequest",
@@ -301,7 +328,7 @@ export default class ProductCard extends NavigationMixin(InputBase) {
 		this.customEvent("productdelete", this._product);
 	}
 
-	handleOnCancelDeleteProductClic() {
+	handleOnCancelDeleteProductClick() {
 		this.isDeleting = false;
 	}
 

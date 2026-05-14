@@ -12,9 +12,11 @@ import DELIVERY_TYPE_FIELD
 	from "@salesforce/schema/DeliveryGroup__c.DeliveryType__c";
 import LOCATION_TYPE_FIELD
 	from "@salesforce/schema/DeliveryGroup__c.LocationType__c";
-import VENUE_ID_FIELD
+import NOTES_FIELD
+	from "@salesforce/schema/DeliveryGroup__c.Notes__c";
+import DELIVERY_CENTER_ID_FIELD
 	from "@salesforce/schema/DeliveryGroup__c.DeliveryCenter__c";
-import VENUE_NAME_FIELD
+import DELIVERY_CENTER_NAME_FIELD
 	from "@salesforce/schema/DeliveryGroup__c.DeliveryCenter__r.Name";
 import ADDRESS_LABEL_FIELD
 	from "@salesforce/schema/DeliveryGroup__c.AddressLabel__c";
@@ -44,9 +46,9 @@ export function createNewDelvieryGroup() {
 		name: DEFAULT_GROUP_NAME,
 		dueDate: null,
 		deliveryType: "Delivery",
-		locationType: "Venue",
-		venueId: null,
-		venueName: null,
+		locationType: "DeliveryCenter",
+		deliveryCenterId: null,
+		deliveryCenterName: null,
 		addressLabel: null,
 		addressHtml: null,
 		isNew: true,
@@ -56,18 +58,19 @@ export function createNewDelvieryGroup() {
 }
 
 export function createGroupFromRecord(record) {
-	let venueId = getFieldValue(record, VENUE_ID_FIELD);
+	let deliveryCenterId = getFieldValue(record, DELIVERY_CENTER_ID_FIELD);
 	return {
 		...createNewDelvieryGroup(),
 		uniqueId: record.id,
 		name: getFieldValue(record, NAME_FIELD),
 		dueDate: getFieldValue(record, DUE_DATE_FIELD),
 		deliveryType: getFieldValue(record, DELIVERY_TYPE_FIELD) || "Delivery",
-		locationType: getFieldValue(record, LOCATION_TYPE_FIELD) || "Venue",
-		venueId,
-		venueName: getFieldValue(record, VENUE_NAME_FIELD),
+		locationType: getFieldValue(record, LOCATION_TYPE_FIELD) || "Delivery Center",
+		deliveryCenterId,
+		deliveryCenterName: getFieldValue(record, DELIVERY_CENTER_NAME_FIELD),
 		addressLabel: getFieldValue(record, ADDRESS_LABEL_FIELD),
 		addressHtml: getFieldValue(record, ADDRESS_HTML_FIELD),
+		notes: getFieldValue(record, NOTES_FIELD),
 		isNew: false,
 		isPlaceHolder: false,
 		products: []
@@ -81,9 +84,9 @@ export function createGroupFromApexRecord(record) {
 		name: record.Name,
 		dueDate: record.DueDate__c,
 		deliveryType: record.DeliveryType__c || "Delivery",
-		locationType: record.LocationType__c || "Venue",
-		venueId: record.DeliveryCenter__c,
-		venueName: record.DeliveryCenter__r?.Name,
+		locationType: record.LocationType__c || "Delivery Center",
+		deliveryCenterId: record.DeliveryCenter__c,
+		deliveryCenterName: record.DeliveryCenter__r?.Name,
 		addressLabel: record.AddressLabel__c,
 		addressHtml: record.AddressHtml__c,
 		isNew: false,
@@ -94,13 +97,13 @@ export function createGroupFromApexRecord(record) {
 
 export function createGroupRecord(deliveryGroup) {
 	let record = {
-		DeliveryCenter__c: deliveryGroup.venueId,
+		DeliveryCenter__c: deliveryGroup.deliveryCenterId,
 		Name: deliveryGroup.name,
 		DeliveryType__c: deliveryGroup.deliveryType,
 		DueDate__c: deliveryGroup.dueDate
 	};
 
-	/* if (deliveryGroup.venueId) {
+	/* if (deliveryGroup.deliveryCenterId) {
 		record.Address__Street__s = null;
 		record.Address__City__s = null;
 		record.Address__StateCode__s = null;
@@ -151,11 +154,11 @@ export default class DeliveryGroupCard extends InputBase {
 
 	isLoading = false;
 
-	venueId;
-	venueName;
-	venueAddress;
+	deliveryCenterId;
+	deliveryCenterName;
+	deliveryCenterAddress;
 
-	locationTypeChoice = "Venue";
+	locationTypeChoice = "Delivery Center";
 	clonedGroupName;
 
 	get showCloneButton() {
@@ -181,7 +184,7 @@ export default class DeliveryGroupCard extends InputBase {
 			case "Courier":
 			case "Uber":
 			case "DHL":
-				return this.showVenue ?
+				return this.showDeliveryCenter ?
 					"standard:account" :
 					"standard:address";
 			default:
@@ -191,16 +194,16 @@ export default class DeliveryGroupCard extends InputBase {
 
 	get locationTypeOptions() {
 		return [{
-			label: "Venue",
-			value: "Venue"
+			label: "Delivery Center",
+			value: "Delivery Center"
 		}, {
 			label: "Address",
 			value: "Address"
 		}]
 	}
 
-	get showVenue() {
-		return this.locationTypeChoice == "Venue";
+	get showDeliveryCenter() {
+		return this.locationTypeChoice == "Delivery Center";
 	}
 
 	get showAddress() {
@@ -226,8 +229,9 @@ export default class DeliveryGroupCard extends InputBase {
 			DUE_DATE_FIELD,
 			DELIVERY_TYPE_FIELD,
 			LOCATION_TYPE_FIELD,
-			VENUE_ID_FIELD,
-			VENUE_NAME_FIELD,
+			NOTES_FIELD,
+			DELIVERY_CENTER_ID_FIELD,
+			DELIVERY_CENTER_NAME_FIELD,
 			ADDRESS_LABEL_FIELD,
 			ADDRESS_HTML_FIELD
 		]
@@ -244,7 +248,7 @@ export default class DeliveryGroupCard extends InputBase {
 	}
 
 	@wire(getRecord, { 
-		recordId: "$venueId",
+		recordId: "$deliveryCenterId",
 		fields: [
 			ACCOUNT_ID_FIELD,
 			ACCOUNT_NAME_FIELD,
@@ -255,10 +259,10 @@ export default class DeliveryGroupCard extends InputBase {
 			ACCOUNT_SHIPPING_COUNTRY
 		]
 	})
-	wiredVenueAccount({ data, error }) {
+	wiredDeliveryCenterAccount({ data, error }) {
 		if (data) {
-			this.venueName = getFieldValue(data, ACCOUNT_NAME_FIELD);
-			this.venueAddress = {
+			this.deliveryCenterName = getFieldValue(data, ACCOUNT_NAME_FIELD);
+			this.deliveryCenterAddress = {
 				street: getFieldValue(data, ACCOUNT_SHIPPING_STREET_FIELD),
 				city: getFieldValue(data, ACCOUNT_SHIPPING_CITY_FIELD),
 				state: getFieldValue(data, ACCOUNT_SHIPPING_STATE_FIELD),
@@ -273,11 +277,11 @@ export default class DeliveryGroupCard extends InputBase {
 	}
 
 	handleOnOpenDetailsClick() {
-		this.venueId = this.group.venueId;
+		this.deliveryCenterId = this.group.deliveryCenterId;
 
-		if (!this.venueId) {
-			this.venueNam = null;
-			this.venueAddress = null;
+		if (!this.deliveryCenterId) {
+			this.deliveryCenterName = null;
+			this.deliveryCenterAddress = null;
 		}
 
 		this.getComponent(".detailsModal").open();
@@ -299,7 +303,7 @@ export default class DeliveryGroupCard extends InputBase {
 	handleOnDetailsFieldChange(event) {
 		switch (event.target.fieldName) {
 			case "DeliveryCenter__c":
-				this.venueId = event.target.value;
+				this.deliveryCenterId = event.target.value;
 				break;
 			default:
 				break;
@@ -311,7 +315,7 @@ export default class DeliveryGroupCard extends InputBase {
 		/*
 		switch (event.target.dataset.fieldName) {
 			case "Name":
-				this.venueId = ;
+				this.deliveryCenterId = event.target.value;
 				break;
 			default:
 				break;

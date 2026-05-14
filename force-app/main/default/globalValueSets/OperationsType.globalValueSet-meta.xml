@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GlobalValueSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customValue>
+        <fullName>Large Format Printing</fullName>
+        <default>false</default>
+        <label>Large Format Printing</label>
+    </customValue>
+    <customValue>
+        <fullName>Offset Printing</fullName>
+        <default>false</default>
+        <label>Offset Printing</label>
+    </customValue>
+    <customValue>
+        <fullName>Digital Printing</fullName>
+        <default>false</default>
+        <label>Digital Printing</label>
+    </customValue>
+    <customValue>
+        <fullName>Dye Sublimation Printing</fullName>
+        <default>false</default>
+        <label>Dye Sublimation Printing</label>
+    </customValue>
+    <customValue>
+        <fullName>Foil Printing</fullName>
+        <default>false</default>
+        <label>Foil Printing</label>
+    </customValue>
+    <customValue>
+        <fullName>Tru Cut - with Knife</fullName>
+        <default>false</default>
+        <label>Tru Cut - with Knife</label>
+    </customValue>
+    <customValue>
+        <fullName>Tru Cut - with Bit</fullName>
+        <default>false</default>
+        <label>Tru Cut - with Bit</label>
+    </customValue>
+    <customValue>
+        <fullName>Laser Cut</fullName>
+        <default>false</default>
+        <label>Laser Cut</label>
+    </customValue>
+    <customValue>
+        <fullName>Die Cut</fullName>
+        <default>false</default>
+        <label>Die Cut</label>
+    </customValue>
+    <customValue>
+        <fullName>Kiss Cut</fullName>
+        <default>false</default>
+        <label>Kiss Cut</label>
+    </customValue>
+    <customValue>
+        <fullName>Matte Lamination</fullName>
+        <default>false</default>
+        <label>Matte Lamination</label>
+    </customValue>
+    <customValue>
+        <fullName>Gloss Lamination</fullName>
+        <default>false</default>
+        <label>Gloss Lamination</label>
+    </customValue>
+    <customValue>
+        <fullName>Semi Gloss Lamination</fullName>
+        <default>false</default>
+        <label>Semi Gloss Lamination</label>
+    </customValue>
+    <customValue>
+        <fullName>Dry Erase Lamination</fullName>
+        <default>false</default>
+        <label>Dry Erase Lamination</label>
+    </customValue>
+    <customValue>
+        <fullName>Double Sided Adhesive Lamination</fullName>
+        <default>false</default>
+        <label>Double Sided Adhesive Lamination</label>
+    </customValue>
+    <customValue>
+        <fullName>Texture Lamination</fullName>
+        <default>false</default>
+        <label>Texture Lamination</label>
+    </customValue>
+    <customValue>
+        <fullName>Metallic Lamination</fullName>
+        <default>false</default>
+        <label>Metallic Lamination</label>
+    </customValue>
+    <customValue>
+        <fullName>Plastic Lamination</fullName>
+        <default>false</default>
+        <label>Plastic Lamination</label>
+    </customValue>
+    <customValue>
+        <fullName>Silk Lamination</fullName>
+        <default>false</default>
+        <label>Silk Lamination</label>
+    </customValue>
+    <customValue>
+        <fullName>Velvet Lamination</fullName>
+        <default>false</default>
+        <label>Velvet Lamination</label>
+    </customValue>
+    <customValue>
+        <fullName>Color lamination</fullName>
+        <default>false</default>
+        <label>Color lamination</label>
+    </customValue>
+    <customValue>
+        <fullName>Half-Fold</fullName>
+        <default>false</default>
+        <label>Half-Fold</label>
+    </customValue>
+    <customValue>
+        <fullName>Tri-Fold</fullName>
+        <default>false</default>
+        <label>Tri-Fold</label>
+    </customValue>
+    <customValue>
+        <fullName>Z-Fold</fullName>
+        <default>false</default>
+        <label>Z-Fold</label>
+    </customValue>
+    <customValue>
+        <fullName>4 Panel Accordian Fold</fullName>
+        <default>false</default>
+        <label>4 Panel Accordian Fold</label>
+    </customValue>
+    <customValue>
+        <fullName>3 Panel Gate Fold</fullName>
+        <default>false</default>
+        <label>3 Panel Gate Fold</label>
+    </customValue>
+    <customValue>
+        <fullName>Double Gate Fold</fullName>
+        <default>false</default>
+        <label>Double Gate Fold</label>
+    </customValue>
+    <customValue>
+        <fullName>Roll Fold</fullName>
+        <default>false</default>
+        <label>Roll Fold</label>
+    </customValue>
+    <customValue>
+        <fullName>Double Parallel Fold</fullName>
+        <default>false</default>
+        <label>Double Parallel Fold</label>
+    </customValue>
+    <customValue>
+        <fullName>Vertical Half Fold</fullName>
+        <default>false</default>
+        <label>Vertical Half Fold</label>
+    </customValue>
+    <customValue>
+        <fullName>French Fold</fullName>
+        <default>false</default>
+        <label>French Fold</label>
+    </customValue>
+    <customValue>
+        <fullName>Map Fold</fullName>
+        <default>false</default>
+        <label>Map Fold</label>
+    </customValue>
+    <customValue>
+        <fullName>Other</fullName>
+        <default>false</default>
+        <label>Other</label>
+    </customValue>
+    <masterLabel>Operations Type</masterLabel>
+    <sorted>false</sorted>
+</GlobalValueSet>

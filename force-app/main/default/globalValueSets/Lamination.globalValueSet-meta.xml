@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GlobalValueSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customValue>
+        <fullName>Floor</fullName>
+        <default>false</default>
+        <label>Floor</label>
+    </customValue>
+    <customValue>
+        <fullName>Gloss</fullName>
+        <default>false</default>
+        <label>Gloss</label>
+    </customValue>
+    <customValue>
+        <fullName>Matte</fullName>
+        <default>false</default>
+        <label>Matte</label>
+    </customValue>
+    <customValue>
+        <fullName>Mounting Film</fullName>
+        <default>false</default>
+        <label>Mounting Film</label>
+    </customValue>
+    <customValue>
+        <fullName>Optically Clear</fullName>
+        <default>false</default>
+        <label>Optically Clear</label>
+    </customValue>
+    <customValue>
+        <fullName>Removable</fullName>
+        <default>false</default>
+        <label>Removable</label>
+    </customValue>
+    <customValue>
+        <fullName>Silk</fullName>
+        <default>false</default>
+        <label>Silk</label>
+    </customValue>
+    <customValue>
+        <fullName>White Back</fullName>
+        <default>false</default>
+        <label>White Back</label>
+    </customValue>
+    <masterLabel>Lamination</masterLabel>
+    <sorted>false</sorted>
+</GlobalValueSet>

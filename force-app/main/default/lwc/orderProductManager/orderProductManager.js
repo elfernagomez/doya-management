@@ -2,6 +2,7 @@ import InputBase from 'c/inputBase';
 import { api, track, wire } from "lwc";
 import { NavigationMixin } from "lightning/navigation";
 import { notifyRecordUpdateAvailable } from 'lightning/uiRecordApi';
+import { getObjectInfo } from "lightning/uiObjectInfoApi";
 import {
 	getRecord,
 	getFieldValue,
@@ -268,6 +269,23 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 	searchProductsKey = null;
 	parentItemIds = [];
 
+	@wire(getObjectInfo, { objectApiName: ITEM_OBJECT })
+	orderItemInfo;
+
+	get orderItemCrud() {
+		const d = this.orderItemInfo.data;
+		return {
+			canRead: !!d?.queryable,
+			canCreate: !!d?.createable,
+			canUpdate: !!d?.updateable,
+			canDelete: !!d?.deletable
+		};
+	}
+
+	get canEditOrderItems() {
+		return this.orderItemCrud.canCreate || this.orderItemCrud.canUpdate;
+	}
+
 	get listViewOptions() {
 		return [{
 			label: "Tiles",
@@ -283,7 +301,19 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 	}
 
 	get showAddGroupButton() {
-		return this.isDraft || this.isEdit;
+		return this.canEditOrderItems && (this.isDraft || this.isEdit);
+	}
+
+	get showModeButtons() {
+		return this.canEditOrderItems;
+	}
+
+	get allowAddProductsOnView() {
+		return this.canEditOrderItems && this.isDraft;
+	}
+
+	get allowDeleteOnView() {
+		return this.canEditOrderItems && this.isDraft;
 	}
 
 	get title() {
@@ -858,7 +888,7 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 			}
 		}
 
-		console.log(JSON.stringify(product));
+		console.log(JSON.stringify(product), product.discountAmount * -1);
 		console.log(JSON.stringify(record));
 		return record;
 	}

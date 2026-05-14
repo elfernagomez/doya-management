@@ -51,7 +51,7 @@
 							</div>
 						</div>
 					</lightning-layout-item>
-					<lightning-layout-item 
+					<lightning-layout-item
 						flexibility="grow"
 						class="slds-border_left
 							slds-var-p-horizontal_large">
@@ -460,7 +460,7 @@
 			variant="compact"></c-error-panel>
 	</div>
 	<div class="slds-media__figure slds-media__figure_reverse">
-		<div lwc:if={isDeleting}
+		<!-- <div lwc:if={isDeleting}
 			class="delete-panel
 				slds-panel
 				slds-panel_docked
@@ -490,8 +490,8 @@
 					</lightning-layout-item>
 				</lightning-layout>
 			</div>
-		</div>
-		<lightning-button-group lwc:elseif={showDeleteButton}>
+		</div> -->
+		<lightning-button-group lwc:if={showDeleteButton}>
 			<lightning-button-icon
 				icon-name="utility:delete"
 				title="Remove Product From Current Order"

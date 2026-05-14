@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GlobalValueSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customValue>
+        <fullName>Fixed Amount</fullName>
+        <default>false</default>
+        <label>Fixed Amount</label>
+    </customValue>
+    <customValue>
+        <fullName>Percentage</fullName>
+        <default>false</default>
+        <label>Percentage</label>
+    </customValue>
+    <description>A &quot;percentage discount&quot; means a deduction from the original price based on a specific percentage, while a &quot;fixed amount discount&quot; refers to subtracting a set dollar amount from the original price, regardless of the item&apos;s cost; essentially, a percentage d</description>
+    <masterLabel>Discount Type</masterLabel>
+    <sorted>false</sorted>
+</GlobalValueSet>

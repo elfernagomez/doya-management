@@ -2,100 +2,109 @@
 <div lwc:if={isView}
 	class="slds-is-relative
 		slds-box
-		slds-box_x-small
+		slds-box_xx-small
 		slds-media
 		slds-media_small
 		slds-var-p-around_medium
 		slds-theme_default">
 	<div class="slds-media__body">
-		<lightning-layout vertical-align="center"
-			multiple-rows="true">
-			<lightning-layout-item size="12"
-				large-device-size="3"
-				class="slds-var-p-right_small">
-				<div class="slds-media slds-media_small">
-					<div class="slds-media__figure">
-						<lightning-icon lwc:if={_discount.isPercent}
-							icon-name="utility:percent"
-							title={_discount.productName}
-							size="x-small"></lightning-icon>
-						<lightning-icon lwc:if={_discount.isFixed}
-							icon-name="utility:moneybag"
-							title={_discount.productName}
-							size="x-small"></lightning-icon>
-					</div>
-					<div class="slds-media__body">
-						<h3 title={_discount.productName}>
-							<b>{_discount.productName}</b>
-						</h3>
-						<p class="slds-text-body_small">
-							{_discount.productCode}
-						</p>
-					</div>
-				</div>
-			</lightning-layout-item>
-			<lightning-layout-item 
-				flexibility="grow"
-				class="slds-var-p-horizontal_large">
-				<lightning-layout>
-					<lightning-layout-item class="slds-var-m-right_xx-large">
-						<div class="slds-form-element">
-							<label class="slds-form-element__label slds-p-top_none">
-								Discount Type
-							</label>
-							<div class="slds-form-element__control">
-								<div class="slds-form-element__static">
-									{_discount.discountType}&nbsp;
-								</div>
+		<div class="slds-media
+				slds-media_small
+				slds-is-relative">
+			<div class="slds-media__body slds-var-p-horizontal_small">
+				<lightning-layout vertical-align="center"
+					multiple-rows="true">
+					<lightning-layout-item size="12"
+						large-device-size="3"
+						class="slds-var-p-right_small">
+						<div class="slds-media slds-media_small">
+							<div class="slds-media__figure">
+								<lightning-icon lwc:if={_discount.isPercentage}
+									icon-name="utility:percent"
+									title={_discount.productName}
+									size="x-small"></lightning-icon>
+								<lightning-icon lwc:if={_discount.isFixed}
+									icon-name="utility:moneybag"
+									title={_discount.productName}
+									size="x-small"></lightning-icon>
+							</div>
+							<div class="slds-media__body">
+								<h3 title={_discount.productName}>
+									<b>{_discount.productName}</b>
+								</h3>
+								<p class="slds-text-body_small">
+									{_discount.productCode}
+								</p>
 							</div>
 						</div>
 					</lightning-layout-item>
-					<lightning-layout-item class="slds-var-m-right_xx-large">
-						<div class="slds-form-element">
-							<label class="slds-form-element__label slds-p-top_none">
-								Discount Amount
-							</label>
-							<div class="slds-form-element__control">
-								<div class="slds-form-element__static">
-									<lightning-formatted-number
-										lwc:if={_discount.isPercentage}
-										format-style="percent"
-										maximum-fraction-digits="2"
-										value={percentage}
-										></lightning-formatted-number>&nbsp;
-									<lightning-formatted-number
-										lwc:if={_discount.isFixed}
-										format-style="currency"
-										maximum-fraction-digits="2"
-										value={_discount.discountAmount}
-										></lightning-formatted-number>&nbsp;
+					<lightning-layout-item
+						flexibility="grow"
+						class="slds-border_left
+							slds-var-p-horizontal_large">
+						<lightning-layout multiple-rows="true">
+							<lightning-layout-item class="slds-var-m-right_xx-large">
+								<div class="slds-form-element">
+									<label class="slds-form-element__label slds-p-top_none">
+										Discount Type
+									</label>
+									<div class="slds-form-element__control">
+										<div class="slds-form-element__static">
+											{_discount.discountType}&nbsp;
+										</div>
+									</div>
 								</div>
-							</div>
-						</div>
+							</lightning-layout-item>
+							<lightning-layout-item class="slds-var-m-right_xx-large">
+								<div class="slds-form-element">
+									<label class="slds-form-element__label slds-p-top_none">
+										Discount Amount
+									</label>
+									<div class="slds-form-element__control">
+										<div class="slds-form-element__static">
+											<lightning-formatted-number
+												lwc:if={_discount.isPercentage}
+												format-style="percent"
+												maximum-fraction-digits="2"
+												value={percentage}
+												></lightning-formatted-number>&nbsp;
+											<lightning-formatted-number
+												lwc:if={_discount.isFixed}
+												format-style="currency"
+												maximum-fraction-digits="2"
+												value={_discount.discountAmount}
+												></lightning-formatted-number>&nbsp;
+										</div>
+									</div>
+								</div>
+							</lightning-layout-item>
+						</lightning-layout>
+					</lightning-layout-item>
+					<lightning-layout-item 
+						class="slds-border_left"
+						style="min-width:12rem;">
+						<lightning-layout multiple-rows="true"
+							horizontal-align="end">
+							<lightning-layout-item size="6"
+								class="slds-var-p-horizontal_small">
+								<div class="slds-form-element">
+									<label class="slds-form-element__label slds-no-flex">
+										Total
+									</label>
+									<div class="slds-text-heading_small">
+										<lightning-formatted-number 
+											format-style="currency"
+											currency-code="USD"
+											value={_discount.totalPrice}
+											></lightning-formatted-number>
+									</div>
+								</div>
+							</lightning-layout-item>
+						</lightning-layout>
 					</lightning-layout-item>
 				</lightning-layout>
-			</lightning-layout-item>
-			<lightning-layout-item style="min-width:12rem;">
-				<lightning-layout multiple-rows="true"
-					horizontal-align="end">
-					<lightning-layout-item size="6"
-						class="slds-var-p-horizontal_small">
-						<div class="slds-form-element">
-							<label class="slds-form-element__label slds-no-flex">
-								Total
-							</label>
-							<div class="slds-text-heading_small">
-								<lightning-formatted-number 
-									format-style="currency"
-									currency-code="USD"
-									value={_discount.totalPrice}
-									></lightning-formatted-number>
-							</div>
-						</div>
-					</lightning-layout-item>
-				</lightning-layout>
-			</lightning-layout-item>
-		</lightning-layout>
+			</div>
+		</div>
 	</div>
 	<div lwc:if={showDeleteButton}
 		class="slds-media__figure slds-media__figure_reverse"
@@ -109,8 +118,10 @@
 <div lwc:if={isEdit}
 	class="slds-is-relative
 		slds-box
-		slds-box_x-small
-		slds-media">
+		slds-box_xx-small
+		slds-is-relative
+		slds-media
+		slds-media_small">
 	<!-- <div class="slds-media__figure slds-var-p-vertical_xx-small">
 		<lightning-button-icon icon-name="utility:drag_and_drop"
 			variant="bare"
@@ -118,13 +129,13 @@
 			class="slds-hidden"></lightning-button-icon>
 	</div> -->
 	<div class="slds-media__body">
-		<lightning-layout>
+		<lightning-layout vertical-align="stretch">
 			<lightning-layout-item size="3"
 				class="slds-var-p-vertical_xx-small
 					slds-var-p-right_small">
 				<div class="slds-media slds-media_small">
 					<div class="slds-media__figure">
-						<lightning-icon lwc:if={_discount.isPercent}
+						<lightning-icon lwc:if={_discount.isPercentage}
 							icon-name="utility:percent"
 							title={_discount.productName}
 							size="x-small"></lightning-icon>
@@ -200,7 +211,7 @@
 			variant="compact"></c-error-panel>
 	</div>
 	<div class="slds-media__figure slds-media__figure_reverse">
-		<div lwc:if={isDeleting}
+		<!-- <div lwc:if={isDeleting}
 			class="delete-panel
 				slds-panel
 				slds-panel_docked
@@ -230,8 +241,8 @@
 					</lightning-layout-item>
 				</lightning-layout>
 			</div>
-		</div>
-		<lightning-button-icon lwc:elseif={showDeleteButton}
+		</div> -->
+		<lightning-button-icon lwc:if={showDeleteButton}
 			icon-name="utility:delete"
 			title="Remove Discount From Current Order"
 			disabled={_discount.isDisabled}

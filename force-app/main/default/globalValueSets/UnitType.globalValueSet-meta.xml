@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GlobalValueSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customValue>
+        <fullName>Each</fullName>
+        <default>false</default>
+        <label>Each</label>
+    </customValue>
+    <customValue>
+        <fullName>SqFt</fullName>
+        <default>false</default>
+        <label>SqFt</label>
+    </customValue>
+    <customValue>
+        <fullName>Hour</fullName>
+        <default>false</default>
+        <label>Hour</label>
+    </customValue>
+    <masterLabel>Unit Type</masterLabel>
+    <sorted>false</sorted>
+</GlobalValueSet>
