@@ -34,3 +34,20 @@
 .dropzone[data-dragging="true"] {
 	border: 3px var(--slds-g-color-brand-base-50, #0176d3) solid;
 }
+
+@keyframes borderFade {
+	0%, 80% {
+		outline-color: var(--slds-g-color-accent-1);
+	}
+	100% {
+		outline-color: transparent;
+	}
+}
+
+.border-animation {
+	border-radius: var(--slds-g-radius-border-2);
+	outline-width: 2px;
+	outline-style: solid;
+	outline-color: transparent;
+	animation: borderFade 2s ease-in-out 1;
+}

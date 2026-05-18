@@ -38,7 +38,6 @@ public with sharing class OrderManager {
 		
 		return [
 			SELECT Name,
-				BusinessNumber__c,
 				DueDate__c,
 				OrderNumber,
 				Status,

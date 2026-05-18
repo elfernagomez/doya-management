@@ -88,6 +88,12 @@
             </value>
         </inputAssignments>
         <inputAssignments>
+            <field>DueDate__c</field>
+            <value>
+                <elementReference>$Record.DueDate__c</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
             <field>LocationType__c</field>
             <value>
                 <stringValue>Delivery Center</stringValue>

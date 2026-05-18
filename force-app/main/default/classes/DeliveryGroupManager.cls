@@ -33,6 +33,7 @@ public with sharing class DeliveryGroupManager {
 				Address__PostalCode__s,
 				Address__StateCode__s,
 				Address__Street__s,
+				CreatedDate,
 				DueDate__c,
 				DeliveryType__c,
 				LocationType__c,
@@ -83,7 +84,7 @@ public with sharing class DeliveryGroupManager {
 				)
 			FROM DeliveryGroup__c
 			WHERE Order__c = :orderIds
-			ORDER BY DueDate__c NULLS LAST, CreatedDate
+			ORDER BY DueDate__c ASC NULLS LAST, CreatedDate ASC
 		];
 
 		for (DeliveryGroup__c g : groups) {
@@ -164,6 +165,7 @@ public with sharing class DeliveryGroupManager {
 					Address__PostalCode__s,
 					Address__StateCode__s,
 					Address__Street__s,
+					CreatedDate,
 					DueDate__c,
 					DeliveryType__c,
 					LocationType__c,
@@ -211,11 +213,11 @@ public with sharing class DeliveryGroupManager {
 							Product2.RecordType.DeveloperName
 						FROM OrderProducts__r
 						WHERE Id IN :orderItemIds
-						ORDER BY CreatedDate
+						ORDER BY CreatedDate ASC
 					)
 				FROM DeliveryGroup__c
 				WHERE Id IN :deliveryGroupIds
-				ORDER BY DueDate__c NULLS LAST, CreatedDate
+				ORDER BY DueDate__c ASC NULLS LAST, CreatedDate ASC
 			];
 			return groups;
 		} catch (Exception ex) {
@@ -261,6 +263,7 @@ public with sharing class DeliveryGroupManager {
 				Address__PostalCode__s,
 				Address__StateCode__s,
 				Address__Street__s,
+				CreatedDate,
 				DueDate__c,
 				DeliveryType__c,
 				LocationType__c,
@@ -294,7 +297,7 @@ public with sharing class DeliveryGroupManager {
 						PricebookEntryId,
 						Product2Id
 					FROM OrderProducts__r
-					ORDER BY CreatedDate
+					ORDER BY CreatedDate ASC
 				)
 			FROM DeliveryGroup__c
 			WHERE Order__c IN :sourceOrdersMap.keySet()
@@ -351,6 +354,7 @@ public with sharing class DeliveryGroupManager {
 					Address__PostalCode__s,
 					Address__StateCode__s,
 					Address__Street__s,
+					CreatedDate,
 					DueDate__c,
 					DeliveryType__c,
 					LocationType__c,

@@ -6,6 +6,8 @@ import CustomConfirm from 'c/customConfirm';
 
 import NAME_FIELD
 	from "@salesforce/schema/DeliveryGroup__c.Name";
+import CREATED_DATE_FIELD
+	from "@salesforce/schema/DeliveryGroup__c.CreatedDate";
 import DUE_DATE_FIELD
 	from "@salesforce/schema/DeliveryGroup__c.DueDate__c";
 import DELIVERY_TYPE_FIELD
@@ -44,6 +46,7 @@ export function createNewDelvieryGroup() {
 	return {
 		uniqueId: "unsaved_0",
 		name: DEFAULT_GROUP_NAME,
+		createdDate: null,
 		dueDate: null,
 		deliveryType: "Delivery",
 		locationType: "DeliveryCenter",
@@ -63,6 +66,7 @@ export function createGroupFromRecord(record) {
 		...createNewDelvieryGroup(),
 		uniqueId: record.id,
 		name: getFieldValue(record, NAME_FIELD),
+		createdDate: getFieldValue(record, CREATED_DATE_FIELD),
 		dueDate: getFieldValue(record, DUE_DATE_FIELD),
 		deliveryType: getFieldValue(record, DELIVERY_TYPE_FIELD) || "Delivery",
 		locationType: getFieldValue(record, LOCATION_TYPE_FIELD) || "Delivery Center",
@@ -82,6 +86,7 @@ export function createGroupFromApexRecord(record) {
 		...createNewDelvieryGroup(),
 		uniqueId: record.Id,
 		name: record.Name,
+		createdDate: record.CreatedDate,
 		dueDate: record.DueDate__c,
 		deliveryType: record.DeliveryType__c || "Delivery",
 		locationType: record.LocationType__c || "Delivery Center",
@@ -226,6 +231,7 @@ export default class DeliveryGroupCard extends InputBase {
 		recordId: "$recordId",
 		fields: [
 			NAME_FIELD,
+			CREATED_DATE_FIELD,
 			DUE_DATE_FIELD,
 			DELIVERY_TYPE_FIELD,
 			LOCATION_TYPE_FIELD,

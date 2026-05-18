@@ -38,15 +38,13 @@
 					<span class="slds-th__action slds-text-link_reset">Product</span>
 				</lightning-layout-item>
 			</lightning-layout>
-
 			<!-- Items Rows -->
 			<div lwc:if={itemCount}>
 				<lightning-layout for:each={items}
 					for:item="item"
 					for:index="i"
 					vertical-align="stretch"
-					key={item.uniqueId}
-					class="slds-border_bottom">
+					key={item.uniqueId}>
 					<!-- Quantity -->
 					<lightning-layout-item size="1"
 						class="slds-cell_action-mode">
@@ -122,8 +120,7 @@
 					for:item="item"
 					for:index="i"
 					vertical-align="stretch"
-					key={item.uniqueId}
-					class="slds-border_bottom">
+					key={item.uniqueId}>
 					<!-- Quantity -->
 					<lightning-layout-item size="2"
 						class="slds-cell_action-mode">

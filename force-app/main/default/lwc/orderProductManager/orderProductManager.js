@@ -366,10 +366,7 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 	handleOnProductCreated(event) {
 		this.handleOnEditClick();
 		const groupId = event.target.dataset.groupId;
-		const product = {
-			...event.detail,
-			description: this.getDefaultDescription(event.detail)
-		};
+		const product = { ...event.detail };
 
 		if (product.hasParts) {
 			OrderProductPartsSelectionModal.open({
@@ -390,7 +387,6 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 									...createNewProduct(),
 									...part,
 									uniqueId: `unsaved_${groupId}${i}`,
-									description: this.getDefaultDescription(newProduct),
 									parentItemId: newProduct.uniqueId,
 									parentItemProductName: newProduct.productName,
 									isPart: true
@@ -535,7 +531,6 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 			orderId: this.recordId
 		})
 		.then(data => {
-			// this.wiredDeliveryGroupsResult = result;
 			this.parentItemIds = {};
 			this.groups = [
 				...data.map(r => ({
@@ -636,6 +631,7 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 				{
 					uniqueId: result.id
 				});
+			this.scrollToElement(`[data-group-id="${result.id}"]`);
 		})
 		.catch(error =>
 			this.toast("Error",
@@ -709,8 +705,10 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 
 				// calculated fields
 				const changes = {
+					...prod
+					/* description: prod.description,
 					listPrice: prod.listPrice,
-					totalPrice: prod.totalPrice
+					totalPrice: prod.totalPrice */
 				};
 
 				if (product.isNew) {
@@ -887,9 +885,7 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 				record[ITEM_UNIT_PRICE_FIELD.fieldApiName] = 0.01;
 			}
 		}
-
-		console.log(JSON.stringify(product), product.discountAmount * -1);
-		console.log(JSON.stringify(record));
+		
 		return record;
 	}
 
@@ -1022,5 +1018,18 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 	getDefaultDescription(product) {
 		return `${product.productName}, ${
 			product.qty} ${product.unitType} for ${product.groupName}`;
+	}
+
+	scrollToElement(selector) {
+		// eslint-disable-next-line @lwc/lwc/no-async-operation
+		setTimeout(() => {
+			const element = this.template.querySelector(selector);
+			if (element) {
+				element.classList.add("border-animation");
+				element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+				// eslint-disable-next-line @lwc/lwc/no-async-operation
+				setTimeout(() => element.classList.remove("border-animation"), 2000);
+			}
+		}, 200);
 	}
 }

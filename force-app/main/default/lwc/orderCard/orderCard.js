@@ -5,8 +5,6 @@ import { NavigationMixin } from 'lightning/navigation';
 
 import ORDER_NUMBER_FIELD
 	from "@salesforce/schema/Order.OrderNumber";
-import BUSSINESS_NUMBER_FIELD
-	from "@salesforce/schema/Order.BusinessNumber__c";
 import STATUS_FIELD
 	from "@salesforce/schema/Order.Status";
 import ACCOUNT_ID_FIELD
@@ -21,8 +19,7 @@ import TOTAL_AMOUNT_FIELD
 export function createOrderFromRecord(record) {
 	return {
 		uniqueId: record.id,
-		orderNumber: getFieldValue(record, BUSSINESS_NUMBER_FIELD) ||
-			getFieldValue(record, ORDER_NUMBER_FIELD),
+		orderNumber: getFieldValue(record, ORDER_NUMBER_FIELD),
 		status: getFieldValue(record, STATUS_FIELD),
 		accountId: getFieldValue(record, ACCOUNT_ID_FIELD),
 		accountName: getFieldValue(record, ACCOUNT_NAME_FIELD),
@@ -34,7 +31,7 @@ export function createOrderFromRecord(record) {
 export function createOrderFromApexRecord(record) {
 	return {
 		uniqueId: record.Id,
-		orderNumber: record.BusinessNumber__c || record.OrderNumber,
+		orderNumber: record.OrderNumber,
 		status: record.Status,
 		accountId: record.AccountId,
 		accountName: record.Account?.Name,
@@ -64,7 +61,7 @@ export default class OrderCard extends NavigationMixin(InputBase) {
 	@wire(getRecord, { 
 		recordId: "$recordId",
 		fields: [
-			BUSSINESS_NUMBER_FIELD,
+			ORDER_NUMBER_FIELD,
 			STATUS_FIELD,
 			ACCOUNT_ID_FIELD,
 			ACCOUNT_NAME_FIELD,

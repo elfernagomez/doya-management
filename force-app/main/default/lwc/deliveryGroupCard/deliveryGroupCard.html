@@ -1,7 +1,6 @@
 <template>
 <div class="slds-box
 		slds-theme_shade
-		slds-var-m-bottom_small
 		slds-p-around_none">
 	<div class="slds-page-header"
 		style="background:none;">
@@ -34,6 +33,14 @@
 										month="numeric"
 										day="numeric"></lightning-formatted-date-time>
 								</li>
+								<!-- <li lwc:if={group.createdDate}
+									class="slds-item">
+									<lightning-formatted-date-time
+										value={group.createdDate}
+										year="numeric"
+										month="numeric"
+										day="numeric"></lightning-formatted-date-time>
+								</li> -->
 								<li lwc:if={group.deliveryType}
 									class="slds-item">{group.deliveryType}</li>
 								<li lwc:if={group.addressLabel}
@@ -254,7 +261,7 @@
 								field-name="DeliveryCenter__c"
 								variant="label-stacked"
 								onchange={handleOnDetailsFieldChange}
-								required></lightning-input-field>
+								></lightning-input-field>
 
 							<div lwc:if={deliveryCenterAddress}
 								class="slds-form-element

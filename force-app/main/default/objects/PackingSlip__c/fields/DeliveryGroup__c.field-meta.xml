@@ -4,6 +4,16 @@
     <deleteConstraint>Restrict</deleteConstraint>
     <externalId>false</externalId>
     <label>Delivery Group</label>
+    <lookupFilter>
+        <active>true</active>
+        <errorMessage>Delivery Group must be from the same Order.</errorMessage>
+        <filterItems>
+            <field>$Source.Order__c</field>
+            <operation>equals</operation>
+            <valueField>DeliveryGroup__c.Order__c</valueField>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
     <referenceTo>DeliveryGroup__c</referenceTo>
     <relationshipLabel>Packing Slips</relationshipLabel>
     <relationshipName>PackingSlips</relationshipName>

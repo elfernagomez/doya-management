@@ -12,8 +12,7 @@
 				slds-media_small
 				slds-is-relative">
 			<div class="slds-media__body slds-var-p-horizontal_small">
-				<lightning-layout vertical-align="center"
-					multiple-rows="true">
+				<lightning-layout multiple-rows="true">
 					<lightning-layout-item size="12"
 						large-device-size="3"
 						class="slds-var-p-right_small">
@@ -32,8 +31,9 @@
 								<h3 title={_discount.productName}>
 									<b>{_discount.productName}</b>
 								</h3>
-								<p class="slds-text-body_small">
-									{_discount.productCode}
+								<p lwc:if={_discount.productCode}
+									class="slds-text-body_small">
+									<i>{_discount.productCode}</i>
 								</p>
 							</div>
 						</div>
