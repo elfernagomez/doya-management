@@ -15,6 +15,10 @@
 		<value xsi:type="xsd:string">SCREEN</value>
 	</values>
 	<values>
+		<field>Dimensions__c</field>
+		<value xsi:type="xsd:string">LETTER_8_5X11</value>
+	</values>
+	<values>
 		<field>Provider_Key__c</field>
 		<value xsi:type="xsd:string">SHIPMENT</value>
 	</values>
@@ -29,33 +33,74 @@
 	<values>
 		<field>Body__c</field>
 		<value xsi:type="xsd:string"><![CDATA[<div style="width:100%;">
-<div style="overflow:hidden;margin-bottom:20px;">
-	<div style="float:left;max-width:55%;">
+<div style="overflow:hidden;margin-bottom:20px;width:100%;">
+	<div style="float:left;width:60%;">
 		{{#if LogoUrl}}<img src="{{LogoUrl}}" alt="Logo" style="max-height:54px;max-width:180px;margin-bottom:8px;" />{{/if}}
-		<h1>Packing Slip</h1>
-		<div style="color:#54698d;">Order No. <strong>{{OrderNumber}}</strong></div>
+		<h1 style="margin-top:0;">Packing Slip</h1>
+		<table style="width:100%;border-collapse:collapse;border:none;">
+			<tr>
+				<td style="color:#54698d;width:25%;vertical-align:top;padding:2px 0;">Order No.</td>
+				<td style="color:#54698d;width:75%;vertical-align:top;padding:2px 0;"><strong>{{OrderNumber}}</strong></td>
+			</tr>
+			{{#if AccountName}}
+			<tr>
+				<td style="color:#54698d;width:25%;vertical-align:top;padding:2px 0;">Account:</td>
+				<td style="color:#54698d;width:75%;vertical-align:top;padding:2px 0;"><strong>{{AccountName}}</strong></td>
+			</tr>
+			{{/if}}
+			{{#if PONumber}}
+			<tr>
+				<td style="color:#54698d;width:25%;vertical-align:top;padding:2px 0;">PO Number:</td>
+				<td style="color:#54698d;width:75%;vertical-align:top;padding:2px 0;"><strong>{{PONumber}}</strong></td>
+			</tr>
+			{{/if}}
+			{{#if OrderName}}
+			<tr>
+				<td style="color:#54698d;width:25%;vertical-align:top;padding:2px 0;">Order Title:</td>
+				<td style="color:#54698d;width:75%;vertical-align:top;padding:2px 0;"><strong>{{OrderName}}</strong></td>
+			</tr>
+			{{/if}}
+		</table>
+	</div>
+	<div style="float:left;width:40%;">
+		<div style="padding:12px 16px;border:1px solid #d8dde6;border-radius:6px;">
+			<div><strong>Tracking</strong>: {{TrackingNumber}}</div>
+			{{#if Carrier}}<div><strong>Carrier</strong>: {{Carrier}}</div>{{/if}}
+			{{#if Description}}<div><strong>Description</strong>: {{Description}}</div>{{/if}}
+			{{#if BoxDimensions}}<div><strong>Box Dimensions</strong>: {{BoxDimensions}}</div>{{/if}}
+			{{#if BoxWeightDisplay}}<div><strong>Box Weight</strong>: {{BoxWeightDisplay}}</div>{{/if}}
+			<div style="padding:12px;text-align:center;">
+				{{#if BarcodeImageUrl}}<img src="{{BarcodeImageUrl}}" alt="Barcode" style="height:80px;width:auto;max-width:280px;" />{{/if}}
+			</div>
+			<!-- <div style="text-align:center;">
+				{{#if QrImageUrl}}<img src="{{QrImageUrl}}" alt="QR Code" style="width:100px;height:100px;" />{{/if}}
+			</div> -->
+		</div>
+	</div>
+</div>
+<div style="overflow:hidden;margin-bottom:30px;width:100%;">
+	<div style="float:left;width:50%;">
+		<h2>Ship From</h2>
+		<h4 style="margin:0;"><b>{{ShipFromName}}</b></h4>
+		{{#if ShipFromAddress}}<div style="white-space:pre-line;">{{ShipFromAddress}}</div>{{/if}}
+		{{#if ShipFromPhone}}<div>Phone: {{ShipFromPhone}}</div>{{/if}}
+		{{#if ShipFromAttentionContactName}}<div>Attn: {{ShipFromAttentionContactName}}</div>{{/if}}
+	</div>
+	<div style="float:left;width:50%;">
 		<h2>Ship To</h2>
-		<div>{{ShipToName}}</div>
+		<h4 style="margin:0;"><b>{{ShipToName}}</b></h4>
 		{{#if ShipToAddress}}<div style="white-space:pre-line;">{{ShipToAddress}}</div>{{/if}}
-		</div>
-	<div style="float:right;border:1px solid #d8dde6;border-radius:6px;padding:12px 16px;min-width:240px;max-width:40%;">
-		<div><strong>Tracking</strong>: {{TrackingNumber}}</div>
-		{{#if Carrier}}<div><strong>Carrier</strong>: {{Carrier}}</div>{{/if}}
-		{{#if Description}}<div><strong>Description</strong>: {{Description}}</div>{{/if}}
-		<div style="padding:12px;text-align:center;">
-			{{#if BarcodeImageUrl}}<img src="{{BarcodeImageUrl}}" alt="Barcode" style="height:80px;width:auto;max-width:280px;" />{{/if}}
-		</div>
-		<div style="text-align:center;">
-			{{#if QrImageUrl}}<img src="{{QrImageUrl}}" alt="QR Code" style="width:100px;height:100px;" />{{/if}}
-		</div>
+		{{#if ShipToPhone}}<div>Phone: {{ShipToPhone}}</div>{{/if}}
+		{{#if ShipToAttentionContactName}}<div>Attn: {{ShipToAttentionContactName}}</div>{{/if}}
 	</div>
 </div>
 <table style="width:100%;border-collapse:collapse;margin-top:16px;">
 	<thead>
 		<tr>
-			<th style="border:1px solid #d8dde6;padding:8px;vertical-align:top;background:#f3f6f9;text-align:left;">Product Code</th>
+			<th style="border:1px solid #d8dde6;padding:8px;vertical-align:top;background:#f3f6f9;text-align:left;">Code</th>
 			<th style="border:1px solid #d8dde6;padding:8px;vertical-align:top;background:#f3f6f9;text-align:left;">Product</th>
 			<th style="border:1px solid #d8dde6;padding:8px;vertical-align:top;background:#f3f6f9;text-align:left;">Description</th>
+			<th style="border:1px solid #d8dde6;padding:8px;vertical-align:top;background:#f3f6f9;text-align:left;">Size</th>
 			<th style="border:1px solid #d8dde6;padding:8px;vertical-align:top;background:#f3f6f9;text-align:right;width:80px;">Qty</th>
 		</tr>
 	</thead>
@@ -65,6 +110,7 @@
 			<td style="border:1px solid #d8dde6;padding:8px;vertical-align:top;">{{ProductCode}}</td>
 			<td style="border:1px solid #d8dde6;padding:8px;vertical-align:top;">{{ProductName}}</td>
 			<td style="border:1px solid #d8dde6;padding:8px;vertical-align:top;">{{Description}}</td>
+			<td style="border:1px solid #d8dde6;padding:8px;vertical-align:top;white-space:nowrap;">{{Size}}</td>
 			<td style="border:1px solid #d8dde6;padding:8px;vertical-align:top;text-align:right;width:80px;">{{Quantity}}</td>
 		</tr>
 		{{/each}}

@@ -9,8 +9,6 @@
 		<valueSetDefinition>
 			<value><fullName>SCREEN</fullName><default>true</default><label>Screen</label></value>
 			<value><fullName>PRINT</fullName><default>false</default><label>Print</label></value>
-			<value><fullName>PDF</fullName><default>false</default><label>PDF</label></value>
-			<value><fullName>ZPL</fullName><default>false</default><label>ZPL</label></value>
 		</valueSetDefinition>
 	</valueSet>
 </CustomField>

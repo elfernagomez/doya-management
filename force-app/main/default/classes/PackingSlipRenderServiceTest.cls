@@ -19,7 +19,7 @@ private class PackingSlipRenderServiceTest {
 		deliveryGroupRecord.put('Name', 'Grace Hopper');
 		deliveryGroupRecord.put('DeliveryCenterName__c', 'Grace Hopper');
 		deliveryGroupRecord.put('AddressLabel__c', 'Grace Hopper');
-		deliveryGroupRecord.put('AddressHtml__c', '100 Example Road');
+		deliveryGroupRecord.put('DeliveryAddressHtml__c', '100 Example Road');
 		deliveryGroupRecord.put('DeliveryType__c', 'FedEx');
 		packingSlip.putSObject('DeliveryGroup__r', deliveryGroupRecord);
 
@@ -45,41 +45,37 @@ private class PackingSlipRenderServiceTest {
 	}
 
 	@IsTest
-	static void renderService_generatesHtmlAndZpl() {
+	static void renderService_generatesHtmlAndPdfFromSingleTemplate() {
 		Id packingSlipId = buildFakePackingSlipId();
 		primeProviderTestData(packingSlipId);
 
 		PackingSlipDataModels.TemplateDefinition screenTemplate = new PackingSlipDataModels.TemplateDefinition();
 		screenTemplate.templateKey = 'DefaultHtml';
+		screenTemplate.dimensions = 'LETTER_8_5X11';
 		screenTemplate.name = 'HTML';
+		screenTemplate.templateType = 'HTML';
 		screenTemplate.outputMode = 'SCREEN';
 		screenTemplate.providerKey = 'SHIPMENT';
 		screenTemplate.isActive = true;
 		screenTemplate.source = 'PACKAGED';
 		screenTemplate.body = '<div>{{OrderNumber}} {{#each Items}}{{ProductCode}}{{/each}} {{BarcodeSvg}}</div>';
 
-		PackingSlipDataModels.TemplateDefinition zplTemplate = new PackingSlipDataModels.TemplateDefinition();
-		zplTemplate.templateKey = 'DefaultZpl';
-		zplTemplate.name = 'ZPL';
-		zplTemplate.outputMode = 'ZPL';
-		zplTemplate.providerKey = 'SHIPMENT';
-		zplTemplate.isActive = true;
-		zplTemplate.source = 'PACKAGED';
-		zplTemplate.body = '^XA^FD{{OrderNumber}}^FS^XZ';
-
 		PackingSlipTemplateRepository.setTestData(
 			new List<PackingSlipDataModels.TemplateDefinition>(),
-			new List<PackingSlipDataModels.TemplateDefinition>{ screenTemplate, zplTemplate },
+			new List<PackingSlipDataModels.TemplateDefinition>{ screenTemplate },
 			new List<PackingSlipDataModels.FieldMapDefinition>()
 		);
 
 		String html = PackingSlipRenderService.previewHtml(packingSlipId, 'DefaultHtml');
-		String zpl = PackingSlipRenderService.generateZpl(packingSlipId, 'DefaultZpl');
+		String labelHtml = PackingSlipRenderService.previewHtml(packingSlipId, 'DefaultHtml', 'LABEL_6X4');
+		String pdfHtml = PackingSlipRenderService.pdfHtml(packingSlipId, 'DefaultHtml', 'LABEL_6X4');
 
 		System.assert(html.contains('ORD-300'));
 		System.assert(html.contains('SKU-300'));
-		System.assert(zpl.contains('^XA'));
-		System.assert(zpl.contains('ORD-300'));
+		System.assert(html.contains('8.5in 11in'));
+		System.assert(labelHtml.contains('6in 4in'));
+		System.assert(pdfHtml.contains('6in 4in'));
+		System.assert(pdfHtml.contains('ORD-300'));
 
 		PackingSlipTemplateRepository.clearTestData();
 		DefaultPackingSlipDataProvider.clearTestData();

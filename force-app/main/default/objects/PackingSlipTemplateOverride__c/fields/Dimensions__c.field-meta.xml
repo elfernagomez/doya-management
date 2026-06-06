@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+	<fullName>Dimensions__c</fullName>
+	<label>Dimensions</label>
+	<required>true</required>
+	<type>Picklist</type>
+	<valueSet>
+		<restricted>true</restricted>
+		<valueSetDefinition>
+			<value><fullName>LABEL_6X4</fullName><default>false</default><label>6&quot; x 4&quot;</label></value>
+			<value><fullName>LETTER_8_5X11</fullName><default>true</default><label>8.5&quot; x 11&quot;</label></value>
+		</valueSetDefinition>
+	</valueSet>
+</CustomField>

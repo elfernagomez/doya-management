@@ -4,6 +4,11 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import listSubscriberTemplates from '@salesforce/apex/PackingSlipController.listSubscriberTemplates';
 import setTemplateActive from '@salesforce/apex/PackingSlipController.setTemplateActive';
 
+const DIMENSIONS_LABELS = {
+	LABEL_6X4: '6" x 4"',
+	LETTER_8_5X11: '8.5" x 11"'
+};
+
 export default class PackingSlipTemplateManager extends LightningElement {
 	@api
 	providerKey = 'SHIPMENT';
@@ -28,6 +33,10 @@ export default class PackingSlipTemplateManager extends LightningElement {
 			const templates = await listSubscriberTemplates({ providerKey: this.providerKey });
 			this.templates = (templates || []).map(template => ({
 				...template,
+				dimensionsLabel:
+					DIMENSIONS_LABELS[template.dimensions || 'LETTER_8_5X11'] ||
+					template.dimensions ||
+					'8.5" x 11"',
 				statusLabel: template.isActive ? 'Active' : 'Inactive',
 				actionLabel: template.isActive ? 'Deactivate' : 'Activate'
 			}));

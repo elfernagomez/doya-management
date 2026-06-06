@@ -10,13 +10,12 @@ public with sharing class PackingSlipController {
 	}
 
 	@AuraEnabled(cacheable=true)
-	public static String getPdfUrl(Id recordId, String templateKey) {
-		return PackingSlipRenderService.getPdfUrl(recordId, templateKey);
+	public static String getPdfUrl(Id recordId, String templateKey, String pageSize) {
+		return PackingSlipRenderService.getPdfUrl(recordId, templateKey, pageSize);
 	}
 
-	@AuraEnabled
-	public static String generateZpl(Id recordId, String templateKey) {
-		return PackingSlipRenderService.generateZpl(recordId, templateKey);
+	public static String getPdfUrl(Id recordId, String templateKey) {
+		return PackingSlipRenderService.getPdfUrl(recordId, templateKey, null);
 	}
 
 	@AuraEnabled

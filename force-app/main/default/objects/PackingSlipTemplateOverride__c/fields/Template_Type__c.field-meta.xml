@@ -8,8 +8,6 @@
 		<restricted>true</restricted>
 		<valueSetDefinition>
 			<value><fullName>HTML</fullName><default>true</default><label>HTML</label></value>
-			<value><fullName>PDF</fullName><default>false</default><label>PDF</label></value>
-			<value><fullName>ZPL</fullName><default>false</default><label>ZPL</label></value>
 		</valueSetDefinition>
 	</valueSet>
 </CustomField>

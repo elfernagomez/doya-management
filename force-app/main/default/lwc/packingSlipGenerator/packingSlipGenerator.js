@@ -3,15 +3,12 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 import getTemplateOptions from '@salesforce/apex/PackingSlipController.getTemplateOptions';
 import getPdfUrl from '@salesforce/apex/PackingSlipController.getPdfUrl';
-import generateZpl from '@salesforce/apex/PackingSlipController.generateZpl';
 import cloneDefaultTemplate from '@salesforce/apex/PackingSlipController.cloneDefaultTemplate';
 
-const OUTPUT_MODE_OPTIONS = [
-	{ label: 'Screen Preview', value: 'SCREEN' },
-	{ label: 'Browser Print', value: 'PRINT' },
-	{ label: 'PDF', value: 'PDF' },
-	{ label: 'ZPL', value: 'ZPL' }
-];
+const PAGE_SIZE_LABELS = {
+	LABEL_6X4: '6" x 4"',
+	LETTER_8_5X11: '8.5" x 11"'
+};
 
 export default class PackingSlipGenerator extends LightningElement {
 	@api
@@ -29,10 +26,7 @@ export default class PackingSlipGenerator extends LightningElement {
 	@track
 	previewUrl;
 
-	@track
-	zplOutput;
-
-	selectedOutputMode = 'SCREEN';
+	selectedPageSize;
 	selectedTemplateKey;
 	pdfUrl;
 	pendingPrint = false;
@@ -41,16 +35,30 @@ export default class PackingSlipGenerator extends LightningElement {
 		this.loadTemplateOptions();
 	}
 
-	get outputModeOptions() {
-		return OUTPUT_MODE_OPTIONS;
+	get pageSizeOptions() {
+		const dimensions = new Set();
+		(this.allTemplateOptions || []).forEach(option => {
+			if (option.templateType !== 'HTML')
+				return;
+			dimensions.add(option.dimensions || 'LETTER_8_5X11');
+		});
+
+		return Array.from(dimensions)
+			.sort()
+			.map(value => ({
+				label: PAGE_SIZE_LABELS[value] || value,
+				value
+			}));
 	}
 
 	get filteredTemplateOptions() {
 		return this.allTemplateOptions
 			.filter(option => {
-				if (this.selectedOutputMode === 'PRINT')
-					return option.outputMode === 'SCREEN' || option.outputMode === 'PRINT';
-				return option.outputMode === this.selectedOutputMode;
+				if (option.templateType !== 'HTML')
+					return false;
+
+				const optionDimensions = option.dimensions || 'LETTER_8_5X11';
+				return !this.selectedPageSize || optionDimensions === this.selectedPageSize;
 			})
 			.map(option => ({
 				label: `${option.label} (${option.source})`,
@@ -62,16 +70,8 @@ export default class PackingSlipGenerator extends LightningElement {
 		return !!this.previewUrl;
 	}
 
-	get hasZplOutput() {
-		return !!this.zplOutput;
-	}
-
 	get disableActionButtons() {
 		return this.isLoading || !this.selectedTemplateKey;
-	}
-
-	get previewTitle() {
-		return this.selectedOutputMode === 'PRINT' ? 'Print Preview' : 'On-Screen Preview';
 	}
 
 	async loadTemplateOptions() {
@@ -80,6 +80,7 @@ export default class PackingSlipGenerator extends LightningElement {
 		try {
 			const options = await getTemplateOptions({ recordId: this.recordId });
 			this.allTemplateOptions = options || [];
+			this.ensureSelectedPageSize();
 			this.ensureSelectedTemplate();
 			this.refreshPreview();
 		} catch (error) {
@@ -101,17 +102,27 @@ export default class PackingSlipGenerator extends LightningElement {
 			this.selectedTemplateKey = filtered[0].value;
 	}
 
-	handleOutputModeChange(event) {
-		this.selectedOutputMode = event.detail.value;
-		this.clearPreview();
-		this.zplOutput = null;
+	ensureSelectedPageSize() {
+		const options = this.pageSizeOptions;
+		if (!options.length) {
+			this.selectedPageSize = null;
+			return;
+		}
+
+		const selectedStillVisible = options.some(option => option.value === this.selectedPageSize);
+		if (!selectedStillVisible)
+			this.selectedPageSize = options[0].value;
+	}
+
+	handlePageSizeChange(event) {
+		this.selectedPageSize = event.detail.value;
 		this.ensureSelectedTemplate();
+		this.refreshPreview();
 	}
 
 	handleTemplateChange(event) {
 		this.selectedTemplateKey = event.detail.value;
 		this.clearPreview();
-		this.zplOutput = null;
 	}
 
 	buildPreviewUrl(printMode = false) {
@@ -120,7 +131,10 @@ export default class PackingSlipGenerator extends LightningElement {
 
 		let url =
 			`/apex/PackingSlipPreview?mode=preview&recordId=${encodeURIComponent(this.recordId)}` +
-			`&templateKey=${encodeURIComponent(this.selectedTemplateKey)}`;
+			`&templateKey=${encodeURIComponent(this.selectedTemplateKey)}` +
+			`&v=${Date.now()}`;
+		if (this.selectedPageSize)
+			url += `&pageSize=${encodeURIComponent(this.selectedPageSize)}`;
 		if (printMode)
 			url += '&print=1';
 		return url;
@@ -130,7 +144,6 @@ export default class PackingSlipGenerator extends LightningElement {
 		this.errorMessage = null;
 		this.pendingPrint = false;
 		this.previewUrl = this.buildPreviewUrl();
-		this.zplOutput = null;
 	}
 
 	async handlePreviewClick() {
@@ -139,7 +152,6 @@ export default class PackingSlipGenerator extends LightningElement {
 
 	async handlePrintClick() {
 		this.errorMessage = null;
-		this.zplOutput = null;
 		const targetPreviewUrl = this.buildPreviewUrl();
 		if (!targetPreviewUrl)
 			return;
@@ -167,28 +179,13 @@ export default class PackingSlipGenerator extends LightningElement {
 		try {
 			const url = await getPdfUrl({
 				recordId: this.recordId,
-				templateKey: this.selectedTemplateKey
+				templateKey: this.selectedTemplateKey,
+				pageSize: this.selectedPageSize
 			});
 			this.pdfUrl = url;
 			window.open(url, '_blank');
 		} catch (error) {
 			this.handleError(error, 'Failed to prepare the PDF rendering URL.');
-		} finally {
-			this.isLoading = false;
-		}
-	}
-
-	async handleShowZplClick() {
-		this.isLoading = true;
-		this.errorMessage = null;
-		try {
-			this.clearPreview();
-			this.zplOutput = await generateZpl({
-				recordId: this.recordId,
-				templateKey: this.selectedTemplateKey
-			});
-		} catch (error) {
-			this.handleError(error, 'Failed to generate ZPL output.');
 		} finally {
 			this.isLoading = false;
 		}
@@ -205,15 +202,6 @@ export default class PackingSlipGenerator extends LightningElement {
 			this.handleError(error, 'Failed to clone the packaged template.');
 		} finally {
 			this.isLoading = false;
-		}
-	}
-
-	async handleCopyZplClick() {
-		try {
-			await navigator.clipboard.writeText(this.zplOutput || '');
-			this.showToast('Copied', 'ZPL output copied to your clipboard.', 'success');
-		} catch (error) {
-			this.showToast('Copy failed', 'Clipboard access is not available in this browser.', 'warning');
 		}
 	}
 

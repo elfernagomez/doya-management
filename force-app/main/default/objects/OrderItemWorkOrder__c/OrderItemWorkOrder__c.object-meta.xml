@@ -155,7 +155,7 @@
     <externalSharingModel>Private</externalSharingModel>
     <label>Order Product Work Order</label>
     <nameField>
-        <displayFormat>OIWO{000000}</displayFormat>
+        <displayFormat>OIWO-{000000}</displayFormat>
         <label>Order Item Work Order #</label>
         <type>AutoNumber</type>
     </nameField>

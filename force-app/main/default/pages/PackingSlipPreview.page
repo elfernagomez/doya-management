@@ -4,7 +4,7 @@
 	standardStylesheets="false"
 	applyHtmlTag="false"
 	applyBodyTag="false"
-	cache="true">
+	cache="false">
 	<script>
 		window.addEventListener('message', function(event) {
 			if (!event || !event.data || event.data.type !== 'packing-slip-print')

@@ -5,14 +5,6 @@
 
 			<div class="controls">
 				<lightning-combobox
-					name="outputMode"
-					label="Output Mode"
-					value={selectedOutputMode}
-					options={outputModeOptions}
-					onchange={handleOutputModeChange}>
-				</lightning-combobox>
-
-				<lightning-combobox
 					name="template"
 					label="Template"
 					value={selectedTemplateKey}
@@ -29,6 +21,20 @@
 					disabled={disableActionButtons}
 					onclick={handlePreviewClick}>
 				</lightning-button-icon>
+				<lightning-radio-group
+					name="pageSize"
+					label="Paper Size"
+					variant="label-hidden"
+					value={selectedPageSize}
+					options={pageSizeOptions}
+					type="button"
+					onchange={handlePageSizeChange}>
+				</lightning-radio-group>
+				<lightning-button
+					label="PDF"
+					disabled={disableActionButtons}
+					onclick={handleOpenPdfClick}>
+				</lightning-button>
 				<lightning-button-icon
 					icon-name="utility:print"
 					alternative-text="Print"
@@ -36,16 +42,6 @@
 					disabled={disableActionButtons}
 					onclick={handlePrintClick}>
 				</lightning-button-icon>
-				<lightning-button
-					label="PDF"
-					disabled={disableActionButtons}
-					onclick={handleOpenPdfClick}>
-				</lightning-button>
-				<lightning-button
-					label="Show ZPL"
-					disabled={disableActionButtons}
-					onclick={handleShowZplClick}>
-				</lightning-button>
 				<lightning-button
 					label="Clone Default Template"
 					disabled={disableActionButtons}
@@ -69,19 +65,6 @@
 				<template lwc:else>
 					<div class="empty-state">Generate a preview to inspect the rendered packing slip.</div>
 				</template>
-			</section>
-
-			<section class="zpl-section" lwc:if={hasZplOutput}>
-				<div class="zpl-header">
-					<h2 class="section-title">ZPL Output</h2>
-					<lightning-button-icon
-						icon-name="utility:copy_to_clipboard"
-						alternative-text="Copy ZPL"
-						title="Copy ZPL"
-						onclick={handleCopyZplClick}>
-					</lightning-button-icon>
-				</div>
-				<lightning-textarea value={zplOutput} readonly class="zpl-output"></lightning-textarea>
 			</section>
 		</div>
 	</lightning-card>

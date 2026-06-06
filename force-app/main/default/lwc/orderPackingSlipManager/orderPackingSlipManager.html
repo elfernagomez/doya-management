@@ -53,10 +53,11 @@
 
 <div lwc:if={hasGroups}
 	class="slds-var-m-top_small">
-	<template for:each={groups}
-		for:item="group">
-		<c-delivery-group-card key={group.uniqueId}
-			delivery-group={group}
+	<div for:each={groups}
+		for:item="group"
+		key={group.uniqueId}
+		class="slds-var-m-bottom_small">
+		<c-delivery-group-card delivery-group={group}
 			mode="view"
 			hide-details-button=true
 			custom-actions={deliveryGroupCardCustomActions}
@@ -73,7 +74,7 @@
 					onpackingslipcustomactionclick={handleOnPackingSlipCustomActionClick}></c-packing-slip-item-editor>
 			</div>
 		</c-delivery-group-card>
-	</template>
+	</div>
 
 	<!-- <template for:each={packingSlips}
 		for:item="packingSlip">

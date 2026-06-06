@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<label>Default HTML Box Weight Unit Type</label>
+	<protected>false</protected>
+	<values><field>Template_Key__c</field><value xsi:type="xsd:string">DefaultHtml</value></values>
+	<values><field>Field_Key__c</field><value xsi:type="xsd:string">BoxWeightUnitType</value></values>
+	<values><field>Field_Label__c</field><value xsi:type="xsd:string">Box Weight Unit Type</value></values>
+	<values><field>Field_Path__c</field><value xsi:type="xsd:string">Header.BoxWeightUnitType</value></values>
+	<values><field>Display_Order__c</field><value xsi:type="xsd:double">80</value></values>
+	<values><field>Is_Visible__c</field><value xsi:type="xsd:boolean">true</value></values>
+</CustomMetadata>

@@ -155,7 +155,7 @@
     <externalSharingModel>ControlledByParent</externalSharingModel>
     <label>Packing Slip Item</label>
     <nameField>
-        <displayFormat>PSI{000000}</displayFormat>
+        <displayFormat>PSI-{000000}</displayFormat>
         <label>Packing Slip Item #</label>
         <type>AutoNumber</type>
     </nameField>

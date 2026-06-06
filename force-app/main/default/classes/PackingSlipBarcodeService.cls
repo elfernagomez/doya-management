@@ -26,12 +26,6 @@ public with sharing class PackingSlipBarcodeService {
 			escapeHtml(getQrImageUrl(value)) + '" />';
 	}
 
-	public static String sanitizeForZpl(String value) {
-		if (value == null)
-			return '';
-		return value.replace('^', ' ').replace('~', ' ').replace('\r', ' ').replace('\n', ' ');
-	}
-
 	private static String escapeHtml(String value) {
 		if (value == null)
 			return '';

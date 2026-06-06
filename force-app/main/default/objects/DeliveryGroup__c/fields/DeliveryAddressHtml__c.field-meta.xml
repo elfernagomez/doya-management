@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>AddressHtml__c</fullName>
+    <fullName>DeliveryAddressHtml__c</fullName>
     <externalId>false</externalId>
     <formula>IF (
-  ISPICKVAL( LocationType__c, &apos;Delivery Center&apos; ),
-  DeliveryCenter__r.ShippingStreet &amp; BR() &amp;
+  ISPICKVAL( DeliveryLocationType__c, &apos;Delivery Center&apos; ),
+  DeliveryCenter__r.ShippingStreet &amp; " " &amp;
   DeliveryCenter__r.ShippingCity &amp; &apos; &apos; &amp;
   DeliveryCenter__r.ShippingState &amp;
   IF (
     NOT(ISBLANK( DeliveryCenter__r.ShippingPostalCode )),
     &apos;, &apos; &amp; DeliveryCenter__r.ShippingPostalCode,
     &apos;&apos;
-  ) &amp; BR() &amp;
+  ) &amp; " " &amp;
   DeliveryCenter__r.ShippingCountry,
-  Address__Street__s &amp; BR() &amp;
-  Address__City__s &amp; &apos; &apos; &amp;
-  TEXT(Address__StateCode__s) &amp;
+  DeliveryAddress__Street__s &amp; " " &amp;
+  DeliveryAddress__City__s &amp; &apos; &apos; &amp;
+  TEXT(DeliveryAddress__StateCode__s) &amp;
   IF (
-    NOT(ISBLANK( Address__PostalCode__s )),
-    &apos;, &apos; &amp; Address__PostalCode__s,
+    NOT(ISBLANK( DeliveryAddress__PostalCode__s )),
+    &apos;, &apos; &amp; DeliveryAddress__PostalCode__s,
     &apos;&apos;
-  ) &amp; BR() &amp;
-  TEXT(Address__CountryCode__s)
+  ) &amp; " " &amp;
+  TEXT(DeliveryAddress__CountryCode__s)
 )</formula>
-    <label>Address HTML</label>
+    <label>Delivery Address HTML</label>
     <required>false</required>
     <trackTrending>false</trackTrending>
     <type>Text</type>

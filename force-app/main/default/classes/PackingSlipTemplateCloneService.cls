@@ -7,12 +7,16 @@ public with sharing class PackingSlipTemplateCloneService {
 			PackingSlipTemplateRepository.getPackagedTemplate(templateKey);
 		if (templateDefinition == null)
 			throw new AuraHandledException('No packaged template was found for key ' + templateKey + '.');
+		String dimensions = String.isBlank(templateDefinition.dimensions) ?
+			'LETTER_8_5X11' :
+			templateDefinition.dimensions;
 
 		List<PackingSlipTemplateOverride__c> existingTemplates = [
 			SELECT Id
 			FROM PackingSlipTemplateOverride__c
 			WHERE Template_Key__c = :templateDefinition.templateKey
 			AND Output_Mode__c = :templateDefinition.outputMode
+			AND Dimensions__c = :dimensions
 			AND Provider_Key__c = :templateDefinition.providerKey
 			LIMIT 1
 		];
@@ -25,6 +29,7 @@ public with sharing class PackingSlipTemplateCloneService {
 			Template_Key__c = templateDefinition.templateKey,
 			Template_Type__c = templateDefinition.templateType,
 			Output_Mode__c = templateDefinition.outputMode,
+			Dimensions__c = dimensions,
 			Provider_Key__c = templateDefinition.providerKey,
 			Is_Active__c = false,
 			Body__c = templateDefinition.body,

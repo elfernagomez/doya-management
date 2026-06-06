@@ -6,6 +6,7 @@
 			<template lwc:if={hasTemplates}>
 				<div class="table-header row">
 					<div>Name</div>
+					<div>Dimensions</div>
 					<div>Output Mode</div>
 					<div>Type</div>
 					<div>Status</div>
@@ -14,6 +15,7 @@
 				<template for:each={templates} for:item="template">
 					<div key={template.id} class="row table-row">
 						<div>{template.name}</div>
+						<div>{template.dimensionsLabel}</div>
 						<div>{template.outputMode}</div>
 						<div>{template.templateType}</div>
 						<div>{template.statusLabel}</div>

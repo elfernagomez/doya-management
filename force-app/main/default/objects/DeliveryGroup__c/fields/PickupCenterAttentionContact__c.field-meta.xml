@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>PickupCenterAttentionContact__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <externalId>false</externalId>
+    <inlineHelpText>Contact person at the pickup center (Attn).</inlineHelpText>
+    <label>Attention Contact</label>
+    <referenceTo>Contact</referenceTo>
+    <relationshipLabel>Delivery Groups</relationshipLabel>
+    <relationshipName>DgPickupCenterAttn</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

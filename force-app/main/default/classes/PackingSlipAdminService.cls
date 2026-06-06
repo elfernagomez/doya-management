@@ -14,7 +14,7 @@ public with sharing class PackingSlipAdminService {
 			throw new AuraHandledException('A template Id is required.');
 
 		PackingSlipTemplateOverride__c templateRecord = [
-			SELECT Id, Provider_Key__c, Output_Mode__c, Is_Active__c
+			SELECT Id, Provider_Key__c, Output_Mode__c, Dimensions__c, Is_Active__c
 			FROM PackingSlipTemplateOverride__c
 			WHERE Id = :templateId
 			LIMIT 1
@@ -27,6 +27,7 @@ public with sharing class PackingSlipAdminService {
 				FROM PackingSlipTemplateOverride__c
 				WHERE Provider_Key__c = :templateRecord.Provider_Key__c
 				AND Output_Mode__c = :templateRecord.Output_Mode__c
+				AND Dimensions__c = :templateRecord.Dimensions__c
 				AND Id != :templateRecord.Id
 			]) {
 				sibling.Is_Active__c = false;

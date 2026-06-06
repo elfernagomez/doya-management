@@ -3,6 +3,7 @@ public class PackingSlipDataModels {
 		@AuraEnabled public String id;
 		@AuraEnabled public String name;
 		@AuraEnabled public String templateKey;
+		@AuraEnabled public String dimensions;
 		@AuraEnabled public String templateType;
 		@AuraEnabled public String outputMode;
 		@AuraEnabled public String providerKey;
@@ -17,6 +18,7 @@ public class PackingSlipDataModels {
 			option.label = String.isBlank(name) ? templateKey : name;
 			option.value = templateKey;
 			option.templateKey = templateKey;
+			option.dimensions = String.isBlank(dimensions) ? 'LETTER_8_5X11' : dimensions;
 			option.templateType = templateType;
 			option.outputMode = outputMode;
 			option.providerKey = providerKey;
@@ -43,6 +45,7 @@ public class PackingSlipDataModels {
 		@AuraEnabled public String label;
 		@AuraEnabled public String value;
 		@AuraEnabled public String templateKey;
+		@AuraEnabled public String dimensions;
 		@AuraEnabled public String templateType;
 		@AuraEnabled public String outputMode;
 		@AuraEnabled public String providerKey;
@@ -74,6 +77,11 @@ public class PackingSlipDataModels {
 		@AuraEnabled public String trackingNumber;
 		@AuraEnabled public String carrier;
 		@AuraEnabled public String description;
+		@AuraEnabled public Decimal boxWidth;
+		@AuraEnabled public Decimal boxHeight;
+		@AuraEnabled public Decimal boxDepth;
+		@AuraEnabled public Decimal boxWeight;
+		@AuraEnabled public String boxWeightUnitType;
 
 		public Map<String, Object> toMap() {
 			return new Map<String, Object>{
@@ -81,7 +89,12 @@ public class PackingSlipDataModels {
 				'OrderNumber' => orderNumber,
 				'TrackingNumber' => trackingNumber,
 				'Carrier' => carrier,
-				'Description' => description
+				'Description' => description,
+				'BoxWidth' => boxWidth,
+				'BoxHeight' => boxHeight,
+				'BoxDepth' => boxDepth,
+				'BoxWeight' => boxWeight,
+				'BoxWeightUnitType' => boxWeightUnitType
 			};
 		}
 	}
@@ -102,6 +115,7 @@ public class PackingSlipDataModels {
 		@AuraEnabled public String productCode;
 		@AuraEnabled public String productName;
 		@AuraEnabled public Decimal quantity;
+		@AuraEnabled public String size;
 		@AuraEnabled public String description;
 
 		public Map<String, Object> toMap() {
@@ -109,6 +123,7 @@ public class PackingSlipDataModels {
 				'ProductCode' => productCode,
 				'ProductName' => productName,
 				'Quantity' => quantity,
+				'Size' => size,
 				'Description' => description
 			};
 		}
@@ -117,6 +132,7 @@ public class PackingSlipDataModels {
 	public class DocumentData {
 		@AuraEnabled public HeaderData header = new HeaderData();
 		@AuraEnabled public AddressBlock shipTo = new AddressBlock();
+		@AuraEnabled public AddressBlock shipFrom = new AddressBlock();
 		@AuraEnabled public List<LineItemData> items = new List<LineItemData>();
 		@AuraEnabled public String barcodeValue;
 		@AuraEnabled public String qrValue;
@@ -129,6 +145,7 @@ public class PackingSlipDataModels {
 			Map<String, Object> context = new Map<String, Object>();
 			Map<String, Object> headerMap = header == null ? new Map<String, Object>() : header.toMap();
 			Map<String, Object> shipToMap = shipTo == null ? new Map<String, Object>() : shipTo.toMap();
+			Map<String, Object> shipFromMap = shipFrom == null ? new Map<String, Object>() : shipFrom.toMap();
 			List<Object> itemMaps = new List<Object>();
 
 			for (LineItemData item : items)
@@ -137,9 +154,12 @@ public class PackingSlipDataModels {
 			context.putAll(headerMap);
 			context.put('Header', headerMap);
 			context.put('ShipTo', shipToMap);
+			context.put('ShipFrom', shipFromMap);
 			context.putAll(new Map<String, Object>{
 				'ShipToName' => shipToMap.get('Name'),
 				'ShipToAddress' => shipToMap.get('Address'),
+				'ShipFromName' => shipFromMap.get('Name'),
+				'ShipFromAddress' => shipFromMap.get('Address'),
 				'Items' => itemMaps,
 				'BarcodeValue' => barcodeValue,
 				'QrValue' => qrValue,
@@ -161,7 +181,6 @@ public class PackingSlipDataModels {
 		@AuraEnabled public String providerKey;
 		@AuraEnabled public String html;
 		@AuraEnabled public String pdfUrl;
-		@AuraEnabled public String zpl;
 	}
 
 	public static Object resolvePath(Map<String, Object> context, String path) {

@@ -1,5 +1,9 @@
 import { api, wire, track } from 'lwc';
 import InputBase from 'c/inputBase';
+import { getObjectInfo } from 'lightning/uiObjectInfoApi';
+import { getRecord, getFieldValue } from 'lightning/uiRecordApi';
+import PACKING_SLIP_OBJECT from '@salesforce/schema/PackingSlip__c';
+import ORDER_STATUS_FIELD from '@salesforce/schema/Order.Status';
 import { refreshApex } from '@salesforce/apex';
 import { subscribe, unsubscribe, onError } from 'lightning/empApi';
 import LightningConfirm from 'lightning/confirm';
@@ -9,7 +13,6 @@ import PackingSlipItemEditorModal from 'c/packingSlipItemEditorModal';
 import PackingSlipCreateModal from 'c/packingSlipCreateModal';
 import { convertFromApexRecord } from 'c/orderProductManager';
 import deletePackingSlip from '@salesforce/apex/PackingSlipManager.deletePackingSlip';
-
 
 import getDeliveryGroupsByOrder
 	from '@salesforce/apex/DeliveryGroupManager.getDeliveryGroupsByOrder';
@@ -70,6 +73,29 @@ export default class OrderPackingSlipManager extends InputBase {
 	pendingPrintPackingSlipId;
 	loadedPrintPackingSlipId;
 
+	@wire(getObjectInfo, { objectApiName: PACKING_SLIP_OBJECT })
+	packingSlipInfo;
+
+	@wire(getRecord, { recordId: '$recordId', fields: [ORDER_STATUS_FIELD] })
+	order;
+
+	get packingSlipCrud() {
+		const d = this.packingSlipInfo?.data;
+		return {
+			canRead: !!d?.queryable,
+			canCreate: !!d?.createable,
+			canUpdate: !!d?.updateable,
+			canDelete: !!d?.deletable
+		};
+	}
+
+	get isOrderActionable() {
+		const status = getFieldValue(this.order?.data, ORDER_STATUS_FIELD);
+		return status !== 'Delivered' &&
+			status !== 'Invoiced' &&
+			status !== 'Cancelled';
+	}
+
 	connectedCallback() {
 		this.subscribeToPackingSlipCreateEvents();
 		this.registerEmpApiErrorListener();
@@ -82,11 +108,9 @@ export default class OrderPackingSlipManager extends InputBase {
 	get deliveryGroupCardCustomActions() {
 		const options = [];
 
-		if (this.isView) {
-			//...
-		}
+		const canAddSlip = this.packingSlipCrud.canCreate && this.isOrderActionable;
 
-		if (this.isEdit) {
+		if ((this.isView || this.isEdit) && canAddSlip) {
 			options.push({
 				label: 'New Packing Slip',
 				name: 'new',
@@ -100,6 +124,9 @@ export default class OrderPackingSlipManager extends InputBase {
 
 	get packingSlipCardCustomActions() {
 		const options = [];
+		const canAddSlipItem = this.isOrderActionable && true;
+		const canDeleteSlip = this.packingSlipCrud.canDelete && this.isOrderActionable;
+		const canEditSlip = this.packingSlipCrud.canUpdate && this.isOrderActionable;
 
 		if (this.isView) {
 			options.push(...[
@@ -110,30 +137,48 @@ export default class OrderPackingSlipManager extends InputBase {
 					variant: 'neutral'
 				}
 			]);
-		}
 
-		if (this.isEdit) {
-			options.push(...[
-				{
-					label: 'Edit',
-					name: 'edit',
-					iconName: 'utility:edit',
-					variant: 'neutral'
-				},
-				{
-					label: 'Add/Remove Items',
-					name: 'items',
-					iconName: 'utility:list',
-					variant: 'neutral'
-				},
-				{
+			if (canDeleteSlip) {
+				options.push({
 					label: 'Delete',
 					name: 'delete',
 					iconName: 'utility:delete',
 					variant: 'neutral',
 					type: 'button-icon'
-				}
-			]);
+				});
+			}
+		}
+
+		
+		if (this.isEdit) {
+			if (canEditSlip) {
+				options.push({
+						label: 'Edit',
+						name: 'edit',
+						iconName: 'utility:edit',
+						variant: 'neutral'
+				});
+			}
+
+
+			if (canAddSlipItem) {
+				options.push({
+					label: 'Add/Remove Items',
+					name: 'items',
+					iconName: 'utility:list',
+					variant: 'neutral'
+				});
+			}
+
+			if (canDeleteSlip) {
+				options.push({
+					label: 'Delete',
+					name: 'delete',
+					iconName: 'utility:delete',
+					variant: 'neutral',
+					type: 'button-icon'
+				});
+			}
 		}
 
 		return options;
@@ -291,6 +336,7 @@ export default class OrderPackingSlipManager extends InputBase {
 				if (result?.status === 'saved') {
 					this.showToast('Success', 'Packing slip created successfully', 'success');
 					this.refreshDeliveryGroups();
+					this.handleOnEditClick();
 				}
 			});
 	}

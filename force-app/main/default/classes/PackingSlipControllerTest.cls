@@ -19,7 +19,7 @@ private class PackingSlipControllerTest {
 		deliveryGroupRecord.put('Name', 'Katherine Johnson');
 		deliveryGroupRecord.put('DeliveryCenterName__c', 'Katherine Johnson');
 		deliveryGroupRecord.put('AddressLabel__c', 'Katherine Johnson');
-		deliveryGroupRecord.put('AddressHtml__c', '1 Orbit Way');
+		deliveryGroupRecord.put('DeliveryAddressHtml__c', '1 Orbit Way');
 		deliveryGroupRecord.put('DeliveryType__c', 'Ground');
 		packingSlip.putSObject('DeliveryGroup__r', deliveryGroupRecord);
 
@@ -37,6 +37,7 @@ private class PackingSlipControllerTest {
 
 		PackingSlipDataModels.TemplateDefinition screenTemplate = new PackingSlipDataModels.TemplateDefinition();
 		screenTemplate.templateKey = 'DefaultHtml';
+		screenTemplate.dimensions = 'LETTER_8_5X11';
 		screenTemplate.name = 'Screen';
 		screenTemplate.templateType = 'HTML';
 		screenTemplate.outputMode = 'SCREEN';
@@ -45,29 +46,9 @@ private class PackingSlipControllerTest {
 		screenTemplate.source = 'PACKAGED';
 		screenTemplate.body = '<div>{{OrderNumber}}</div>';
 
-		PackingSlipDataModels.TemplateDefinition pdfTemplate = new PackingSlipDataModels.TemplateDefinition();
-		pdfTemplate.templateKey = 'DefaultPdf';
-		pdfTemplate.name = 'PDF';
-		pdfTemplate.templateType = 'PDF';
-		pdfTemplate.outputMode = 'PDF';
-		pdfTemplate.providerKey = 'SHIPMENT';
-		pdfTemplate.isActive = true;
-		pdfTemplate.source = 'PACKAGED';
-		pdfTemplate.body = '<div>{{TrackingNumber}}</div>';
-
-		PackingSlipDataModels.TemplateDefinition zplTemplate = new PackingSlipDataModels.TemplateDefinition();
-		zplTemplate.templateKey = 'DefaultZpl';
-		zplTemplate.name = 'ZPL';
-		zplTemplate.templateType = 'ZPL';
-		zplTemplate.outputMode = 'ZPL';
-		zplTemplate.providerKey = 'SHIPMENT';
-		zplTemplate.isActive = true;
-		zplTemplate.source = 'PACKAGED';
-		zplTemplate.body = '^XA^FD{{TrackingNumber}}^FS^XZ';
-
 		PackingSlipTemplateRepository.setTestData(
 			new List<PackingSlipDataModels.TemplateDefinition>(),
-			new List<PackingSlipDataModels.TemplateDefinition>{ screenTemplate, pdfTemplate, zplTemplate },
+			new List<PackingSlipDataModels.TemplateDefinition>{ screenTemplate },
 			new List<PackingSlipDataModels.FieldMapDefinition>()
 		);
 
@@ -76,15 +57,14 @@ private class PackingSlipControllerTest {
 			PackingSlipController.previewHtml(packingSlipId, 'DefaultHtml');
 			List<PackingSlipDataModels.TemplateOption> options =
 				PackingSlipController.getTemplateOptions(packingSlipId);
-			String pdfUrl = PackingSlipController.getPdfUrl(packingSlipId, 'DefaultPdf');
-			String zpl = PackingSlipController.generateZpl(packingSlipId, 'DefaultZpl');
+			String pdfUrl = PackingSlipController.getPdfUrl(packingSlipId, 'DefaultHtml', 'LABEL_6X4');
 			Id clonedTemplateId = PackingSlipController.cloneDefaultTemplate('DefaultHtml');
 		Test.stopTest();
 
 		System.assert(response.html.contains('ORD-400'));
-		System.assertEquals(3, options.size());
+		System.assertEquals(1, options.size());
 		System.assert(pdfUrl.contains('/apex/PackingSlipPdf'));
-		System.assert(zpl.contains('TRK-400'));
+		System.assert(pdfUrl.contains('pageSize=LABEL_6X4'));
 		System.assertNotEquals(null, clonedTemplateId);
 
 		PackingSlipTemplateRepository.clearTestData();
@@ -98,6 +78,7 @@ private class PackingSlipControllerTest {
 			Template_Key__c = 'A',
 			Template_Type__c = 'HTML',
 			Output_Mode__c = 'SCREEN',
+			Dimensions__c = 'LETTER_8_5X11',
 			Provider_Key__c = 'SHIPMENT',
 			Is_Active__c = true,
 			Body__c = '<div>A</div>',
@@ -108,6 +89,7 @@ private class PackingSlipControllerTest {
 			Template_Key__c = 'B',
 			Template_Type__c = 'HTML',
 			Output_Mode__c = 'SCREEN',
+			Dimensions__c = 'LETTER_8_5X11',
 			Provider_Key__c = 'SHIPMENT',
 			Is_Active__c = false,
 			Body__c = '<div>B</div>',

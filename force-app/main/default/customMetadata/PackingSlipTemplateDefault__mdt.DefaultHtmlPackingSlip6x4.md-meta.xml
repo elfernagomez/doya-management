@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<label>Default HTML Packing Slip 6x4</label>
+	<protected>false</protected>
+	<values>
+		<field>Template_Key__c</field>
+		<value xsi:type="xsd:string">DefaultHtml6x4</value>
+	</values>
+	<values>
+		<field>Template_Type__c</field>
+		<value xsi:type="xsd:string">HTML</value>
+	</values>
+	<values>
+		<field>Output_Mode__c</field>
+		<value xsi:type="xsd:string">SCREEN</value>
+	</values>
+	<values>
+		<field>Dimensions__c</field>
+		<value xsi:type="xsd:string">LABEL_6X4</value>
+	</values>
+	<values>
+		<field>Provider_Key__c</field>
+		<value xsi:type="xsd:string">SHIPMENT</value>
+	</values>
+	<values>
+		<field>Is_Active__c</field>
+		<value xsi:type="xsd:boolean">true</value>
+	</values>
+	<values>
+		<field>Description__c</field>
+		<value xsi:type="xsd:string">Default compact packing slip template for 6x4 labels.</value>
+	</values>
+	<values>
+		<field>Body__c</field>
+		<value xsi:type="xsd:string"><![CDATA[<div style="overflow:hidden;width:100%;">
+	<div style="float:left;width:60%;">
+		{{#if LogoUrl}}<img src="{{LogoUrl}}" alt="Logo" style="max-height:54px;max-width:180px;margin-bottom:8px;" />{{/if}}
+		<h1 style="margin-top:0;">Packing Slip</h1>
+		<table style="width:100%;border-collapse:collapse;border:none;">
+			<tr>
+				<td style="color:#54698d;width:30%;vertical-align:top;padding:2px 0;">Order No.</td>
+				<td style="color:#54698d;width:70%;vertical-align:top;padding:2px 0;"><strong>{{OrderNumber}}</strong></td>
+			</tr>
+			{{#if AccountName}}
+			<tr>
+				<td style="color:#54698d;width:30%;vertical-align:top;padding:2px 0;">Account:</td>
+				<td style="color:#54698d;width:70%;vertical-align:top;padding:2px 0;"><strong>{{AccountName}}</strong></td>
+			</tr>
+			{{/if}}
+			{{#if PONumber}}
+			<tr>
+				<td style="color:#54698d;width:30%;vertical-align:top;padding:2px 0;">PO Number:</td>
+				<td style="color:#54698d;width:70%;vertical-align:top;padding:2px 0;"><strong>{{PONumber}}</strong></td>
+			</tr>
+			{{/if}}
+			{{#if OrderName}}
+			<tr>
+				<td style="color:#54698d;width:30%;vertical-align:top;padding:2px 0;">Order Title:</td>
+				<td style="color:#54698d;width:70%;vertical-align:top;padding:2px 0;"><strong>{{OrderName}}</strong></td>
+			</tr>
+			{{/if}}
+		</table>
+	</div>
+	<div style="float:right;width:40%;">
+		<div style="border:1px solid #ddd;">
+			<div style="padding:6px;text-align:center;font-size:small;">{{TrackingNumber}}</div>
+			<div style="padding:6px;text-align:center;">
+				{{#if BarcodeImageUrl}}<img src="{{BarcodeImageUrl}}" alt="Barcode" style="height:60px;width:auto;max-width:206px;" />{{/if}}
+			</div>
+			<!-- <div style="text-align:center;">
+				{{#if QrImageUrl}}<img src="{{QrImageUrl}}" alt="QR Code" style="width:100px;height:100px;" />{{/if}}
+			</div> -->
+		</div>
+	</div>
+</div>
+<div style="overflow:hidden;width:100%;margin-top:30px;">
+	<div style="float:left;width:45%;">
+		<h3 style="margin-bottom:5px;">Ship From</h3>
+		<h5 style="margin:0;"><b>{{ShipFromName}}</b></h5>
+		{{#if ShipFromAddress}}<div style="white-space:pre-line;font-size:small;">{{ShipFromAddress}}</div>{{/if}}
+		{{#if ShipFromPhone}}<div style="font-size:small;">{{ShipFromPhone}}</div>{{/if}}
+		{{#if ShipFromAttentionContactName}}<div style="font-size:small;">Attn: {{ShipFromAttentionContactName}}</div>{{/if}}
+	</div>
+	<div style="float:left;width:45%;margin-right:4%;">
+		<h3 style="margin-bottom:5px;">Ship To</h3>
+		<h5 style="margin:0;"><b>{{ShipToName}}</b></h5>
+		{{#if ShipToAddress}}<div style="white-space:pre-line;font-size:small;">{{ShipToAddress}}</div>{{/if}}
+		{{#if ShipToPhone}}<div style="font-size:small;">{{ShipToPhone}}</div>{{/if}}
+		{{#if ShipToAttentionContactName}}<div style="font-size:small;">Attn: {{ShipToAttentionContactName}}</div>{{/if}}
+	</div>
+</div>]]></value>
+	</values>
+</CustomMetadata>

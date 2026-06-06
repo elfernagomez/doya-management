@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>Status__c</fullName>
+    <fullName>PickupLocationType__c</fullName>
     <externalId>false</externalId>
-    <label>Status</label>
-    <required>false</required>
+    <label>Pickup Location Type</label>
+    <required>true</required>
     <trackTrending>false</trackTrending>
     <type>Picklist</type>
     <valueSet>
@@ -11,19 +11,20 @@
         <valueSetDefinition>
             <sorted>false</sorted>
             <value>
-                <fullName>New</fullName>
+                <fullName>Address</fullName>
+                <default>false</default>
+                <label>Address</label>
+            </value>
+            <value>
+                <fullName>Pickup Center</fullName>
                 <default>true</default>
-                <label>New</label>
+                <label>Pickup Center</label>
             </value>
             <value>
-                <fullName>Closed</fullName>
+                <fullName>Venue</fullName>
                 <default>false</default>
-                <label>Closed</label>
-            </value>
-            <value>
-                <fullName>Delivered</fullName>
-                <default>false</default>
-                <label>Delivered</label>
+                <isActive>false</isActive>
+                <label>Venue</label>
             </value>
         </valueSetDefinition>
     </valueSet>

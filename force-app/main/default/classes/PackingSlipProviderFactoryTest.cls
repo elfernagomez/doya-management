@@ -19,7 +19,7 @@ private class PackingSlipProviderFactoryTest {
 		deliveryGroupRecord.put('Name', 'Ada Lovelace');
 		deliveryGroupRecord.put('DeliveryCenterName__c', 'Ada Lovelace');
 		deliveryGroupRecord.put('AddressLabel__c', 'Ada Lovelace');
-		deliveryGroupRecord.put('AddressHtml__c', '123 Main Street');
+		deliveryGroupRecord.put('DeliveryAddressHtml__c', '123 Main Street');
 		deliveryGroupRecord.put('DeliveryType__c', 'UPS');
 		packingSlip.putSObject('DeliveryGroup__r', deliveryGroupRecord);
 

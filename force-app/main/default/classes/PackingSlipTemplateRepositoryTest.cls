@@ -4,6 +4,7 @@ private class PackingSlipTemplateRepositoryTest {
 	static void repository_prefersSubscriberOverrideOverPackagedDefault() {
 		PackingSlipDataModels.TemplateDefinition packaged = new PackingSlipDataModels.TemplateDefinition();
 		packaged.templateKey = 'DefaultHtml';
+		packaged.dimensions = 'LETTER_8_5X11';
 		packaged.name = 'Packaged';
 		packaged.outputMode = 'SCREEN';
 		packaged.providerKey = 'SHIPMENT';
@@ -12,6 +13,7 @@ private class PackingSlipTemplateRepositoryTest {
 
 		PackingSlipDataModels.TemplateDefinition subscriber = new PackingSlipDataModels.TemplateDefinition();
 		subscriber.templateKey = 'DefaultHtml';
+		subscriber.dimensions = 'LETTER_8_5X11';
 		subscriber.name = 'Subscriber';
 		subscriber.outputMode = 'SCREEN';
 		subscriber.providerKey = 'SHIPMENT';
@@ -34,9 +36,11 @@ private class PackingSlipTemplateRepositoryTest {
 	@IsTest
 	static void repository_fallsBackToPackagedDefaultWhenSubscriberMissing() {
 		PackingSlipDataModels.TemplateDefinition packaged = new PackingSlipDataModels.TemplateDefinition();
-		packaged.templateKey = 'DefaultPdf';
-		packaged.name = 'Packaged PDF';
-		packaged.outputMode = 'PDF';
+		packaged.templateKey = 'DefaultHtml';
+		packaged.dimensions = 'LETTER_8_5X11';
+		packaged.templateType = 'HTML';
+		packaged.name = 'Packaged HTML';
+		packaged.outputMode = 'SCREEN';
 		packaged.providerKey = 'SHIPMENT';
 		packaged.isActive = true;
 		packaged.source = 'PACKAGED';
@@ -48,9 +52,9 @@ private class PackingSlipTemplateRepositoryTest {
 		);
 
 		PackingSlipDataModels.TemplateDefinition resolved =
-			PackingSlipTemplateRepository.getTemplate('DefaultPdf', 'PDF', 'SHIPMENT');
+			PackingSlipTemplateRepository.getTemplate('DefaultHtml', 'SCREEN', 'SHIPMENT');
 
-		System.assertEquals('Packaged PDF', resolved.name);
+		System.assertEquals('Packaged HTML', resolved.name);
 		PackingSlipTemplateRepository.clearTestData();
 	}
 }

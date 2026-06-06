@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>DiscountAmount__c</fullName>
+    <description>If the discount type is &quot;Percentage,&quot; this number represents the percentage that will be deducted from the total. If the discount type is &quot;Fixed,&quot; this number represents the exact dollar amount that will be deducted from the total.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>If the discount type is &quot;Percentage,&quot; this number represents the percentage that will be deducted from the total. If the discount type is &quot;Fixed,&quot; this number represents the exact dollar amount that will be deducted from the total.</inlineHelpText>
+    <label>Discount Amount</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>2</scale>
+    <trackHistory>false</trackHistory>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

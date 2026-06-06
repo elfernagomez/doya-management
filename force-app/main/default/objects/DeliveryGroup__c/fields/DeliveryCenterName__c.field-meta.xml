@@ -3,7 +3,7 @@
     <fullName>DeliveryCenterName__c</fullName>
     <externalId>false</externalId>
     <formula>IF(
-  ISPICKVAL(LocationType__c, &apos;Delivery Center&apos;),
+  ISPICKVAL(DeliveryLocationType__c, &apos;Delivery Center&apos;),
   DeliveryCenter__r.Name,
   &apos;&apos;
 )</formula>

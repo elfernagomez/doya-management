@@ -8,13 +8,22 @@ public with sharing class PackingSlipTemplateRepository {
 		String outputMode,
 		String providerKey
 	) {
+		return getTemplate(templateKey, outputMode, providerKey, null);
+	}
+
+	public static PackingSlipDataModels.TemplateDefinition getTemplate(
+		String templateKey,
+		String outputMode,
+		String providerKey,
+		String dimensions
+	) {
 		List<PackingSlipDataModels.TemplateDefinition> subscriberTemplates =
-			filterTemplates(getSubscriberTemplates(), templateKey, outputMode, providerKey, true);
+			filterTemplates(getSubscriberTemplates(), templateKey, outputMode, providerKey, dimensions, true);
 		if (!subscriberTemplates.isEmpty())
 			return subscriberTemplates[0];
 
 		List<PackingSlipDataModels.TemplateDefinition> packagedTemplates =
-			filterTemplates(getPackagedTemplates(), templateKey, outputMode, providerKey, true);
+			filterTemplates(getPackagedTemplates(), templateKey, outputMode, providerKey, dimensions, true);
 		if (!packagedTemplates.isEmpty())
 			return packagedTemplates[0];
 
@@ -23,7 +32,7 @@ public with sharing class PackingSlipTemplateRepository {
 
 	public static PackingSlipDataModels.TemplateDefinition getPackagedTemplate(String templateKey) {
 		List<PackingSlipDataModels.TemplateDefinition> packagedTemplates =
-			filterTemplates(getPackagedTemplates(), templateKey, null, null, false);
+			filterTemplates(getPackagedTemplates(), templateKey, null, null, null, false);
 		return packagedTemplates.isEmpty() ? null : packagedTemplates[0];
 	}
 
@@ -32,13 +41,13 @@ public with sharing class PackingSlipTemplateRepository {
 			new Map<String, PackingSlipDataModels.TemplateDefinition>();
 
 		for (PackingSlipDataModels.TemplateDefinition templateDefinition :
-			filterTemplates(getPackagedTemplates(), null, null, providerKey, true)) {
-			uniqueTemplatesByKey.put(templateDefinition.templateKey, templateDefinition);
+			filterTemplates(getPackagedTemplates(), null, null, providerKey, null, true)) {
+			uniqueTemplatesByKey.put(templateDefinition.templateKey + '|' + templateDefinition.dimensions, templateDefinition);
 		}
 
 		for (PackingSlipDataModels.TemplateDefinition templateDefinition :
-			filterTemplates(getSubscriberTemplates(), null, null, providerKey, true)) {
-			uniqueTemplatesByKey.put(templateDefinition.templateKey, templateDefinition);
+			filterTemplates(getSubscriberTemplates(), null, null, providerKey, null, true)) {
+			uniqueTemplatesByKey.put(templateDefinition.templateKey + '|' + templateDefinition.dimensions, templateDefinition);
 		}
 
 		List<PackingSlipDataModels.TemplateDefinition> orderedTemplates =
@@ -47,7 +56,8 @@ public with sharing class PackingSlipTemplateRepository {
 
 		List<PackingSlipDataModels.TemplateOption> options = new List<PackingSlipDataModels.TemplateOption>();
 		for (PackingSlipDataModels.TemplateDefinition templateDefinition : orderedTemplates)
-			options.add(templateDefinition.toOption());
+			if (templateDefinition.templateType == 'HTML')
+				options.add(templateDefinition.toOption());
 		return options;
 	}
 
@@ -67,7 +77,7 @@ public with sharing class PackingSlipTemplateRepository {
 
 		List<PackingSlipTemplateOverride__c> templateRecords = [
 			SELECT Id, Name, Template_Key__c, Template_Type__c, Output_Mode__c,
-				Provider_Key__c, Is_Active__c, Body__c, Description__c,
+				Provider_Key__c, Is_Active__c, Body__c, Description__c, Dimensions__c,
 				Subscriber_Override__c
 			FROM PackingSlipTemplateOverride__c
 			ORDER BY LastModifiedDate DESC
@@ -80,6 +90,7 @@ public with sharing class PackingSlipTemplateRepository {
 			templateDefinition.id = String.valueOf(templateRecord.Id);
 			templateDefinition.name = templateRecord.Name;
 			templateDefinition.templateKey = templateRecord.Template_Key__c;
+			templateDefinition.dimensions = normalizeDimensions(templateRecord.Dimensions__c);
 			templateDefinition.templateType = templateRecord.Template_Type__c;
 			templateDefinition.outputMode = templateRecord.Output_Mode__c;
 			templateDefinition.providerKey = templateRecord.Provider_Key__c;
@@ -101,7 +112,7 @@ public with sharing class PackingSlipTemplateRepository {
 		List<PackingSlipDataModels.TemplateDefinition> templates = new List<PackingSlipDataModels.TemplateDefinition>();
 		for (SObject templateRecord : Database.query(
 			'SELECT Id, DeveloperName, MasterLabel, Template_Key__c, Template_Type__c, ' +
-			'Output_Mode__c, Provider_Key__c, Is_Active__c, Body__c, Description__c ' +
+			'Output_Mode__c, Provider_Key__c, Is_Active__c, Body__c, Description__c, Dimensions__c ' +
 			'FROM PackingSlipTemplateDefault__mdt ORDER BY MasterLabel ASC'
 		)) {
 			PackingSlipDataModels.TemplateDefinition templateDefinition =
@@ -109,6 +120,7 @@ public with sharing class PackingSlipTemplateRepository {
 			templateDefinition.id = String.valueOf(templateRecord.get('Id'));
 			templateDefinition.name = (String)templateRecord.get('MasterLabel');
 			templateDefinition.templateKey = (String)templateRecord.get('Template_Key__c');
+			templateDefinition.dimensions = normalizeDimensions((String)templateRecord.get('Dimensions__c'));
 			templateDefinition.templateType = (String)templateRecord.get('Template_Type__c');
 			templateDefinition.outputMode = (String)templateRecord.get('Output_Mode__c');
 			templateDefinition.providerKey = (String)templateRecord.get('Provider_Key__c');
@@ -153,6 +165,7 @@ public with sharing class PackingSlipTemplateRepository {
 		String templateKey,
 		String outputMode,
 		String providerKey,
+		String dimensions,
 		Boolean activeOnly
 	) {
 		List<PackingSlipDataModels.TemplateDefinition> filteredTemplates =
@@ -165,6 +178,8 @@ public with sharing class PackingSlipTemplateRepository {
 			if (!String.isBlank(outputMode) && templateDefinition.outputMode != outputMode)
 				continue;
 			if (!String.isBlank(providerKey) && templateDefinition.providerKey != providerKey)
+				continue;
+			if (!String.isBlank(dimensions) && normalizeDimensions(templateDefinition.dimensions) != normalizeDimensions(dimensions))
 				continue;
 			filteredTemplates.add(templateDefinition);
 		}
@@ -183,6 +198,7 @@ public with sharing class PackingSlipTemplateRepository {
 			cloneTemplate.id = source.id;
 			cloneTemplate.name = source.name;
 			cloneTemplate.templateKey = source.templateKey;
+			cloneTemplate.dimensions = source.dimensions;
 			cloneTemplate.templateType = source.templateType;
 			cloneTemplate.outputMode = source.outputMode;
 			cloneTemplate.providerKey = source.providerKey;
@@ -212,6 +228,17 @@ public with sharing class PackingSlipTemplateRepository {
 			clones.add(cloneMap);
 		}
 		return clones;
+	}
+
+	private static String normalizeDimensions(String dimensions) {
+		if (String.isBlank(dimensions))
+			return 'LETTER_8_5X11';
+
+		String normalized = dimensions.trim().toUpperCase();
+		if (normalized == 'LABEL_6X4')
+			return 'LABEL_6X4';
+
+		return 'LETTER_8_5X11';
 	}
 
 	@TestVisible

@@ -79,16 +79,23 @@ export default class PackingSlipCreateModal extends LightningModal {
 								if (!fieldApiNames.length)
 									return null;
 
-								const fields = fieldApiNames.map((fieldApiName, fieldIndex) => ({
-									key: `section-${sectionIndex}-row-${rowIndex}-item-${itemIndex}-field-${fieldIndex}`,
-									apiName: fieldApiName,
-									defaultValue: this.isEditMode ? undefined : this.mergedDefaultValues[fieldApiName]
-								}));
+								const fields = fieldApiNames.map((fieldApiName, fieldIndex) => {
+									const isReadOnly = this.isFieldReadOnly(fieldApiName, item);
+									console.log(fieldApiName, isReadOnly);
+									return {
+										key: `section-${sectionIndex}-row-${rowIndex}-item-${itemIndex}-field-${fieldIndex}`,
+										apiName: fieldApiName,
+										defaultValue: this.isEditMode ? undefined : this.mergedDefaultValues[fieldApiName],
+										isReadOnly,
+										isRequired: !!item.required && !isReadOnly,
+										useOutputField: isReadOnly,
+										useInputField: !isReadOnly
+									};
+								});
 
 								return {
 									key: `section-${sectionIndex}-row-${rowIndex}-item-${itemIndex}`,
-									fields,
-									isRequired: item.required || false
+									fields
 								};
 							})
 							.filter(Boolean);
@@ -113,6 +120,17 @@ export default class PackingSlipCreateModal extends LightningModal {
 				};
 			})
 			.filter(Boolean);
+	}
+
+	isFieldReadOnly(fieldApiName, layoutItem) {
+		const fieldMeta = this.objectFields[fieldApiName] || {};
+		const editableByLayout = this.isEditMode ? layoutItem?.editableForUpdate !== false : layoutItem?.editableForNew !== false;
+		const editableByFls = this.isEditMode ? !!fieldMeta.updateable : !!fieldMeta.createable;
+
+		return !!fieldMeta.calculated ||
+			!!fieldMeta.autoNumber ||
+			!editableByLayout ||
+			!editableByFls;
 	}
 
 	get hasSections() {

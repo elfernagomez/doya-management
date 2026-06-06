@@ -94,7 +94,7 @@
             </value>
         </inputAssignments>
         <inputAssignments>
-            <field>LocationType__c</field>
+            <field>DeliveryLocationType__c</field>
             <value>
                 <stringValue>Delivery Center</stringValue>
             </value>

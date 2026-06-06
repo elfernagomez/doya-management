@@ -13,17 +13,25 @@ import DUE_DATE_FIELD
 import DELIVERY_TYPE_FIELD
 	from "@salesforce/schema/DeliveryGroup__c.DeliveryType__c";
 import LOCATION_TYPE_FIELD
-	from "@salesforce/schema/DeliveryGroup__c.LocationType__c";
+	from "@salesforce/schema/DeliveryGroup__c.DeliveryLocationType__c";
+import PICKUP_LOCATION_TYPE_FIELD
+	from "@salesforce/schema/DeliveryGroup__c.PickupLocationType__c";
 import NOTES_FIELD
 	from "@salesforce/schema/DeliveryGroup__c.Notes__c";
 import DELIVERY_CENTER_ID_FIELD
 	from "@salesforce/schema/DeliveryGroup__c.DeliveryCenter__c";
 import DELIVERY_CENTER_NAME_FIELD
 	from "@salesforce/schema/DeliveryGroup__c.DeliveryCenter__r.Name";
+import PICKUP_CENTER_ID_FIELD
+	from "@salesforce/schema/DeliveryGroup__c.PickupCenter__c";
+import PICKUP_CENTER_NAME_FIELD
+	from "@salesforce/schema/DeliveryGroup__c.PickupCenter__r.Name";
 import ADDRESS_LABEL_FIELD
 	from "@salesforce/schema/DeliveryGroup__c.AddressLabel__c";
-import ADDRESS_HTML_FIELD
-	from "@salesforce/schema/DeliveryGroup__c.AddressHtml__c";
+import DELIVERY_ADDRESS_HTML_FIELD
+	from "@salesforce/schema/DeliveryGroup__c.DeliveryAddressHtml__c";
+import PICKUP_ADDRESS_HTML_FIELD
+	from "@salesforce/schema/DeliveryGroup__c.PickupAddressHtml__c";
 
 import ACCOUNT_ID_FIELD
 	from "@salesforce/schema/Account.Id";
@@ -50,10 +58,14 @@ export function createNewDelvieryGroup() {
 		dueDate: null,
 		deliveryType: "Delivery",
 		locationType: "DeliveryCenter",
+		pickupLocationType: "Pickup Center",
 		deliveryCenterId: null,
 		deliveryCenterName: null,
+		pickupCenterId: null,
+		pickupCenterName: null,
 		addressLabel: null,
-		addressHtml: null,
+		deliveryAddressHtml: null,
+		pickupAddressHtml: null,
 		isNew: true,
 		isPlaceHolder: false,
 		products: []
@@ -70,10 +82,14 @@ export function createGroupFromRecord(record) {
 		dueDate: getFieldValue(record, DUE_DATE_FIELD),
 		deliveryType: getFieldValue(record, DELIVERY_TYPE_FIELD) || "Delivery",
 		locationType: getFieldValue(record, LOCATION_TYPE_FIELD) || "Delivery Center",
+		pickupLocationType: getFieldValue(record, PICKUP_LOCATION_TYPE_FIELD) || "Pickup Center",
 		deliveryCenterId,
 		deliveryCenterName: getFieldValue(record, DELIVERY_CENTER_NAME_FIELD),
+		pickupCenterId: getFieldValue(record, PICKUP_CENTER_ID_FIELD),
+		pickupCenterName: getFieldValue(record, PICKUP_CENTER_NAME_FIELD),
 		addressLabel: getFieldValue(record, ADDRESS_LABEL_FIELD),
-		addressHtml: getFieldValue(record, ADDRESS_HTML_FIELD),
+		deliveryAddressHtml: getFieldValue(record, DELIVERY_ADDRESS_HTML_FIELD),
+		pickupAddressHtml: getFieldValue(record, PICKUP_ADDRESS_HTML_FIELD),
 		notes: getFieldValue(record, NOTES_FIELD),
 		isNew: false,
 		isPlaceHolder: false,
@@ -89,11 +105,15 @@ export function createGroupFromApexRecord(record) {
 		createdDate: record.CreatedDate,
 		dueDate: record.DueDate__c,
 		deliveryType: record.DeliveryType__c || "Delivery",
-		locationType: record.LocationType__c || "Delivery Center",
+		locationType: record.DeliveryLocationType__c || "Delivery Center",
+		pickupLocationType: record.PickupLocationType__c || "Pickup Center",
 		deliveryCenterId: record.DeliveryCenter__c,
 		deliveryCenterName: record.DeliveryCenter__r?.Name,
+		pickupCenterId: record.PickupCenter__c,
+		pickupCenterName: record.PickupCenter__r?.Name,
 		addressLabel: record.AddressLabel__c,
-		addressHtml: record.AddressHtml__c,
+		deliveryAddressHtml: record.DeliveryAddressHtml__c,
+		pickupAddressHtml: record.PickupAddressHtml__c,
 		isNew: false,
 		isPlaceHolder: false,
 		products: []
@@ -103,23 +123,24 @@ export function createGroupFromApexRecord(record) {
 export function createGroupRecord(deliveryGroup) {
 	let record = {
 		DeliveryCenter__c: deliveryGroup.deliveryCenterId,
+		PickupCenter__c: deliveryGroup.pickupCenterId,
 		Name: deliveryGroup.name,
 		DeliveryType__c: deliveryGroup.deliveryType,
 		DueDate__c: deliveryGroup.dueDate
 	};
 
 	/* if (deliveryGroup.deliveryCenterId) {
-		record.Address__Street__s = null;
-		record.Address__City__s = null;
-		record.Address__StateCode__s = null;
-		record.Address__PostalCode__s = null;
-		record.Address__CountryCode__s = null;
+		record.DeliveryAddress__Street__s = null;
+		record.DeliveryAddress__City__s = null;
+		record.DeliveryAddress__StateCode__s = null;
+		record.DeliveryAddress__PostalCode__s = null;
+		record.DeliveryAddress__CountryCode__s = null;
 	} else {
-		record.Address__Street__s = deliveryGroup.address?.street;
-		record.Address__City__s = deliveryGroup.address?.city;
-		record.Address__StateCode__s = deliveryGroup.address?.stateCode;
-		record.Address__PostalCode__s = deliveryGroup.address?.postalCode;
-		record.Address__CountryCode__s = deliveryGroup.address?.countryCode;
+		record.DeliveryAddress__Street__s = deliveryGroup.address?.street;
+		record.DeliveryAddress__City__s = deliveryGroup.address?.city;
+		record.DeliveryAddress__StateCode__s = deliveryGroup.address?.stateCode;
+		record.DeliveryAddress__PostalCode__s = deliveryGroup.address?.postalCode;
+		record.DeliveryAddress__CountryCode__s = deliveryGroup.address?.countryCode;
 	} */
 
 	if (!deliveryGroup.isNew) {
@@ -152,7 +173,8 @@ export default class DeliveryGroupCard extends InputBase {
 
 	set deliveryGroup(value) {
 		this.group = {...value};
-		this.locationTypeChoice = this.group.locationType;
+		this.locationTypeChoice = this.group.locationType || "Delivery Center";
+		this.pickupLocationTypeChoice = this.group.pickupLocationType || "Pickup Center";
 	}
 
 	group = {};
@@ -162,8 +184,12 @@ export default class DeliveryGroupCard extends InputBase {
 	deliveryCenterId;
 	deliveryCenterName;
 	deliveryCenterAddress;
+	pickupCenterId;
+	pickupCenterName;
+	pickupCenterAddress;
 
 	locationTypeChoice = "Delivery Center";
+	pickupLocationTypeChoice = "Pickup Center";
 	clonedGroupName;
 
 	get showCloneButton() {
@@ -207,12 +233,30 @@ export default class DeliveryGroupCard extends InputBase {
 		}]
 	}
 
+	get pickupLocationTypeOptions() {
+		return [{
+			label: "Pickup Center",
+			value: "Pickup Center"
+		}, {
+			label: "Address",
+			value: "Address"
+		}]
+	}
+
 	get showDeliveryCenter() {
 		return this.locationTypeChoice == "Delivery Center";
 	}
 
-	get showAddress() {
+	get showDeliveryAddress() {
 		return this.locationTypeChoice == "Address";
+	}
+
+	get showPickupCenter() {
+		return this.pickupLocationTypeChoice == "Pickup Center";
+	}
+
+	get showPickupAddress() {
+		return this.pickupLocationTypeChoice == "Address";
 	}
 
 	get isSaveButtonDisabled() {
@@ -235,20 +279,54 @@ export default class DeliveryGroupCard extends InputBase {
 			DUE_DATE_FIELD,
 			DELIVERY_TYPE_FIELD,
 			LOCATION_TYPE_FIELD,
+			PICKUP_LOCATION_TYPE_FIELD,
 			NOTES_FIELD,
 			DELIVERY_CENTER_ID_FIELD,
 			DELIVERY_CENTER_NAME_FIELD,
+			PICKUP_CENTER_ID_FIELD,
+			PICKUP_CENTER_NAME_FIELD,
 			ADDRESS_LABEL_FIELD,
-			ADDRESS_HTML_FIELD
+			DELIVERY_ADDRESS_HTML_FIELD,
+			PICKUP_ADDRESS_HTML_FIELD
 		]
 	})
 	wiredDeliveryGroup({ data, error }) {
 		if (data) {
 			this.group = createGroupFromRecord(data);
-			this.locationTypeChoice = this.group.locationType;
+			this.locationTypeChoice = this.group.locationType || "Delivery Center";
+			this.pickupLocationTypeChoice = this.group.pickupLocationType || "Pickup Center";
 		} else if (error) {
 			this.addError(
 				`There was an issue while retrieving the group (${this.recordId})`,
+				error);
+		}
+	}
+
+	@wire(getRecord, {
+		recordId: "$pickupCenterId",
+		fields: [
+			ACCOUNT_ID_FIELD,
+			ACCOUNT_NAME_FIELD,
+			ACCOUNT_SHIPPING_STREET_FIELD,
+			ACCOUNT_SHIPPING_CITY_FIELD,
+			ACCOUNT_SHIPPING_STATE_FIELD,
+			ACCOUNT_SHIPPING_POSTAL_CODE_FIELD,
+			ACCOUNT_SHIPPING_COUNTRY
+		]
+	})
+	wiredPickupCenterAccount({ data, error }) {
+		if (data) {
+			this.pickupCenterName = getFieldValue(data, ACCOUNT_NAME_FIELD);
+			this.pickupCenterAddress = {
+				street: getFieldValue(data, ACCOUNT_SHIPPING_STREET_FIELD),
+				city: getFieldValue(data, ACCOUNT_SHIPPING_CITY_FIELD),
+				state: getFieldValue(data, ACCOUNT_SHIPPING_STATE_FIELD),
+				postalCode: getFieldValue(data, ACCOUNT_SHIPPING_POSTAL_CODE_FIELD),
+				country: getFieldValue(data, ACCOUNT_SHIPPING_COUNTRY)
+			};
+		} else if (error) {
+			this.addError(
+				"There was an issue while retrieving the pickup center",
 				error);
 		}
 	}
@@ -284,10 +362,16 @@ export default class DeliveryGroupCard extends InputBase {
 
 	handleOnOpenDetailsClick() {
 		this.deliveryCenterId = this.group.deliveryCenterId;
+		this.pickupCenterId = this.group.pickupCenterId;
 
 		if (!this.deliveryCenterId) {
 			this.deliveryCenterName = null;
 			this.deliveryCenterAddress = null;
+		}
+
+		if (!this.pickupCenterId) {
+			this.pickupCenterName = null;
+			this.pickupCenterAddress = null;
 		}
 
 		this.getComponent(".detailsModal").open();
@@ -306,10 +390,17 @@ export default class DeliveryGroupCard extends InputBase {
 		this.locationTypeChoice = event.target.value;
 	}
 
+	handleOnPickupLocationTypeChange(event) {
+		this.pickupLocationTypeChoice = event.target.value;
+	}
+
 	handleOnDetailsFieldChange(event) {
 		switch (event.target.fieldName) {
 			case "DeliveryCenter__c":
 				this.deliveryCenterId = event.target.value;
+				break;
+			case "PickupCenter__c":
+				this.pickupCenterId = event.target.value;
 				break;
 			default:
 				break;
@@ -348,7 +439,7 @@ export default class DeliveryGroupCard extends InputBase {
 		});
 	}
 
-	handleOnSaveClick(event) {
+	handleOnSaveClick() {
 		this.refs.hiddenDetailsButton.click();
 	}
 
@@ -383,11 +474,12 @@ export default class DeliveryGroupCard extends InputBase {
 		event.preventDefault();
 		this.isLoading = true;
 		const fields = event.detail.fields;
-		fields.LocationType__c = this.locationTypeChoice;
+		fields.DeliveryLocationType__c = this.locationTypeChoice;
+		fields.PickupLocationType__c = this.pickupLocationTypeChoice;
 		this.getComponent(".detailsForm").submit(fields);
 	}
 
-	handleOnSuccess(event) {
+	handleOnSuccess() {
 		this.isLoading = false;
 		this.getComponent(".detailsModal").close();
 		this.customEvent("groupedit", {

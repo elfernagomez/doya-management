@@ -18,8 +18,7 @@
 	gap: 0.75rem;
 }
 
-.preview-section,
-.zpl-section {
+.preview-section {
 	border: 1px solid #d8dde6;
 	border-radius: 0.75rem;
 	background: #fff;
@@ -46,15 +45,4 @@
 	border-radius: 0.5rem;
 	color: #54698d;
 	text-align: center;
-}
-
-.zpl-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 0.75rem;
-}
-
-.zpl-output {
-	--slds-c-textarea-sizing-min-height: 18rem;
 }

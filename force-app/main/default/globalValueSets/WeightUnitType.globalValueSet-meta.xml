@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GlobalValueSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customValue>
+        <fullName>lbs</fullName>
+        <isActive>true</isActive>
+        <label>lbs</label>
+    </customValue>
+    <customValue>
+        <fullName>kg</fullName>
+        <isActive>true</isActive>
+        <label>kg</label>
+    </customValue>
+    <description>Weight unit type for box dimensions</description>
+    <masterLabel>Weight Unit Type</masterLabel>
+    <sorted>false</sorted>
+</GlobalValueSet>

@@ -161,7 +161,7 @@
     <externalSharingModel>ControlledByParent</externalSharingModel>
     <label>Packing Slip</label>
     <nameField>
-        <displayFormat>PS{000000}</displayFormat>
+        <displayFormat>PS-{000000}</displayFormat>
         <label>Packing Slip #</label>
         <type>AutoNumber</type>
     </nameField>

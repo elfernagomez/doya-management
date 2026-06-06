@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>PickupAddressHtml__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF (
+  ISPICKVAL( PickupLocationType__c, &apos;Pickup Center&apos; ),
+  PickupCenter__r.ShippingStreet &amp; " " &amp;
+  PickupCenter__r.ShippingCity &amp; &apos; &apos; &amp;
+  PickupCenter__r.ShippingState &amp;
+  IF (
+    NOT(ISBLANK( PickupCenter__r.ShippingPostalCode )),
+    &apos;, &apos; &amp; PickupCenter__r.ShippingPostalCode,
+    &apos;&apos;
+  ) &amp; " " &amp;
+  PickupCenter__r.ShippingCountry,
+  PickupAddress__Street__s &amp; " " &amp;
+  PickupAddress__City__s &amp; &apos; &apos; &amp;
+  TEXT(PickupAddress__StateCode__s) &amp;
+  IF (
+    NOT(ISBLANK( PickupAddress__PostalCode__s )),
+    &apos;, &apos; &amp; PickupAddress__PostalCode__s,
+    &apos;&apos;
+  ) &amp; " " &amp;
+  TEXT(PickupAddress__CountryCode__s)
+)</formula>
+    <label>Pickup Address HTML</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

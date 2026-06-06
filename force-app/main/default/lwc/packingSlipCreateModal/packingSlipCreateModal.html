@@ -26,14 +26,22 @@
 									for:item="item">
 									<div key={item.key}
 										class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
-										<template for:each={item.fields}
-											for:item="field">
-											<lightning-input-field key={field.key}
-												field-name={field.apiName}
-												value={field.defaultValue}
-												required={item.isRequired}>
-											</lightning-input-field>
-										</template>
+										<div for:each={item.fields}
+											for:item="field"
+											key={field.key}>
+											<template lwc:if={field.useOutputField}>
+												<lightning-output-field
+													field-name={field.apiName}>
+												</lightning-output-field>
+											</template>
+											<template lwc:if={field.useInputField}>
+												<lightning-input-field
+													field-name={field.apiName}
+													value={field.defaultValue}
+													required={field.isRequired}>
+												</lightning-input-field>
+											</template>
+										</div>
 									</div>
 								</template>
 							</div>
