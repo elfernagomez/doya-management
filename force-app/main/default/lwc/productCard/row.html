@@ -269,7 +269,7 @@
 				data-src="product"
 				data-field="description"
 				data-type="string"
-				onchange={handleFieldChange}></lightning-input>
+				onblur={handleFieldChange}></lightning-input>
 		</div>
 		<lightning-layout vertical-align="stretch">
 			<lightning-layout-item size="3"
@@ -430,7 +430,7 @@
 				data-src="product"
 				data-field="notes"
 				data-type="string"
-				onchange={handleFieldChange}
+				onblur={handleFieldChange}
 				class="slds-var-m-bottom_small"></lightning-textarea>
 			<lightning-button lwc:else
 				label="Add Notes"

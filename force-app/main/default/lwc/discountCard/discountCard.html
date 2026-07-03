@@ -157,20 +157,19 @@
 			<lightning-layout-item flexibility="grow"
 				class="slds-var-p-horizontal_small">
 				<lightning-layout multiple-rows="true">
-					<lightning-layout-item>
+					<lightning-layout-item class="x-large-row">
 						<lightning-select label="Discount Type"
 							disabled={_discount.isDisabled}
 							options={discountTypeOptions}
-							type="button"
 							value={_discount.discountType}
 							variant="label-stacked"
 							data-src="discount"
 							data-field="discountType"
 							data-type="string"
 							onchange={handleFieldChange}
-							class="medium-row"></lightning-select>
+							></lightning-select>
 					</lightning-layout-item>
-					<lightning-layout-item>
+					<lightning-layout-item class="x-large-row">
 						<lightning-input type={inputType}
 							label="Discount Amount"
 							disabled={_discount.isDisabled}
@@ -184,11 +183,10 @@
 					</lightning-layout-item>
 				</lightning-layout>
 			</lightning-layout-item>
-			<lightning-layout-item style="min-width:12rem;">
+			<lightning-layout-item >
 				<lightning-layout multiple-rows="true"
 					horizontal-align="end">
-					<lightning-layout-item size="6"
-						class="slds-var-p-horizontal_small">
+					<lightning-layout-item class="slds-var-p-horizontal_small">
 						<div class="slds-form-element">
 							<label class="slds-form-element__label slds-no-flex">
 								Total
@@ -211,37 +209,6 @@
 			variant="compact"></c-error-panel>
 	</div>
 	<div class="slds-media__figure slds-media__figure_reverse">
-		<!-- <div lwc:if={isDeleting}
-			class="delete-panel
-				slds-panel
-				slds-panel_docked
-				slds-panel_docked-right
-				slds-is-open
-				slds-is-absolute">
-			<div class="slds-panel__body">
-				<lightning-layout>
-					<lightning-layout-item
-						class="slds-var-m-right_small">
-						<p>Are you sure?</p>
-					</lightning-layout-item>
-					<lightning-layout-item
-						class="slds-border_left slds-var-p-left_small">
-						<div class="slds-var-m-bottom_xxx-small">
-							<lightning-button label="Yes, Delete"
-								variant="destructive"
-								onclick={handleOnConfirmDeleteDiscountClick}
-								></lightning-button>
-						</div>
-						<div class="slds-var-m-bottom_xxx-small">
-							<lightning-button label="No, Cancel"
-								variant="brand-outline"
-								onclick={handleOnCancelDeleteDiscountClic}
-								></lightning-button>
-						</div>
-					</lightning-layout-item>
-				</lightning-layout>
-			</div>
-		</div> -->
 		<lightning-button-icon lwc:if={showDeleteButton}
 			icon-name="utility:delete"
 			title="Remove Discount From Current Order"

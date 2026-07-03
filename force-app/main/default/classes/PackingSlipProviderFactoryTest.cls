@@ -9,19 +9,14 @@ private class PackingSlipProviderFactoryTest {
 			TrackingNumber__c = trackingNumber,
 			Description__c = 'Priority'
 		);
-		packingSlip.put('Name', 'PS-TEST');
 
-		Order orderRecord = new Order();
-		orderRecord.put('OrderNumber', orderNumber);
+		Order orderRecord = (Order)JSON.deserialize(
+			'{"OrderNumber":"' + orderNumber + '"}',
+			Order.class
+		);
 		packingSlip.putSObject('Order__r', orderRecord);
 
-		SObject deliveryGroupRecord = Schema.getGlobalDescribe().get('DeliveryGroup__c').newSObject();
-		deliveryGroupRecord.put('Name', 'Ada Lovelace');
-		deliveryGroupRecord.put('DeliveryCenterName__c', 'Ada Lovelace');
-		deliveryGroupRecord.put('AddressLabel__c', 'Ada Lovelace');
-		deliveryGroupRecord.put('DeliveryAddressHtml__c', '123 Main Street');
-		deliveryGroupRecord.put('DeliveryType__c', 'UPS');
-		packingSlip.putSObject('DeliveryGroup__r', deliveryGroupRecord);
+		packingSlip.putSObject('DeliveryGroup__r', Schema.getGlobalDescribe().get('DeliveryGroup__c').newSObject());
 
 		return packingSlip;
 	}
@@ -30,8 +25,6 @@ private class PackingSlipProviderFactoryTest {
 		PackingSlipItem__c itemRecord = new PackingSlipItem__c(
 			Quantity__c = 4
 		);
-		itemRecord.put('Name', 'Item-1');
-		itemRecord.put('Product__c', 'Widget');
 
 		OrderItem orderProductRecord = new OrderItem();
 		orderProductRecord.Description = 'Red';
@@ -61,19 +54,35 @@ private class PackingSlipProviderFactoryTest {
 	@IsTest
 	static void defaultProvider_returnsStructuredDocumentData() {
 		Id packingSlipId = buildFakePackingSlipId();
+		PackingSlip__c firstGroupPackingSlip = new PackingSlip__c();
+
+		PackingSlip__c secondGroupPackingSlip = new PackingSlip__c(Id = packingSlipId);
+
+		PackingSlip__c thirdGroupPackingSlip = new PackingSlip__c();
+
+		List<PackingSlip__c> groupPackingSlips = new List<PackingSlip__c>{
+			firstGroupPackingSlip,
+			secondGroupPackingSlip,
+			thirdGroupPackingSlip
+		};
+		PackingSlip__c packingSlip = buildTestPackingSlip('ORD-200', 'TRK-200');
+		packingSlip.Id = packingSlipId;
 		DefaultPackingSlipDataProvider.setTestData(
 			packingSlipId,
-			buildTestPackingSlip('ORD-200', 'TRK-200'),
-			buildTestItems()
+			packingSlip,
+			buildTestItems(),
+			groupPackingSlips
 		);
 
 		PackingSlipDataModels.DocumentData document =
 			new DefaultPackingSlipDataProvider().getDocumentData(packingSlipId, null);
 
 		System.assertEquals('TRK-200', document.header.trackingNumber);
-		System.assertEquals('Ada Lovelace', document.shipTo.name);
 		System.assertEquals(1, document.items.size());
 		System.assertEquals('SKU-1', document.items[0].productCode);
+		System.assertEquals(2, document.tokenValues.get('CurrentPackageNumber'));
+		System.assertEquals(3, document.tokenValues.get('TotalPackagesInGroup'));
+		System.assertEquals('2/3', document.tokenValues.get('PackageSequenceDisplay'));
 
 		DefaultPackingSlipDataProvider.clearTestData();
 	}

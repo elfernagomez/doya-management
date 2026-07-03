@@ -255,6 +255,10 @@ export default class ProductCard extends NavigationMixin(InputBase) {
 		let src = event.target.dataset.src;
 		let converted = this.convertToType(val, type);
 		let product = {};
+		let currentValue = this._product[field];
+
+		if (converted === currentValue)
+			return;
 
 		switch (src) {
 			/* case "locals":

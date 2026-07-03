@@ -60,12 +60,19 @@
 				<td style="color:#54698d;width:75%;vertical-align:top;padding:2px 0;"><strong>{{OrderName}}</strong></td>
 			</tr>
 			{{/if}}
+			{{#if Group}}
+			<tr>
+				<td style="color:#54698d;width:25%;vertical-align:top;padding:2px 0;">Group:</td>
+				<td style="color:#54698d;width:75%;vertical-align:top;padding:2px 0;"><strong>{{Group}}</strong></td>
+			</tr>
+			{{/if}}
 		</table>
 	</div>
 	<div style="float:left;width:40%;">
 		<div style="padding:12px 16px;border:1px solid #d8dde6;border-radius:6px;">
-			<div><strong>Tracking</strong>: {{TrackingNumber}}</div>
-			{{#if Carrier}}<div><strong>Carrier</strong>: {{Carrier}}</div>{{/if}}
+			<h4 style="margin:0;text-align:center;margin-bottom:5px;"><strong>{{PackageSequenceDisplay}}</strong></h4>
+			{{#if Tracking}}<div><strong>Tracking</strong>: {{TrackingNumber}}</div>{{/if}}
+			{{#if DeliveryType}}<div><strong>Type</strong>: {{DeliveryType}}</div>{{/if}}
 			{{#if Description}}<div><strong>Description</strong>: {{Description}}</div>{{/if}}
 			{{#if BoxDimensions}}<div><strong>Box Dimensions</strong>: {{BoxDimensions}}</div>{{/if}}
 			{{#if BoxWeightDisplay}}<div><strong>Box Weight</strong>: {{BoxWeightDisplay}}</div>{{/if}}

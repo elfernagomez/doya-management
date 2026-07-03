@@ -8,3 +8,7 @@
 .delete-panel lightning-button {
 	--lwc-lineHeightButton: 1.25rem;
 }
+
+.x-large-row {
+	min-width: 8rem;
+}

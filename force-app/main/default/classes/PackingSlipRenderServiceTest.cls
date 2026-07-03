@@ -9,25 +9,18 @@ private class PackingSlipRenderServiceTest {
 			TrackingNumber__c = 'TRK-300',
 			Description__c = 'Handle with care'
 		);
-		packingSlip.put('Name', 'PS-300');
 
-		Order orderRecord = new Order();
-		orderRecord.put('OrderNumber', 'ORD-300');
+		Order orderRecord = (Order)JSON.deserialize(
+			'{"OrderNumber":"ORD-300"}',
+			Order.class
+		);
 		packingSlip.putSObject('Order__r', orderRecord);
 
-		SObject deliveryGroupRecord = Schema.getGlobalDescribe().get('DeliveryGroup__c').newSObject();
-		deliveryGroupRecord.put('Name', 'Grace Hopper');
-		deliveryGroupRecord.put('DeliveryCenterName__c', 'Grace Hopper');
-		deliveryGroupRecord.put('AddressLabel__c', 'Grace Hopper');
-		deliveryGroupRecord.put('DeliveryAddressHtml__c', '100 Example Road');
-		deliveryGroupRecord.put('DeliveryType__c', 'FedEx');
-		packingSlip.putSObject('DeliveryGroup__r', deliveryGroupRecord);
+		packingSlip.putSObject('DeliveryGroup__r', Schema.getGlobalDescribe().get('DeliveryGroup__c').newSObject());
 
 		PackingSlipItem__c itemRecord = new PackingSlipItem__c(
 			Quantity__c = 1
 		);
-		itemRecord.put('Name', 'Item-300');
-		itemRecord.put('Product__c', 'Label Printer');
 		OrderItem orderProductRecord = new OrderItem();
 		orderProductRecord.Description = 'Industrial';
 		Product2 productRecord = new Product2(
@@ -60,9 +53,20 @@ private class PackingSlipRenderServiceTest {
 		screenTemplate.source = 'PACKAGED';
 		screenTemplate.body = '<div>{{OrderNumber}} {{#each Items}}{{ProductCode}}{{/each}} {{BarcodeSvg}}</div>';
 
+		PackingSlipDataModels.TemplateDefinition labelTemplate = new PackingSlipDataModels.TemplateDefinition();
+		labelTemplate.templateKey = 'DefaultHtml';
+		labelTemplate.dimensions = 'LABEL_6X4';
+		labelTemplate.name = 'HTML Label';
+		labelTemplate.templateType = 'HTML';
+		labelTemplate.outputMode = 'SCREEN';
+		labelTemplate.providerKey = 'SHIPMENT';
+		labelTemplate.isActive = true;
+		labelTemplate.source = 'PACKAGED';
+		labelTemplate.body = '<div>{{OrderNumber}} {{#each Items}}{{ProductCode}}{{/each}} {{BarcodeSvg}}</div>';
+
 		PackingSlipTemplateRepository.setTestData(
 			new List<PackingSlipDataModels.TemplateDefinition>(),
-			new List<PackingSlipDataModels.TemplateDefinition>{ screenTemplate },
+			new List<PackingSlipDataModels.TemplateDefinition>{ screenTemplate, labelTemplate },
 			new List<PackingSlipDataModels.FieldMapDefinition>()
 		);
 

@@ -127,11 +127,11 @@ public with sharing class PackingSlipRenderService {
 		if (normalizedPageSize == PAGE_SIZE_LABEL_6X4) {
 			pageCss = '@page { size: 6in 4in; margin: 0.1in; }';
 			documentStyle = 'padding:0.1in;box-sizing:border-box;';
-			previewMinSizeStyle = 'min-width:6in;min-height:4in;';
+			previewMinSizeStyle = 'width:6in;height:4in;';
 		} else {
 			pageCss = '@page { size: 8.5in 11in; margin: 0.2in; }';
 			documentStyle = 'padding:0.2in;box-sizing:border-box;';
-			previewMinSizeStyle = 'min-width:8.5in;min-height:11in;';
+			previewMinSizeStyle = 'width:8.5in;min-height:11in;';
 		}
 
 		String bodyStyle = isPdf ?

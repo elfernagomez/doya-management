@@ -3,6 +3,13 @@ public with sharing class DefaultPackingSlipDataProvider extends IPackingSlipDat
 	@TestVisible private static Id testRecordId;
 	@TestVisible private static PackingSlip__c testPackingSlip;
 	@TestVisible private static List<PackingSlipItem__c> testPackingSlipItems;
+	@TestVisible private static List<PackingSlip__c> testDeliveryGroupPackingSlips;
+
+	private class PackageSequenceData {
+		public Integer currentPackageNumber;
+		public Integer totalPackagesInGroup;
+		public String packageSequenceDisplay;
+	}
 
 	public override String getProviderKey() {
 		return PROVIDER_KEY;
@@ -21,6 +28,7 @@ public with sharing class DefaultPackingSlipDataProvider extends IPackingSlipDat
 
 		PackingSlip__c packingSlip = loadPackingSlip(recordId);
 		List<PackingSlipItem__c> packingSlipItems = loadPackingSlipItems(recordId);
+		PackageSequenceData packageSequenceData = resolvePackageSequenceData(packingSlip);
 
 		SObject orderRecord = packingSlip.getSObject('Order__r');
 		SObject deliveryGroupRecord = packingSlip.getSObject('DeliveryGroup__r');
@@ -30,7 +38,8 @@ public with sharing class DefaultPackingSlipDataProvider extends IPackingSlipDat
 		String orderDescription = orderRecord == null ? null : (String)orderRecord.get('Description');
 		String poNumber = orderRecord == null ? null : (String)orderRecord.get('PoNumber');
 		String accountName = accountRecord == null ? null : (String)accountRecord.get('Name');
-		String carrier = deliveryGroupRecord == null ? null : (String)deliveryGroupRecord.get('DeliveryType__c');
+		String deliveryGroupName = deliveryGroupRecord == null ? null : (String)deliveryGroupRecord.get('Name');
+		String deliveryType = deliveryGroupRecord == null ? null : (String)deliveryGroupRecord.get('DeliveryType__c');
 		String shipToName = deliveryGroupRecord == null ? null : (String)deliveryGroupRecord.get('DeliveryCenterName__c');
 		String shipToAddress = deliveryGroupRecord == null ? null : sanitizeAddress((String)deliveryGroupRecord.get('DeliveryAddressHtml__c'));
 		SObject deliveryCenterRecord = deliveryGroupRecord == null ? null : deliveryGroupRecord.getSObject('DeliveryCenter__r');
@@ -56,13 +65,16 @@ public with sharing class DefaultPackingSlipDataProvider extends IPackingSlipDat
 		document.header.recordId = String.valueOf(packingSlip.Id);
 		document.header.orderNumber = orderNumber;
 		document.header.trackingNumber = packingSlip.TrackingNumber__c;
-		document.header.carrier = carrier;
+		document.header.carrier = deliveryType;
 		document.header.description = packingSlip.Description__c;
 		document.header.boxWidth = packingSlip.BoxWidth__c;
 		document.header.boxHeight = packingSlip.BoxHeight__c;
 		document.header.boxDepth = packingSlip.BoxDepth__c;
 		document.header.boxWeight = packingSlip.BoxWeight__c;
 		document.header.boxWeightUnitType = packingSlip.BoxWeightUnitType__c;
+		document.tokenValues.put('DeliveryType', deliveryType);
+		document.tokenValues.put('Group', deliveryGroupName);
+		document.tokenValues.put('DeliveryGroupName', deliveryGroupName);
 		document.tokenValues.put('BoxDimensions', buildBoxDimensions(document.header));
 		document.tokenValues.put('BoxWeightDisplay', buildBoxWeight(document.header));
 		document.tokenValues.put('OrderName', orderName);
@@ -77,6 +89,9 @@ public with sharing class DefaultPackingSlipDataProvider extends IPackingSlipDat
 		document.tokenValues.put('ShipToPhone', deliveryCenterPhone);
 		document.tokenValues.put('ShipFromAttentionContactName', pickupAttentionContactName);
 		document.tokenValues.put('ShipFromPhone', pickupCenterPhone);
+		document.tokenValues.put('CurrentPackageNumber', packageSequenceData.currentPackageNumber);
+		document.tokenValues.put('TotalPackagesInGroup', packageSequenceData.totalPackagesInGroup);
+		document.tokenValues.put('PackageSequenceDisplay', packageSequenceData.packageSequenceDisplay);
 		document.shipTo.name = shipToName;
 		document.shipTo.address = shipToAddress;
 		document.shipFrom.name = shipFromName;
@@ -114,7 +129,7 @@ public with sharing class DefaultPackingSlipDataProvider extends IPackingSlipDat
 
 		String query = String.join(
 			new List<String>{
-				'SELECT Id, Name, TrackingNumber__c, Description__c, BoxWidth__c, BoxHeight__c, BoxDepth__c, BoxWeight__c, BoxWeightUnitType__c,',
+				'SELECT Id, Name, DeliveryGroup__c, TrackingNumber__c, Description__c, BoxWidth__c, BoxHeight__c, BoxDepth__c, BoxWeight__c, BoxWeightUnitType__c,',
 				'Order__r.Name, Order__r.OrderNumber, Order__r.Description, Order__r.PoNumber, Order__r.Account.Name,',
 				'DeliveryGroup__r.Name,',
 				'DeliveryGroup__r.DeliveryCenterName__c,',
@@ -150,6 +165,62 @@ public with sharing class DefaultPackingSlipDataProvider extends IPackingSlipDat
 			WHERE PackingSlip__c = :recordId
 			ORDER BY CreatedDate ASC
 		];
+	}
+
+	private static List<PackingSlip__c> loadDeliveryGroupPackingSlips(Id deliveryGroupId) {
+		if (testRecordId != null && testDeliveryGroupPackingSlips != null)
+			return testDeliveryGroupPackingSlips;
+
+		if (deliveryGroupId == null)
+			return new List<PackingSlip__c>();
+
+		return [
+			SELECT Id, Name
+			FROM PackingSlip__c
+			WHERE DeliveryGroup__c = :deliveryGroupId
+			ORDER BY CreatedDate ASC, Name ASC, Id ASC
+		];
+	}
+
+	private static PackageSequenceData resolvePackageSequenceData(PackingSlip__c packingSlip) {
+		PackageSequenceData data = new PackageSequenceData();
+		data.currentPackageNumber = 1;
+		data.totalPackagesInGroup = 1;
+		data.packageSequenceDisplay = '1/1';
+
+		if (packingSlip == null)
+			return data;
+
+		Id deliveryGroupId = (Id)packingSlip.get('DeliveryGroup__c');
+		List<PackingSlip__c> groupPackingSlips = loadDeliveryGroupPackingSlips(deliveryGroupId);
+		if (groupPackingSlips == null || groupPackingSlips.isEmpty())
+			return data;
+
+		data.totalPackagesInGroup = groupPackingSlips.size();
+		String packingSlipIdValue = String.valueOf(packingSlip.Id);
+		String packingSlipNameValue = (String)packingSlip.get('Name');
+
+		for (Integer index = 0; index < groupPackingSlips.size(); index++) {
+			PackingSlip__c groupPackingSlip = groupPackingSlips[index];
+			if (String.valueOf(groupPackingSlip.Id) == packingSlipIdValue) {
+				data.currentPackageNumber = index + 1;
+				data.packageSequenceDisplay = data.currentPackageNumber + '/' + data.totalPackagesInGroup;
+				return data;
+			}
+		}
+
+		if (!String.isBlank(packingSlipNameValue)) {
+			for (Integer index = 0; index < groupPackingSlips.size(); index++) {
+				PackingSlip__c groupPackingSlip = groupPackingSlips[index];
+				if ((String)groupPackingSlip.get('Name') == packingSlipNameValue) {
+					data.currentPackageNumber = index + 1;
+					break;
+				}
+			}
+		}
+
+		data.packageSequenceDisplay = data.currentPackageNumber + '/' + data.totalPackagesInGroup;
+		return data;
 	}
 
 	private static String buildBoxDimensions(PackingSlipDataModels.HeaderData header) {
@@ -207,9 +278,21 @@ public with sharing class DefaultPackingSlipDataProvider extends IPackingSlipDat
 	}
 
 	@TestVisible
+	static void setTestData(
+		Id recordId,
+		PackingSlip__c packingSlip,
+		List<PackingSlipItem__c> packingSlipItems,
+		List<PackingSlip__c> deliveryGroupPackingSlips
+	) {
+		setTestData(recordId, packingSlip, packingSlipItems);
+		testDeliveryGroupPackingSlips = deliveryGroupPackingSlips;
+	}
+
+	@TestVisible
 	static void clearTestData() {
 		testRecordId = null;
 		testPackingSlip = null;
 		testPackingSlipItems = null;
+		testDeliveryGroupPackingSlips = null;
 	}
 }

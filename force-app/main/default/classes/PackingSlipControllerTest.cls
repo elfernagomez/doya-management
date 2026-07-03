@@ -9,19 +9,14 @@ private class PackingSlipControllerTest {
 			TrackingNumber__c = 'TRK-400',
 			Description__c = 'Controller test'
 		);
-		packingSlip.put('Name', 'PS-400');
 
-		Order orderRecord = new Order();
-		orderRecord.put('OrderNumber', 'ORD-400');
+		Order orderRecord = (Order)JSON.deserialize(
+			'{"OrderNumber":"ORD-400"}',
+			Order.class
+		);
 		packingSlip.putSObject('Order__r', orderRecord);
 
-		SObject deliveryGroupRecord = Schema.getGlobalDescribe().get('DeliveryGroup__c').newSObject();
-		deliveryGroupRecord.put('Name', 'Katherine Johnson');
-		deliveryGroupRecord.put('DeliveryCenterName__c', 'Katherine Johnson');
-		deliveryGroupRecord.put('AddressLabel__c', 'Katherine Johnson');
-		deliveryGroupRecord.put('DeliveryAddressHtml__c', '1 Orbit Way');
-		deliveryGroupRecord.put('DeliveryType__c', 'Ground');
-		packingSlip.putSObject('DeliveryGroup__r', deliveryGroupRecord);
+		packingSlip.putSObject('DeliveryGroup__r', Schema.getGlobalDescribe().get('DeliveryGroup__c').newSObject());
 
 		DefaultPackingSlipDataProvider.setTestData(
 			packingSlipId,
