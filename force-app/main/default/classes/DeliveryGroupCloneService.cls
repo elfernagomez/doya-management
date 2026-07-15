@@ -73,10 +73,6 @@ public with sharing class DeliveryGroupCloneService {
 			ORDER BY CreatedDate ASC
 		];
 
-		if (sourceGroups.isEmpty()) {
-			return;
-		}
-
 		Map<Id, DeliveryGroup__c> targetGroupBySourceGroupId = new Map<Id, DeliveryGroup__c>();
 		Map<Id, List<OrderItem>> sourceItemsBySourceGroupId = new Map<Id, List<OrderItem>>();
 
@@ -88,7 +84,9 @@ public with sharing class DeliveryGroupCloneService {
 			sourceItemsBySourceGroupId.put(sourceGroup.Id, sourceGroup.OrderProducts__r.deepClone(false, false, false));
 		}
 
-		insert targetGroupBySourceGroupId.values();
+		if (!targetGroupBySourceGroupId.isEmpty()) {
+			insert targetGroupBySourceGroupId.values();
+		}
 
 		List<OrderItem> itemsToInsert = new List<OrderItem>();
 		List<Id> sourceItemIdsInOrder = new List<Id>();
@@ -106,6 +104,49 @@ public with sharing class DeliveryGroupCloneService {
 				sourceItemIdsInOrder.add(sourceItemId);
 				sourceParentBySourceItemId.put(sourceItemId, sourceParentId);
 			}
+		}
+
+		List<OrderItem> sourceUngroupedDiscounts = [
+			SELECT Id,
+				AvailableQuantity,
+				BasePrice__c,
+				DeliveryGroup__c,
+				DeliveryType__c,
+				Width__c,
+				Height__c,
+				Depth__c,
+				Description,
+				DiscountType__c,
+				DiscountAmount__c,
+				EndDate,
+				ListPrice,
+				Notes__c,
+				Quantity,
+				TotalPrice,
+				UnitPrice,
+				UnitType__c,
+				WorkOrderStatus__c,
+				OrderId,
+				ParentOrderProduct__c,
+				PricebookEntryId,
+				Product2Id
+			FROM OrderItem
+			WHERE OrderId IN :sourceToTargetOrderId.keySet()
+			AND DeliveryGroup__c = null
+			AND Product2.RecordType.DeveloperName = 'Discount'
+			ORDER BY CreatedDate ASC
+		];
+
+		for (OrderItem sourceDiscount : sourceUngroupedDiscounts) {
+			OrderItem clonedDiscount = sourceDiscount.clone(false, true, false, false);
+			Id sourceItemId = clonedDiscount.Id;
+			Id sourceParentId = clonedDiscount.ParentOrderProduct__c;
+			clonedDiscount.OrderId = sourceToTargetOrderId.get(sourceDiscount.OrderId);
+			clonedDiscount.DeliveryGroup__c = null;
+			clonedDiscount.ParentOrderProduct__c = null;
+			itemsToInsert.add(clonedDiscount);
+			sourceItemIdsInOrder.add(sourceItemId);
+			sourceParentBySourceItemId.put(sourceItemId, sourceParentId);
 		}
 
 		if (itemsToInsert.isEmpty()) {
@@ -211,10 +252,6 @@ public with sharing class DeliveryGroupCloneService {
 			ORDER BY CreatedDate ASC
 		];
 
-		if (sourceGroups.isEmpty()) {
-			return;
-		}
-
 		Map<Id, DeliveryGroup__c> targetGroupBySourceGroupId = new Map<Id, DeliveryGroup__c>();
 		Map<Id, List<OpportunityLineItem>> sourceItemsBySourceGroupId =
 			new Map<Id, List<OpportunityLineItem>>();
@@ -227,7 +264,9 @@ public with sharing class DeliveryGroupCloneService {
 			sourceItemsBySourceGroupId.put(sourceGroup.Id, sourceGroup.OpportunityProducts__r.deepClone(false, false, false));
 		}
 
-		insert targetGroupBySourceGroupId.values();
+		if (!targetGroupBySourceGroupId.isEmpty()) {
+			insert targetGroupBySourceGroupId.values();
+		}
 
 		List<OpportunityLineItem> itemsToInsert = new List<OpportunityLineItem>();
 		List<Id> sourceItemIdsInOrder = new List<Id>();
@@ -246,6 +285,48 @@ public with sharing class DeliveryGroupCloneService {
 				sourceItemIdsInOrder.add(sourceItemId);
 				sourceParentBySourceItemId.put(sourceItemId, sourceParentId);
 			}
+		}
+
+		List<OpportunityLineItem> sourceUngroupedDiscounts = [
+			SELECT Id,
+				BasePrice__c,
+				DeliveryGroup__c,
+				DeliveryType__c,
+				Width__c,
+				Height__c,
+				Depth__c,
+				Description,
+				DiscountType__c,
+				DiscountAmount__c,
+				ListPrice,
+				Notes__c,
+				OpportunityId,
+				ParentOrderProduct__c,
+				PricebookEntryId,
+				Product2Id,
+				Quantity,
+				TotalPrice,
+				UnitPrice,
+				UnitType__c,
+				WorkOrderStatus__c
+			FROM OpportunityLineItem
+			WHERE OpportunityId IN :sourceToTargetOpportunityId.keySet()
+			AND DeliveryGroup__c = null
+			AND Product2.RecordType.DeveloperName = 'Discount'
+			ORDER BY CreatedDate ASC
+		];
+
+		for (OpportunityLineItem sourceDiscount : sourceUngroupedDiscounts) {
+			OpportunityLineItem clonedDiscount = sourceDiscount.clone(false, true, false, false);
+			Id sourceItemId = clonedDiscount.Id;
+			Id sourceParentId = clonedDiscount.ParentOrderProduct__c;
+			clonedDiscount.OpportunityId = sourceToTargetOpportunityId.get(sourceDiscount.OpportunityId);
+			clonedDiscount.DeliveryGroup__c = null;
+			clonedDiscount.ParentOrderProduct__c = null;
+			clonedDiscount.TotalPrice = null;
+			itemsToInsert.add(clonedDiscount);
+			sourceItemIdsInOrder.add(sourceItemId);
+			sourceParentBySourceItemId.put(sourceItemId, sourceParentId);
 		}
 
 		if (itemsToInsert.isEmpty()) {

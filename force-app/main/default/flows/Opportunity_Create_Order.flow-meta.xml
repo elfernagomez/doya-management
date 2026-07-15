@@ -3,10 +3,13 @@
     <actionCalls>
         <name>apex_createOrderFromOpportunity</name>
         <label>Create Order From Opportunity</label>
-        <locationX>176</locationX>
-        <locationY>286</locationY>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
         <actionName>CreateOrderFromOpportunityInvocable</actionName>
         <actionType>apex</actionType>
+        <connector>
+            <targetReference>get_latestOrderByOpportunity</targetReference>
+        </connector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
             <name>opportunityId</name>
@@ -16,27 +19,63 @@
         </inputParameters>
         <nameSegment>CreateOrderFromOpportunityInvocable</nameSegment>
         <storeOutputAutomatically>true</storeOutputAutomatically>
-        <connector>
-            <targetReference>get_latestOrderByOpportunity</targetReference>
-        </connector>
+    </actionCalls>
+    <actionCalls>
+        <name>Navigate_to_Record_Action_2</name>
+        <label>Navigate to Record Action 2</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <actionName>c:navigateToRecord</actionName>
+        <actionType>lwcComponent</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>recordId</name>
+            <value>
+                <elementReference>var_createdOrderId</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>objectApiName</name>
+            <value>
+                <stringValue>Order</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>actionName</name>
+            <value>
+                <stringValue>view</stringValue>
+            </value>
+        </inputParameters>
+        <nameSegment>c:navigateToRecord</nameSegment>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
     </actionCalls>
     <apiVersion>66.0</apiVersion>
-    <environments>Default</environments>
-    <interviewLabel>Create Order {!$Flow.CurrentDateTime}</interviewLabel>
-    <label>Create Order</label>
     <assignments>
         <name>assign_outputRecordIdToOrder</name>
         <label>Set Output Record Id</label>
-        <locationX>176</locationX>
-        <locationY>542</locationY>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
         <assignmentItems>
-            <assignToReference>recordId</assignToReference>
+            <assignToReference>var_createdOrderId</assignToReference>
             <operator>Assign</operator>
             <value>
                 <elementReference>get_latestOrderByOpportunity.Id</elementReference>
             </value>
         </assignmentItems>
+        <assignmentItems>
+            <assignToReference>recordId</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>var_createdOrderId</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Navigate_to_Record_Action_2</targetReference>
+        </connector>
     </assignments>
+    <environments>Default</environments>
+    <interviewLabel>Create Order {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Create Order</label>
     <processMetadataValues>
         <name>BuilderType</name>
         <value>
@@ -59,9 +98,9 @@
     <recordLookups>
         <name>get_latestOrderByOpportunity</name>
         <label>Get Latest Order By Opportunity</label>
-        <locationX>176</locationX>
-        <locationY>414</locationY>
-        <assignNullValuesIfNoRecordsFound>true</assignNullValuesIfNoRecordsFound>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
         <connector>
             <targetReference>assign_outputRecordIdToOrder</targetReference>
         </connector>
@@ -82,11 +121,14 @@
     <screens>
         <name>screen_ConfirmCreateOrder</name>
         <label>Confirm Create Order</label>
-        <locationX>176</locationX>
-        <locationY>158</locationY>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
         <allowBack>false</allowBack>
         <allowFinish>true</allowFinish>
         <allowPause>false</allowPause>
+        <connector>
+            <targetReference>apex_createOrderFromOpportunity</targetReference>
+        </connector>
         <fields>
             <name>displayText_ConfirmationMessage</name>
             <fieldText>&lt;p&gt;This will create a Draft Order from the current Opportunity.&lt;/p&gt;&lt;p&gt;Click Next to continue or close this window to cancel.&lt;/p&gt;</fieldText>
@@ -94,12 +136,9 @@
         </fields>
         <showFooter>true</showFooter>
         <showHeader>true</showHeader>
-        <connector>
-            <targetReference>apex_createOrderFromOpportunity</targetReference>
-        </connector>
     </screens>
     <start>
-        <locationX>50</locationX>
+        <locationX>0</locationX>
         <locationY>0</locationY>
         <connector>
             <targetReference>screen_ConfirmCreateOrder</targetReference>
@@ -112,5 +151,12 @@
         <isCollection>false</isCollection>
         <isInput>true</isInput>
         <isOutput>true</isOutput>
+    </variables>
+    <variables>
+        <name>var_createdOrderId</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
     </variables>
 </Flow>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+	<apiVersion>66.0</apiVersion>
+	<isExposed>true</isExposed>
+
+	<masterLabel>Navigate to Record</masterLabel>
+	<description>Navigates a screen flow user to a Salesforce record.</description>
+
+	<targets>
+		<target>lightning__FlowAction</target>
+	</targets>
+
+	<targetConfigs>
+		<targetConfig targets="lightning__FlowAction">
+			<property
+				name="recordId"
+				type="String"
+				label="Record ID"
+				description="ID of the record to open"
+				required="true"/>
+
+			<property
+				name="objectApiName"
+				type="String"
+				label="Object API Name"
+				description="For example, Order"/>
+
+			<property
+				name="actionName"
+				type="String"
+				label="Action"
+				description="view, edit, or clone"
+				default="view"/>
+		</targetConfig>
+	</targetConfigs>
+</LightningComponentBundle>
