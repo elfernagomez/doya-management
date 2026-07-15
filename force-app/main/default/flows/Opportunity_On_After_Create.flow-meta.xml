@@ -5,19 +5,19 @@
         <label>Clone Related Records Action</label>
         <locationX>50</locationX>
         <locationY>431</locationY>
-        <actionName>CloneOrderRelatedRecordsInvocable</actionName>
+        <actionName>CloneOpportunityRelatedRecordsInvocable</actionName>
         <actionType>apex</actionType>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
-            <name>targetOrder</name>
+            <name>targetOpportunity</name>
             <value>
                 <elementReference>$Record</elementReference>
             </value>
         </inputParameters>
-        <nameSegment>CloneOrderRelatedRecordsInvocable</nameSegment>
+        <nameSegment>CloneOpportunityRelatedRecordsInvocable</nameSegment>
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </actionCalls>
-    <apiVersion>57.0</apiVersion>
+    <apiVersion>66.0</apiVersion>
     <decisions>
         <name>decision_isCloned</name>
         <label>Is Cloned?</label>
@@ -46,8 +46,8 @@
         <dataType>Boolean</dataType>
         <expression>ISCLONE()</expression>
     </formulas>
-    <interviewLabel>Order: On After Create {!$Flow.CurrentDateTime}</interviewLabel>
-    <label>Order: On After Create</label>
+    <interviewLabel>Opportunity: On After Create {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Opportunity: On After Create</label>
     <processMetadataValues>
         <name>BuilderType</name>
         <value>
@@ -73,16 +73,9 @@
         <connector>
             <targetReference>decision_isCloned</targetReference>
         </connector>
-        <object>Order</object>
+        <object>Opportunity</object>
         <recordTriggerType>Create</recordTriggerType>
         <triggerType>RecordAfterSave</triggerType>
     </start>
     <status>Active</status>
-    <variables>
-        <name>var_standardPriceBookId</name>
-        <dataType>String</dataType>
-        <isCollection>false</isCollection>
-        <isInput>false</isInput>
-        <isOutput>false</isOutput>
-    </variables>
 </Flow>

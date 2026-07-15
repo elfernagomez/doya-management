@@ -43,8 +43,8 @@ public with sharing class CloneOrderRelatedRecordsInvocable {
 		}
 
 		// now we have both lists with the same order,
-		// we call the helper
-		DeliveryGroupManager.clone(targetOrders, sourceOrders);
+		// we call the shared helper
+		DeliveryGroupCloneService.cloneOrderDeliveryGroupsAndItems(targetOrders, sourceOrders);
 		return targetAndSourceWrapper;
 	}
 

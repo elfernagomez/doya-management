@@ -238,113 +238,7 @@ public with sharing class DeliveryGroupManager {
 	 * @param sourceOrders
 	 */
 	public static void clone(List<Order> newOrders, List<Order> sourceOrders) {
-		List<DeliveryGroup__c> sourceGroups;
-		DeliveryGroup__c sourceGroup;
-		DeliveryGroup__c targetGroup;
-		Order newOrder;
-		Order sourceOrder;
-
-		Map<Id, Order> sourceOrdersMap = new Map<Id, Order>(sourceOrders);
-		Map<Id, Order> newOrdersBySourceIdMap = new Map<Id, Order>();
-		List<OrderItem> newOrderedProducts = new List<OrderItem>();
-		Map<Id, DeliveryGroup__c> sourceGroupBySourceId =
-			new Map<Id, DeliveryGroup__c>();
-		Map<Id, DeliveryGroup__c> targetGroupBySourceId =
-			new Map<Id, DeliveryGroup__c>();
-		Map<Id, List<OrderItem>> newOrderProductsBySourceIdMap =
-			new Map<Id, List<OrderItem>>();
-
-		// we link new order to source orders in the map
-		for (Integer i = 0; i < newOrders.size(); i++) {
-			newOrder = newOrders[i];
-			sourceOrder = sourceOrders[i];
-			newOrdersBySourceIdMap.put(sourceOrder.Id, newOrder);
-		}
-
-		sourceGroups = [
-			SELECT Name,
-				DeliveryAddress__City__s,
-				DeliveryAddress__CountryCode__s,
-				DeliveryAddress__GeocodeAccuracy__s,
-				DeliveryAddress__Latitude__s,
-				DeliveryAddress__Longitude__s,
-				DeliveryAddress__PostalCode__s,
-				DeliveryAddress__StateCode__s,
-				DeliveryAddress__Street__s,
-				CreatedDate,
-				DueDate__c,
-				DeliveryType__c,
-				DeliveryLocationType__c,
-				PickupLocationType__c,
-				Order__c,
-				DeliveryCenter__c,
-				PickupCenter__c,
-				(
-					SELECT Name,
-						Description__c,
-						TrackingNumber__c
-					FROM PackingSlips__r
-					ORDER BY Name
-				),
-				(
-					SELECT AvailableQuantity,
-						BasePrice__c,
-						DeliveryGroup__c,
-						DeliveryType__c,
-						Width__c,
-						Height__c,
-						Depth__c,
-						Description,
-						EndDate,
-						ListPrice,
-						Notes__c,
-						Quantity,
-						TotalPrice,
-						UnitPrice,
-						UnitType__c,
-						OrderId,
-						ParentOrderProduct__c,
-						PricebookEntryId,
-						Product2Id
-					FROM OrderProducts__r
-					ORDER BY CreatedDate ASC
-				)
-			FROM DeliveryGroup__c
-			WHERE Order__c IN :sourceOrdersMap.keySet()
-		];
-
-		// we clone all delivery groups
-		for (DeliveryGroup__c sg : sourceGroups) {
-			newOrder = newOrdersBySourceIdMap.get(sg.Order__c);
-			sourceOrder = sourceOrdersMap.get(sg.Order__c);
-			targetGroup = sg.clone(false, true, false, false);
-			// fields to modify
-			targetGroup.Order__c = newOrder.Id;
-			sourceGroupBySourceId.put(sg.Id, sg);
-			targetGroupBySourceId.put(sg.Id, targetGroup);
-			// we clone the products as well
-			// and we map the products to find them after insert
-			newOrderProductsBySourceIdMap.put(
-				sg.Id,
-				sg.OrderProducts__r.deepClone(false, false, false));
-		}
-
-		// targetGroups
-		insert targetGroupBySourceId.values();
-
-		// we then fix the ids of the new order products
-		for (Id sourceId : targetGroupBySourceId.keySet()) {
-			sourceGroup = sourceGroupBySourceId.get(sourceId);
-			targetGroup = targetGroupBySourceId.get(sourceId);
-
-			for (OrderItem item : newOrderProductsBySourceIdMap.get(sourceId)) {
-				item.DeliveryGroup__c = targetGroup.Id;
-				item.OrderId = targetGroup.Order__c;
-				newOrderedProducts.add(item);
-			}
-		}
-
-		insert newOrderedProducts;
+		DeliveryGroupCloneService.cloneOrderDeliveryGroupsAndItems(newOrders, sourceOrders);
 	}
 
 	@AuraEnabled
@@ -352,7 +246,9 @@ public with sharing class DeliveryGroupManager {
 		DeliveryGroup__c sourceGroup;
 		DeliveryGroup__c targetGroup;
 		List<OrderItem> newOrderProducts;
+		List<OpportunityLineItem> newOpportunityProducts;
 		OrderItem targetOrderProduct;
+		OpportunityLineItem targetOpportunityProduct;
 
 		try {
 			sourceGroup = [
@@ -401,6 +297,29 @@ public with sharing class DeliveryGroupManager {
 							UnitType__c
 						FROM OrderProducts__r
 						ORDER BY CreatedDate
+					),
+					(
+						SELECT BasePrice__c,
+							DeliveryGroup__c,
+							Width__c,
+							Height__c,
+							Depth__c,
+							Description,
+							ListPrice,
+							Notes__c,
+							OpportunityId,
+							ParentOrderProduct__c,
+							PricebookEntryId,
+							Product2Id,
+							Quantity,
+							TotalPrice,
+							UnitPrice,
+							UnitType__c,
+							DiscountType__c,
+							DiscountAmount__c,
+							WorkOrderStatus__c
+						FROM OpportunityProducts__r
+						ORDER BY CreatedDate
 					)
 				FROM DeliveryGroup__c
 				WHERE Id = :deliveryGroupId
@@ -421,6 +340,19 @@ public with sharing class DeliveryGroupManager {
 				}
 
 				insert newOrderProducts;
+			}
+
+			if (!sourceGroup.OpportunityProducts__r.isEmpty()) {
+				newOpportunityProducts = new List<OpportunityLineItem>();
+
+				for (OpportunityLineItem sourceOpportunityProduct : sourceGroup.OpportunityProducts__r) {
+					targetOpportunityProduct =
+						sourceOpportunityProduct.clone(false, true, false, false);
+					targetOpportunityProduct.DeliveryGroup__c = targetGroup.Id;
+					newOpportunityProducts.add(targetOpportunityProduct);
+				}
+
+				insert newOpportunityProducts;
 			}
 
 			return targetGroup.Id;

@@ -26,17 +26,17 @@ import NewWorkOrdersModal from 'c/newWorkOrdersModal';
 import OrderProductPartsSelectionModal from 'c/orderProductPartsSelectionModal';
 
 import getDeliveryGroups
-	from "@salesforce/apex/OrderProductManagerCtrl.getDeliveryGroups";
-import getOrderProductsByProductType
-	from "@salesforce/apex/OrderProductManagerCtrl.getOrderProductsByProductType";
-import saveOrderProducts
-	from "@salesforce/apex/OrderProductManagerCtrl.saveOrderProducts";
+	from "@salesforce/apex/OrderProductManagerCtrl.getOpportunityDeliveryGroups";
+import getOpportunityProductsByProductType
+	from "@salesforce/apex/OrderProductManagerCtrl.getOpportunityProductsByProductType";
+import saveOpportunityProducts
+	from "@salesforce/apex/OrderProductManagerCtrl.saveOpportunityProducts";
 
-import NAME_FIELD from "@salesforce/schema/Order.OrderNumber";
-import DUE_DATE_FIELD from "@salesforce/schema/Order.DueDate__c";
-import STATUS_FIELD from "@salesforce/schema/Order.Status";
-import ACCOUNT_ID_FIELD from "@salesforce/schema/Order.AccountId";
-import ACCOUNT_NAME_FIELD from "@salesforce/schema/Order.Account.Name";
+import NAME_FIELD from "@salesforce/schema/Opportunity.Name";
+import DUE_DATE_FIELD from "@salesforce/schema/Opportunity.CloseDate";
+import STATUS_FIELD from "@salesforce/schema/Opportunity.IsClosed";
+import ACCOUNT_ID_FIELD from "@salesforce/schema/Opportunity.AccountId";
+import ACCOUNT_NAME_FIELD from "@salesforce/schema/Opportunity.Account.Name";
 
 import GROUP_OBJECT
 	from "@salesforce/schema/DeliveryGroup__c";
@@ -44,66 +44,66 @@ import WORK_ORDER_OBJECT
 	from "@salesforce/schema/WorkOrder";
 
 import ITEM_OBJECT
-	from "@salesforce/schema/OrderItem";
+	from "@salesforce/schema/OpportunityLineItem";
 
 import ITEM_ID_FIELD
-	from "@salesforce/schema/OrderItem.Id";
+	from "@salesforce/schema/OpportunityLineItem.Id";
 import ITEM_NUMBER_FIELD
-	from "@salesforce/schema/OrderItem.OrderItemNumber";
+	from "@salesforce/schema/OpportunityLineItem.SortOrder";
 import ITEM_ORDER_ID_FIELD
-	from "@salesforce/schema/OrderItem.OrderId";
+	from "@salesforce/schema/OpportunityLineItem.OpportunityId";
 import ITEM_PRODUCT_ID_FIELD
-	from "@salesforce/schema/OrderItem.Product2Id";
+	from "@salesforce/schema/OpportunityLineItem.Product2Id";
 import ITEM_PRODUCT_NAME_FIELD
-	from "@salesforce/schema/OrderItem.Product2.Name";
+	from "@salesforce/schema/OpportunityLineItem.Product2.Name";
 import ITEM_PRODUCT_CODE_FIELD
-	from "@salesforce/schema/OrderItem.Product2.ProductCode";
+	from "@salesforce/schema/OpportunityLineItem.Product2.ProductCode";
 import ITEM_PRODUCT_MATERIAL_ID_FIELD
-	from "@salesforce/schema/OrderItem.Product2.Material__c";
+	from "@salesforce/schema/OpportunityLineItem.Product2.Material__c";
 import ITEM_PRODUCT_MATERIAL_NAME_FIELD
-	from "@salesforce/schema/OrderItem.Product2.Material__r.Name";
+	from "@salesforce/schema/OpportunityLineItem.Product2.Material__r.Name";
 import ITEM_PRODUCT_RECORD_TYPE_ID_FIELD
-	from "@salesforce/schema/OrderItem.Product2.RecordTypeId";
+	from "@salesforce/schema/OpportunityLineItem.Product2.RecordTypeId";
 import ITEM_PRODUCT_RECORD_TYPE_NAME_FIELD
-	from "@salesforce/schema/OrderItem.Product2.RecordType.DeveloperName";
+	from "@salesforce/schema/OpportunityLineItem.Product2.RecordType.DeveloperName";
 import ITEM_QTY_FIELD
-	from "@salesforce/schema/OrderItem.Quantity";
+	from "@salesforce/schema/OpportunityLineItem.Quantity";
 import ITEM_UNIT_TYPE_FIELD
-	from "@salesforce/schema/OrderItem.UnitType__c";
+	from "@salesforce/schema/OpportunityLineItem.UnitType__c";
 import ITEM_DEPTH_FIELD
-	from "@salesforce/schema/OrderItem.Depth__c";
+	from "@salesforce/schema/OpportunityLineItem.Depth__c";
 import ITEM_WIDTH_FIELD
-	from "@salesforce/schema/OrderItem.Width__c";
+	from "@salesforce/schema/OpportunityLineItem.Width__c";
 import ITEM_HEIGHT_FIELD
-	from "@salesforce/schema/OrderItem.Height__c";
+	from "@salesforce/schema/OpportunityLineItem.Height__c";
 import ITEM_DELIVERY_GROUP_FIELD
-	from "@salesforce/schema/OrderItem.DeliveryGroup__c";
+	from "@salesforce/schema/OpportunityLineItem.DeliveryGroup__c";
 import ITEM_DELIVERY_GROUP_NAME_FIELD
-	from "@salesforce/schema/OrderItem.DeliveryGroup__r.Name";
+	from "@salesforce/schema/OpportunityLineItem.DeliveryGroup__r.Name";
 import ITEM_DELIVERY_GROUP_DUE_DATE_FIELD
-	from "@salesforce/schema/OrderItem.DeliveryGroup__r.DueDate__c";
+	from "@salesforce/schema/OpportunityLineItem.DeliveryGroup__r.DueDate__c";
 import ITEM_DISCOUNT_TYPE_FIELD
-	from "@salesforce/schema/OrderItem.DiscountType__c";
+	from "@salesforce/schema/OpportunityLineItem.DiscountType__c";
 import ITEM_DISCOUNT_AMOUNT_FIELD
-	from "@salesforce/schema/OrderItem.DiscountAmount__c";
+	from "@salesforce/schema/OpportunityLineItem.DiscountAmount__c";
 import ITEM_DESCRIPTION_FIELD
-	from "@salesforce/schema/OrderItem.Description";
+	from "@salesforce/schema/OpportunityLineItem.Description";
 import ITEM_BASE_PRICE_FIELD
-	from "@salesforce/schema/OrderItem.BasePrice__c";
+	from "@salesforce/schema/OpportunityLineItem.BasePrice__c";
 import ITEM_UNIT_PRICE_FIELD
-	from "@salesforce/schema/OrderItem.UnitPrice";
+	from "@salesforce/schema/OpportunityLineItem.UnitPrice";
 import ITEM_TOTAL_PRICE_FIELD
-	from "@salesforce/schema/OrderItem.TotalPrice";
+	from "@salesforce/schema/OpportunityLineItem.TotalPrice";
 import ITEM_CREATED_DATE_FIELD
-	from "@salesforce/schema/OrderItem.CreatedDate";
+	from "@salesforce/schema/OpportunityLineItem.CreatedDate";
 import ITEM_WORK_ORDER_STATUS_FIELD
-	from "@salesforce/schema/OrderItem.WorkOrderStatus__c";
+	from "@salesforce/schema/OpportunityLineItem.WorkOrderStatus__c";
 import ITEM_PARENT_ITEM_FIELD
-	from "@salesforce/schema/OrderItem.ParentOrderProduct__c";
+	from "@salesforce/schema/OpportunityLineItem.ParentOrderProduct__c";
 import ITEM_PARENT_PRODUCT_FIELD
-	from "@salesforce/schema/OrderItem.ParentOrderProduct__r.Product2.Name";
+	from "@salesforce/schema/OpportunityLineItem.ParentOrderProduct__r.Product2.Name";
 import ITEM_NOTES_FIELD
-	from "@salesforce/schema/OrderItem.Notes__c";
+	from "@salesforce/schema/OpportunityLineItem.Notes__c";
 
 import WO_ACCOUNT_ID_FIELD from "@salesforce/schema/WorkOrder.AccountId";
 import WO_DUE_DATE_FIELD from "@salesforce/schema/WorkOrder.DueDate__c";
@@ -116,7 +116,7 @@ import WO_ORDER_PRODUCT_ID_FIELD from "@salesforce/schema/WorkOrder.OrderProduct
 import WO_QUANTITY_FIELD from "@salesforce/schema/WorkOrder.Quantity__c";
 import WO_TITLE_FIELD from "@salesforce/schema/WorkOrder.Title__c";
 
-const ORDER_GROUP_RECORD_TYPE = "Order";
+const OPPORTUNITY_GROUP_RECORD_TYPE = "Opportunity";
 
 export function getFieldApiNames() {
 	return [
@@ -198,7 +198,7 @@ export function convertFromApexRecord(r) {
 	return {
 		...createNewProduct(),
 		uniqueId: r.Id,
-		itemNo: r.OrderItemNumber,
+		itemNo: r.SortOrder,
 		createdDate: new Date(r.CreatedDate),
 		parentItemId: r.ParentOrderProduct__c,
 		parentItemProductName: r.ParentOrderProduct__r?.Product2?.Name,
@@ -250,7 +250,7 @@ export function calculateAggregations(items) {
  * @since 10/30.2022
  * @versino 1.0
  */
-export default class OrderProductManager extends NavigationMixin(InputBase) {
+export default class OpportunityProductManager extends NavigationMixin(InputBase) {
 	@api
 	recordId;
 
@@ -272,13 +272,13 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 	parentItemIds = [];
 
 	@wire(getObjectInfo, { objectApiName: ITEM_OBJECT })
-	orderItemInfo;
+	opportunityItemInfo;
 
 	@wire(getObjectInfo, { objectApiName: GROUP_OBJECT })
 	deliveryGroupObjectInfo;
 
-	get orderItemCrud() {
-		const d = this.orderItemInfo.data;
+	get opportunityItemCrud() {
+		const d = this.opportunityItemInfo.data;
 		return {
 			canRead: !!d?.queryable,
 			canCreate: !!d?.createable,
@@ -287,12 +287,12 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 		};
 	}
 
-	get canEditOrderItems() {
-		return this.orderItemCrud.canCreate || this.orderItemCrud.canUpdate;
+	get canEditOpportunityItems() {
+		return this.opportunityItemCrud.canCreate || this.opportunityItemCrud.canUpdate;
 	}
 
-	get orderDeliveryGroupRecordTypeId() {
-		return this.getDeliveryGroupRecordTypeId(ORDER_GROUP_RECORD_TYPE);
+	get opportunityDeliveryGroupRecordTypeId() {
+		return this.getDeliveryGroupRecordTypeId(OPPORTUNITY_GROUP_RECORD_TYPE);
 	}
 
 	getDeliveryGroupRecordTypeId(recordTypeName) {
@@ -323,19 +323,19 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 	}
 
 	get showAddGroupButton() {
-		return this.canEditOrderItems && (this.isDraft || this.isEdit);
+		return this.canEditOpportunityItems && (this.isDraft || this.isEdit);
 	}
 
 	get showModeButtons() {
-		return this.canEditOrderItems;
+		return this.canEditOpportunityItems;
 	}
 
 	get allowAddProductsOnView() {
-		return this.canEditOrderItems && this.isDraft;
+		return this.canEditOpportunityItems && this.isDraft;
 	}
 
 	get allowDeleteOnView() {
-		return this.canEditOrderItems && this.isDraft;
+		return this.canEditOpportunityItems && this.isDraft;
 	}
 
 	get title() {
@@ -343,12 +343,12 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 	}
 
 	get isDraft() {
-		return getFieldValue(this.order.data, STATUS_FIELD) == "Draft";
+		return !getFieldValue(this.opportunity.data, STATUS_FIELD);
 	}
 
 	get subtitle() {
-		return `<a href="/${getFieldValue(this.order.data, ACCOUNT_ID_FIELD) || ""}">
-			${getFieldValue(this.order.data, ACCOUNT_NAME_FIELD)}</a>`;
+		return `<a href="/${getFieldValue(this.opportunity.data, ACCOUNT_ID_FIELD) || ""}">
+			${getFieldValue(this.opportunity.data, ACCOUNT_NAME_FIELD)}</a>`;
 	}
 
 	get hideAddProducts() {
@@ -356,11 +356,11 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 	}
 
 	get dueDate() {
-		return getFieldValue(this.order.data, DUE_DATE_FIELD);
+		return getFieldValue(this.opportunity.data, DUE_DATE_FIELD);
 	}
 
 	get accountId() {
-		return getFieldValue(this.order.data, DUE_DATE_FIELD);
+		return getFieldValue(this.opportunity.data, ACCOUNT_ID_FIELD);
 	}
 
 	@wire(getRecord, { 
@@ -373,7 +373,7 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 			ACCOUNT_NAME_FIELD
 		]
 	})
-	order;
+	opportunity;
 
 	connectedCallback() {
 		this.getDeliveryGroupsAndProducts();
@@ -550,14 +550,14 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 
 	getDeliveryGroupsAndProducts() {
 		getDeliveryGroups({
-			orderId: this.recordId
+			opportunityId: this.recordId
 		})
 		.then(data => {
 			this.parentItemIds = {};
 			this.groups = [
 				...data.map(r => ({
 					...createGroupFromApexRecord(r),
-					products: r.OrderProducts__r?.map(
+					products: r.OpportunityProducts__r?.map(
 						op => convertFromApexRecord(op)) || []
 				}),
 				{
@@ -586,8 +586,8 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 	}
 
 	getDiscounts() {
-		getOrderProductsByProductType({
-			orderId: this.recordId,
+		getOpportunityProductsByProductType({
+			opportunityId: this.recordId,
 			productTypeName: "Discount"
 		})
 		.then(data => {
@@ -630,7 +630,7 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 		
 		// first, we remove all products
 		// inside the group...
-		saveOrderProducts({
+		saveOpportunityProducts({
 			itemsToUpsert: [],
 			itemsToDelete: group.products.map(p => p.uniqueId)
 		})
@@ -643,10 +643,10 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 			apiName: GROUP_OBJECT.objectApiName,
 			fields: {
 				...createGroupRecord(group),
-				...(this.orderDeliveryGroupRecordTypeId ? {
-					RecordTypeId: this.orderDeliveryGroupRecordTypeId
+				...(this.opportunityDeliveryGroupRecordTypeId ? {
+					RecordTypeId: this.opportunityDeliveryGroupRecordTypeId
 				} : {}),
-				Order__c: this.recordId
+				Opportunity__c: this.recordId
 			}
 		})
 		.then(result => {
@@ -658,11 +658,13 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 				});
 			this.scrollToElement(`[data-group-id="${result.id}"]`);
 		})
-		.catch(error =>
+		.catch(error => {
+			console.error(JSON.stringify(error));
 			this.toast("Error",
 				`Group was not created. There was a problem. ${error.body?.message}`,
 				"error",
-				"sticky"));
+				"sticky");
+		});
 	}
 
 	addProduct(groupId, product) {
@@ -721,7 +723,7 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 	saveProduct(product) {
 		return new Promise((resolve, reject) => {
 			this.removeErrorFromProduct(product);
-			saveOrderProducts({
+			saveOpportunityProducts({
 				itemsToUpsert: [this.convertToRecord(product)],
 				itemsToDelete: []
 			})
@@ -802,7 +804,7 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 			}
 
 			removeErrorFromProduct(product);
-			saveOrderProducts({
+			saveOpportunityProducts({
 				itemsToUpsert: [],
 				itemsToDelete: [product.uniqueId]
 			})
@@ -874,6 +876,7 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 		if (product.isNew) {
 			record[ITEM_ORDER_ID_FIELD.fieldApiName] = this.recordId;
 			record[ITEM_PRODUCT_ID_FIELD.fieldApiName] = product.productId;
+			record[ITEM_UNIT_PRICE_FIELD.fieldApiName] = product.listPrice;
 		} else {
 			record[ITEM_ID_FIELD.fieldApiName] = product.uniqueId;
 		}

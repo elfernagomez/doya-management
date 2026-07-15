@@ -1,0 +1,123 @@
+<!--
+@author Fernando Gomez
+@since 10/30.2022
+@versino 1.0
+-->
+<template>
+<article class="slds-card">
+<div class="slds-card__body">
+	<lightning-layout multiple-rows="true">
+		<lightning-layout-item flexibility="grow"
+			class="slds-var-m-right_small">
+			<lightning-input type="search"
+				name="searchProducts"
+				variant="label-hidden"
+				placeholder="Search Opportunity Products..."
+				onchange={handleOnSearchProductsChange}></lightning-input>
+		</lightning-layout-item>
+		<lightning-layout-item>
+			<lightning-layout>
+				<lightning-button-group>
+					<template lwc:if={showAddGroupButton}>
+						<lightning-button
+							icon-name="utility:add"
+							label="New Group"
+							onclick={handleOnAddGroupClick}></lightning-button>
+					</template>
+					<template lwc:if={showModeButtons}>
+						<template for:each={modeOptions}
+							for:item="modeOption"
+							for:index="index">
+							<lightning-button lwc:if={modeOption.isNotChecked}
+								icon-name={modeOption.iconName}
+								key={modeOption.value}
+								data-value={modeOption.value}
+								label={modeOption.label}
+								onclick={handleOnModeClick}></lightning-button>
+						</template>
+					</template>
+				</lightning-button-group>
+			</lightning-layout>
+		</lightning-layout-item>
+	</lightning-layout>
+	<div for:each={groups}
+		for:item="group"
+		for:index="index"
+		key={group.uniqueId}
+		class="slds-var-m-top_small">
+		<template lwc:if={group.isPlaceHolder}>
+			<c-delivery-group-card lwc:if={group.products.length}
+				delivery-group={group}
+				product-count={group.products.length}
+				mode={mode}
+				allow-delete-on-view={isDraft}>
+				<c-product-manager products={group.products}
+					mode={mode}
+					hide-add-products={hideAddProducts}
+					allow-add-products-on-view={isDraft}
+					allow-delete-on-view={isDraft}
+					onproductcreate={handleOnProductCreated}
+					onproductchange={handleOnProductChange}
+					onproductdelete={handleOnProductDelete}
+					onproductdragstart={handleOnProductDragStart}
+					onproductdragend={handleOnProductDragEnd}
+					onshowpartstoggle={handleOnShowPartsToggle}
+					onproductdeleterequest={handleOnProductDeleteRequest}
+					></c-product-manager>
+			</c-delivery-group-card>
+		</template>
+		<div lwc:else
+			data-group-id={group.uniqueId}
+			class="slds-is-relative">
+			<c-delivery-group-card
+				record-id={group.uniqueId}
+				product-count={group.products.length}
+				mode={mode}
+				allow-delete-on-view={isDraft}
+				ongroupedit={handleOnGroupEdit}
+				ongroupclone={handleOnGroupClone}
+				ongroupdelete={handleOnGroupDelete}>
+				<c-product-manager products={group.products}
+					mode={mode}
+					hide-add-products={hideAddProducts}
+					allow-add-products-on-view={allowAddProductsOnView}
+					allow-delete-on-view={allowDeleteOnView}
+					data-group-id={group.uniqueId}
+					onproductcreate={handleOnProductCreated}
+					onproductchange={handleOnProductChange}
+					onproductdelete={handleOnProductDelete}
+					onproductdragstart={handleOnProductDragStart}
+					onproductdragend={handleOnProductDragEnd}
+					onshowpartstoggle={handleOnShowPartsToggle}
+					onproductdeleterequest={handleOnProductDeleteRequest}
+					></c-product-manager>
+			</c-delivery-group-card>
+			<div lwc:if={group.isDropEnabled}
+				data-group-id={group.uniqueId}
+				data-dragging={group.isDragging}
+				ondragover={handleOnDragOver}
+				ondragleave={handleOnDragLeave}
+				ondrop={handleOnDrop}
+				class="dropzone anchor-all">
+				&nbsp;
+			</div>
+		</div>
+	</div>
+	<div class="slds-var-m-top_small">
+		<c-discount-manager
+			products={discounts}
+			mode={mode}
+			hide-add-products={hideAddProducts}
+			allow-add-products-on-view={allowAddProductsOnView}
+			allow-delete-on-view={allowDeleteOnView}
+			onproductcreate={handleOnProductCreated}
+			onproductchange={handleOnProductChange}
+			onproductdelete={handleOnProductDelete}
+			onproductdeleterequest={handleOnProductDeleteRequest}></c-discount-manager>
+	</div>
+</div>
+<lightning-spinner lwc:if={isLoading}
+	variant="brand"
+	alternative-text="Loading..."></lightning-spinner>
+</article>
+</template>

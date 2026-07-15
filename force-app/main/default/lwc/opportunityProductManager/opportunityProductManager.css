@@ -1,0 +1,53 @@
+.custom-header {
+	border-bottom-left-radius: 0 !important;
+	border-bottom-right-radius: 0 !important;
+}
+
+.anchor-top {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+}
+
+.anchor-bottom {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+}
+
+.anchor-all {
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+}
+
+.dropzone {
+	border-radius: var(--lwc-borderRadiusMedium, 0.25rem);
+	background-color: #ffffff91;
+	border: 3px var(--slds-g-color-border-1, #0176d3) solid;
+}
+
+.dropzone[data-dragging="true"] {
+	border: 3px var(--slds-g-color-brand-base-50, #0176d3) solid;
+}
+
+@keyframes borderFade {
+	0%, 80% {
+		outline-color: var(--slds-g-color-accent-1);
+	}
+	100% {
+		outline-color: transparent;
+	}
+}
+
+.border-animation {
+	border-radius: var(--slds-g-radius-border-2);
+	outline-width: 2px;
+	outline-style: solid;
+	outline-color: transparent;
+	animation: borderFade 2s ease-in-out 1;
+}
