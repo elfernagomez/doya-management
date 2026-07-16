@@ -262,18 +262,27 @@ export default class WorkOrderListView
 			this.data.forEach(row => {
 				const items = result[row.uniqueId];
 				if (items) {
-					const ops = items.map(oi => convertFromApexRecord(oi));
+					const ops = items.map(oi => ({
+						...convertFromApexRecord(oi),
+						isVisible: true
+					}));
 					row.orderProducts = ops;
+					row.hasOrderProducts = ops.length > 0;
 					row.orderProductsButtonLabel =
 						this.labels.orderProductsButtonLabel
 							.replace("{0}", ops.length);
 				} else {
 					row.orderProducts = [];
+					row.hasOrderProducts = false;
 					row.orderProductsButtonLabel =
 						this.labels.orderProductsButtonLabel
 							.replace("{0}", "No");
 				}
 			});
+
+			console.log(
+				"WorkOrderListView :: Order Products fetched",
+				JSON.stringify(this.data));
 		})
 		.catch(error => {
 			this.addError([

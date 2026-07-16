@@ -170,6 +170,7 @@ public with sharing class WorkOrderListViewCtrl {
 					OrderItem__r.DeliveryGroup__r.DueDate__c,
 					OrderItem__r.OrderId,
 					OrderItem__r.Order.DueDate__c,
+					OrderItem__r.Order.OrderNumber,
 					OrderItem__r.PricebookEntryId,
 					OrderItem__r.ParentOrderProduct__c,
 					OrderItem__r.ParentOrderProduct__r.Product2.Name,

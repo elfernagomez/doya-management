@@ -208,6 +208,7 @@ public with sharing class DeliveryGroupManager {
 							UnitType__c,
 							WorkOrderStatus__c,
 							OrderId,
+							Order.OrderNumber,
 							PricebookEntryId,
 							ParentOrderProduct__c,
 							ParentOrderProduct__r.Product2.Name,

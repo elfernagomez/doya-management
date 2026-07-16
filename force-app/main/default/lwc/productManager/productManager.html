@@ -10,13 +10,13 @@
 		error-object={errorObject}></c-error-panel>
 </div>
 <div lwc:if={hasProducts}>
-	<template for:each={products}
+	<template for:each={_products}
 		for:item="product"
 		for:index="index">
 		<div lwc:if={product.isVisible}
 			key={product.uniqueId}
 			data-is-part={product.isPart}
-			class="product-row slds-var-m-bottom_xx-small">
+			class="product-row">
 			<c-product-card product={product}
 				data-index={index}
 				mode={mode}

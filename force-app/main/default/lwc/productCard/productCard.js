@@ -189,7 +189,8 @@ export default class ProductCard extends NavigationMixin(InputBase) {
 			"slds-box",
 			"slds-box_xx-small",
 			"slds-theme_default",
-			this._product.isHidden ? "slds-hide" : ""
+			this._product.isHidden ? "slds-hide" : "",
+			this._product.isPart ? "slds-var-m-left_small" : ""
 		].join(" ");
 	}
 
@@ -202,7 +203,8 @@ export default class ProductCard extends NavigationMixin(InputBase) {
 			"slds-media_small",
 			"slds-theme_default",
 			"draggable",
-			this._product.isHidden ? "slds-hide" : ""
+			this._product.isHidden ? "slds-hide" : "",
+			this._product.isPart ? "slds-var-m-left_small" : ""
 		].join(" ");
 	}
 
@@ -410,6 +412,17 @@ export default class ProductCard extends NavigationMixin(InputBase) {
 				bubbles: true
 			}
 		);
+	}
+
+	handleOnOrderClick() {
+		this[NavigationMixin.Navigate]({
+			type: 'standard__recordPage',
+			attributes: {
+				recordId: this._product.orderId,
+				objectApiName: 'Order',
+				actionName: 'view'
+			}
+		});
 	}
 
 	handleOnGroupClick() {

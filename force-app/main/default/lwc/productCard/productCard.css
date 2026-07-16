@@ -16,3 +16,12 @@
 .delete-panel lightning-button {
 	--lwc-lineHeightButton: 1.25rem;
 }
+
+.list-item-horizontal > .slds-item:not(:first-child):before {
+	content: "|" !important;
+	width: auto !important;
+	height: auto !important;
+	border-radius: 0 !important;
+	background: none !important;
+	color: var(--slds-g-color-neutral-base-60, #939393) !important;
+}

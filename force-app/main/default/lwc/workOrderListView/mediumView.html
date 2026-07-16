@@ -189,7 +189,8 @@
 				</lightning-layout>
 			</lightning-layout-item>
 		</lightning-layout>
-		<lightning-layout vertical-align="stretch"
+		<lightning-layout lwc:if={row.hasOrderProducts}
+			vertical-align="stretch"
 			multiple-rows="true"
 			class="slds-box
 				slds-p-around_none

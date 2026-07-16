@@ -39,5 +39,5 @@
 }
 
 .product-row[data-is-part="true"] {
-	padding-left: var(--lwc-spacingLarge,1.25rem);
+	/* padding-left: var(--lwc-spacingLarge,1.25rem); */
 }

@@ -52,6 +52,8 @@ import ITEM_NUMBER_FIELD
 	from "@salesforce/schema/OrderItem.OrderItemNumber";
 import ITEM_ORDER_ID_FIELD
 	from "@salesforce/schema/OrderItem.OrderId";
+import ITEM_ORDER_NUMBER_FIELD
+	from "@salesforce/schema/OrderItem.Order.OrderNumber";
 import ITEM_PRODUCT_ID_FIELD
 	from "@salesforce/schema/OrderItem.Product2Id";
 import ITEM_PRODUCT_NAME_FIELD
@@ -126,6 +128,8 @@ export function getFieldApiNames() {
 		`${ITEM_OBJECT.objectApiName}.${ITEM_DELIVERY_GROUP_FIELD.fieldApiName}`,
 		`${ITEM_OBJECT.objectApiName}.${ITEM_DELIVERY_GROUP_NAME_FIELD.fieldApiName}`,
 		`${ITEM_OBJECT.objectApiName}.${ITEM_DELIVERY_GROUP_DUE_DATE_FIELD.fieldApiName}`,
+		`${ITEM_OBJECT.objectApiName}.${ITEM_ORDER_ID_FIELD.fieldApiName}`,
+		`${ITEM_OBJECT.objectApiName}.${ITEM_ORDER_NUMBER_FIELD.fieldApiName}`,
 		`${ITEM_OBJECT.objectApiName}.${ITEM_PRODUCT_ID_FIELD.fieldApiName}`,
 		`${ITEM_OBJECT.objectApiName}.${ITEM_PRODUCT_NAME_FIELD.fieldApiName}`,
 		`${ITEM_OBJECT.objectApiName}.${ITEM_PRODUCT_CODE_FIELD.fieldApiName}`,
@@ -162,6 +166,8 @@ export function convertFromRecord(r) {
 		groupId: getFieldValue(r, ITEM_DELIVERY_GROUP_FIELD),
 		groupName: getFieldValue(r, ITEM_DELIVERY_GROUP_NAME_FIELD),
 		groupDueDate: new Date(getFieldValue(r, ITEM_DELIVERY_GROUP_DUE_DATE_FIELD)),
+		orderId: getFieldValue(r, ITEM_ORDER_ID_FIELD),
+		orderNumber: getFieldValue(r, ITEM_ORDER_NUMBER_FIELD),
 		productId: getFieldValue(r, ITEM_PRODUCT_ID_FIELD),
 		productName: getFieldValue(r, ITEM_PRODUCT_NAME_FIELD),
 		productCode: getFieldValue(r, ITEM_PRODUCT_CODE_FIELD),
@@ -205,6 +211,8 @@ export function convertFromApexRecord(r) {
 		groupId: r.DeliveryGroup__c,
 		groupName: r.DeliveryGroup__r?.Name,
 		groupDueDate: new Date(r.DeliveryGroup__r?.DueDate__c),
+		orderId: r.OrderId,
+		orderNumber: r.Order?.OrderNumber,
 		productId: r.Product2Id,
 		productName: r.Product2.Name,
 		productCode: r.Product2.ProductCode,
