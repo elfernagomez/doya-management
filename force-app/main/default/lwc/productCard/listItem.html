@@ -10,7 +10,8 @@
 			<ul class="slds-list_horizontal
 					slds-has-dividers_left
 					list-item-horizontal">
-				<li class="slds-item">
+				<li lwc:if={showOrder}
+					class="slds-item">
 					<a href="#"
 						onclick={handleOnOrderClick}
 						class="">{_product.orderNumber}</a>

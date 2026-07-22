@@ -5,12 +5,13 @@
 		error-object={errorObject}
 		variant="confy"></c-error-panel>
 </div>
-<!-- heads -->
+<!-- body -->
 <div class="">
-<template for:each={data}
+<template lwc:if={hasRecords}>
+<div for:each={data}
 	for:item="row"
-	for:index="i">
-<div key={row.uniqueId}
+	for:index="i"
+	key={row.uniqueId}
 	class="slds-box
 		slds-theme_shade
 		slds-var-m-bottom_small
@@ -228,6 +229,14 @@
 	</div>
 </div>
 </template>
+<div lwc:else>
+	<p class="slds-text-align_center
+			slds-text-color_weak
+			slds-p-around_large
+			slds-var-m-top_small">
+		No Work Orders yet.
+	</p>
+</div>
 <lightning-spinner lwc:if={isLoading}></lightning-spinner>
 </div>
 </template>

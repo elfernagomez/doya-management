@@ -285,6 +285,10 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 	@wire(getObjectInfo, { objectApiName: GROUP_OBJECT })
 	deliveryGroupObjectInfo;
 
+	get showGroupList() {
+		return this.groups && this.groups.length > 0;
+	}
+
 	get orderItemCrud() {
 		const d = this.orderItemInfo.data;
 		return {
@@ -567,13 +571,7 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 					...createGroupFromApexRecord(r),
 					products: r.OrderProducts__r?.map(
 						op => convertFromApexRecord(op)) || []
-				}),
-				{
-					uniqueId: "null",
-					name: "Ungrouped",
-					isPlaceHolder: true,
-					products: []
-				})
+				}))
 			];
 
 			// aggregations

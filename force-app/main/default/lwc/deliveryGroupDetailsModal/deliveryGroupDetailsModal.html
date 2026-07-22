@@ -1,0 +1,536 @@
+<template>
+<lightning-modal-header label="Group Details"></lightning-modal-header>
+<lightning-modal-body class="slds-is-relative">
+	<lightning-record-view-form lwc:if={_isView}
+		object-api-name="DeliveryGroup__c"
+		record-id={recordId}>
+		<div role="list"
+			class="slds-form">
+			<div class="slds-form__row">
+				<div role="listitem"
+					class="slds-form__item slds-show">
+					<lightning-output-field
+						variant="label-stacked"
+						field-name="Name"
+						class="slds-form-element
+							slds-form-element_edit
+							slds-form-element_readonly
+							slds-form-element_stacked
+							slds-hint-parent
+							slds-var-m-top_large"></lightning-output-field>
+					<lightning-output-field
+						variant="label-stacked"
+						field-name="DueDate__c"
+						class="slds-form-element
+							slds-form-element_edit
+							slds-form-element_readonly
+							slds-form-element_stacked
+							slds-hint-parent
+							slds-var-m-top_large"></lightning-output-field>
+				</div>
+				<div role="listitem"
+					class="slds-form__item slds-show">
+					<lightning-output-field
+						variant="label-stacked"
+						field-name="DeliveryType__c"
+						class="slds-form-element
+							slds-form-element_edit
+							slds-form-element_readonly
+							slds-form-element_stacked
+							slds-hint-parent
+							slds-var-m-top_large"></lightning-output-field>
+					<lightning-output-field
+						variant="label-stacked"
+						field-name="Notes__c"
+						class="slds-form-element
+							slds-form-element_edit
+							slds-form-element_readonly
+							slds-form-element_stacked
+							slds-hint-parent
+							slds-var-m-top_large"></lightning-output-field>
+				</div>
+			</div>
+			<div class="slds-form__row">
+				<div role="listitem"
+					class="slds-form__item slds-show">
+					<lightning-output-field
+						variant="label-stacked"
+						field-name="PickupLocationType__c"
+						class="slds-form-element
+							slds-form-element_edit
+							slds-form-element_readonly
+							slds-form-element_stacked
+							slds-hint-parent
+							slds-var-m-top_large"></lightning-output-field>
+					<div lwc:if={showPickupCenter}>
+						<lightning-output-field
+							variant="label-stacked"
+							field-name="PickupCenter__c"
+							class="slds-form-element
+								slds-form-element_edit
+								slds-form-element_readonly
+								slds-form-element_stacked
+								slds-hint-parent
+								slds-var-m-top_large"></lightning-output-field>
+						<div lwc:if={pickupCenterAddress}
+							class="slds-form-element
+								slds-form-element_edit
+								slds-form-element_readonly
+								slds-form-element_stacked
+								slds-hint-parent
+								slds-var-m-top_large">
+							<span class="slds-form-element__label">
+								Pickup Center Address
+							</span>
+							<div class="slds-form-element__control">
+								<div class="slds-form-element__static">
+									{pickupCenterAddress.street}<br/>
+									{pickupCenterAddress.city}
+									{pickupCenterAddress.state},
+									{pickupCenterAddress.postalCode}<br/>
+									{pickupCenterAddress.country}
+								</div>
+							</div>
+						</div>
+						<lightning-output-field
+							variant="label-stacked"
+							field-name="PickupCenterAttentionContact__c"
+							class="slds-form-element
+								slds-form-element_edit
+								slds-form-element_readonly
+								slds-form-element_stacked
+								slds-hint-parent
+								slds-var-m-top_large"></lightning-output-field>
+					</div>
+					<div lwc:if={showPickupAddress}
+						class="slds-form-element
+							slds-form-element_edit
+							slds-form-element_readonly
+							slds-form-element_stacked
+							slds-hint-parent
+							slds-var-m-top_large">
+						<label class="slds-form-element__label">Address</label>
+						<div class="slds-form-element__control">
+							<div class="slds-form-element__static">
+								<lightning-formatted-rich-text
+									value={group.pickupAddressHtml}
+									></lightning-formatted-rich-text>
+							</div>
+						</div>
+						<lightning-output-field
+							variant="label-stacked"
+							field-name="PickupAttentionContactPhone__c"
+							class="slds-form-element
+								slds-form-element_edit
+								slds-form-element_readonly
+								slds-form-element_stacked
+								slds-hint-parent
+								slds-var-m-top_large"></lightning-output-field>
+						<lightning-output-field
+							variant="label-stacked"
+							field-name="PickupAttentionContactName__c"
+							class="slds-form-element
+								slds-form-element_edit
+								slds-form-element_readonly
+								slds-form-element_stacked
+								slds-hint-parent
+								slds-var-m-top_large"></lightning-output-field>
+					</div>
+				</div>
+				<div role="listitem"
+					class="slds-form__item slds-show">
+					<lightning-output-field
+						variant="label-stacked"
+						field-name="DeliveryLocationType__c"
+						class="slds-form-element
+							slds-form-element_edit
+							slds-form-element_readonly
+							slds-form-element_stacked
+							slds-hint-parent
+							slds-var-m-top_large"></lightning-output-field>
+					<div lwc:if={showDeliveryCenter}>
+						<lightning-output-field
+							variant="label-stacked"
+							field-name="DeliveryCenter__c"
+							class="slds-form-element
+								slds-form-element_edit
+								slds-form-element_readonly
+								slds-form-element_stacked
+								slds-hint-parent
+								slds-var-m-top_large"></lightning-output-field>
+						<div lwc:if={deliveryCenterAddress}
+							class="slds-form-element
+								slds-form-element_edit
+								slds-form-element_readonly
+								slds-form-element_stacked
+								slds-hint-parent
+								slds-var-m-top_large">
+							<span class="slds-form-element__label">
+								Delivery Center Address
+							</span>
+							<div class="slds-form-element__control">
+								<div class="slds-form-element__static">
+									{deliveryCenterAddress.street}<br/>
+									{deliveryCenterAddress.city}
+									{deliveryCenterAddress.state},
+									{deliveryCenterAddress.postalCode}<br/>
+									{deliveryCenterAddress.country}
+								</div>
+							</div>
+						</div>
+						<lightning-output-field
+							variant="label-stacked"
+							field-name="DeliveryCenterAttentionContact__c"
+							class="slds-form-element
+								slds-form-element_edit
+								slds-form-element_readonly
+								slds-form-element_stacked
+								slds-hint-parent
+								slds-var-m-top_large"></lightning-output-field>
+					</div>
+					<div lwc:if={showDeliveryAddress}
+						class="slds-form-element
+							slds-form-element_edit
+							slds-form-element_readonly
+							slds-form-element_stacked
+							slds-hint-parent
+							slds-var-m-top_large">
+						<label class="slds-form-element__label">Address</label>
+						<div class="slds-form-element__control">
+							<div class="slds-form-element__static">
+								<lightning-formatted-rich-text
+									value={group.deliveryAddressHtml}
+									></lightning-formatted-rich-text>
+							</div>
+						</div>
+						<lightning-output-field
+							variant="label-stacked"
+							field-name="DeliveryAttentionContactPhone__c"
+							class="slds-form-element
+								slds-form-element_edit
+								slds-form-element_readonly
+								slds-form-element_stacked
+								slds-hint-parent
+								slds-var-m-top_large"></lightning-output-field>
+						<lightning-output-field
+							variant="label-stacked"
+							field-name="DeliveryAttentionContactName__c"
+							class="slds-form-element
+								slds-form-element_edit
+								slds-form-element_readonly
+								slds-form-element_stacked
+								slds-hint-parent
+								slds-var-m-top_large"></lightning-output-field>
+					</div>
+				</div>
+			</div>
+		</div>
+	</lightning-record-view-form>
+	<lightning-record-edit-form lwc:if={_isEdit}
+		object-api-name="DeliveryGroup__c"
+		record-id={recordId}
+		onchange={handleOnDetailsFieldChange}
+		onsubmit={handleOnSubmit}
+		onsuccess={handleOnSuccess}
+		onerror={handleOnError}
+		class="detailsForm">
+		<div lwc:if={isError}
+			class="slds-var-m-bottom_small">
+			<c-error-panel error-title={errorTitle}
+				error-object={errorObject}></c-error-panel>
+		</div>
+		<div role="list"
+			class="slds-form">
+			<div class="slds-form__row">
+				<div role="listitem"
+					class="slds-form__item slds-show">
+					<lightning-input-field variant="label-stacked"
+						field-name="Name"
+						onchange={handleOnDetailsFieldChange}
+						required
+						class="validate
+							slds-size_full"></lightning-input-field>
+					<lightning-input-field variant="label-stacked"
+						field-name="DueDate__c"
+						onchange={handleOnDetailsFieldChange}
+						required
+						class="validate
+							slds-size_full"></lightning-input-field>
+				</div>
+				<div role="listitem"
+					class="slds-form__item slds-show">
+					<lightning-input-field variant="label-stacked"
+						field-name="DeliveryType__c"
+						onchange={handleOnDetailsFieldChange}
+						required
+						class="validate
+							slds-size_full"></lightning-input-field>
+					<lightning-input-field variant="label-stacked"
+						field-name="Notes__c"
+						onchange={handleOnDetailsFieldChange}
+						class="validate
+							slds-size_full"></lightning-input-field>
+				</div>
+			</div>
+			<div class="slds-form__row">
+				<div role="listitem"
+					class="slds-form__item slds-show">
+					<lightning-radio-group name="pickupLocationTypeChoice"
+						label="Pickup Location Type"
+						options={pickupLocationTypeOptions}
+						value={pickupLocationTypeChoice}
+						type="button"
+						onchange={handleOnPickupLocationTypeChange}
+						class="validate"></lightning-radio-group>
+
+					<div lwc:if={showPickupCenter}>
+						<lightning-input-field
+							field-name="PickupCenter__c"
+							variant="label-stacked"
+							onchange={handleOnDetailsFieldChange}
+							></lightning-input-field>
+
+						<div lwc:if={pickupCenterAddress}
+							class="slds-form-element
+								slds-form-element_edit
+								slds-form-element_readonly
+								slds-form-element_stacked
+								slds-hint-parent
+								slds-var-m-top_large">
+							<span class="slds-form-element__label">
+								Pickup Center Address
+							</span>
+							<div class="slds-form-element__control">
+								<div class="slds-form-element__static">
+									{pickupCenterAddress.street}<br/>
+									{pickupCenterAddress.city}
+									{pickupCenterAddress.state},
+									{pickupCenterAddress.postalCode}<br/>
+									{pickupCenterAddress.country}
+								</div>
+							</div>
+						</div>
+
+						<lightning-input-field
+							field-name="PickupCenterAttentionContact__c"
+							variant="label-stacked"
+							onchange={handleOnDetailsFieldChange}
+							></lightning-input-field>
+					</div>
+					<div lwc:if={showPickupAddress}>
+						<lightning-layout multiple-rows="true"
+							class="slds-gutters">
+							<lightning-layout-item size="12"
+								class="slds-col">
+								<lightning-input-field
+									variant="label-stacked"
+									field-name="PickupAddress__Street__s"
+									label="Street"
+									onchange={handleOnDetailsFieldChange}
+									class="validate"></lightning-input-field>
+							</lightning-layout-item>
+							<lightning-layout-item size="6"
+								class="slds-col">
+								<lightning-input-field
+									variant="label-stacked"
+									field-name="PickupAddress__City__s"
+									label="City"
+									onchange={handleOnDetailsFieldChange}
+									class="validate"></lightning-input-field>
+							</lightning-layout-item>
+							<lightning-layout-item size="6"
+								class="slds-col">
+								<lightning-input-field
+									variant="label-stacked"
+									field-name="PickupAddress__StateCode__s"
+									label="State"
+									onchange={handleOnDetailsFieldChange}
+									class="validate"></lightning-input-field>
+							</lightning-layout-item>
+							<lightning-layout-item size="6"
+								class="slds-col">
+								<lightning-input-field
+									variant="label-stacked"
+									field-name="PickupAddress__PostalCode__s"
+									label="Zip Code"
+									onchange={handleOnDetailsFieldChange}
+									class="validate"></lightning-input-field>
+							</lightning-layout-item>
+							<lightning-layout-item size="6"
+								class="slds-col">
+								<lightning-input-field
+									variant="label-stacked"
+									field-name="PickupAddress__CountryCode__s"
+									label="Country"
+									onchange={handleOnDetailsFieldChange}
+									class="validate"></lightning-input-field>
+							</lightning-layout-item>
+							<lightning-layout-item size="6"
+								class="slds-col">
+								<lightning-input-field
+									variant="label-stacked"
+									field-name="PickupAttentionContactPhone__c"
+									onchange={handleOnDetailsFieldChange}
+									class="validate"></lightning-input-field>
+							</lightning-layout-item>
+							<lightning-layout-item size="6"
+								class="slds-col">
+								<lightning-input-field
+									variant="label-stacked"
+									field-name="PickupAttentionContactName__c"
+									onchange={handleOnDetailsFieldChange}
+									class="validate"></lightning-input-field>
+							</lightning-layout-item>
+						</lightning-layout>
+					</div>
+				</div>
+				<div role="listitem"
+					class="slds-form__item slds-show">
+					<lightning-radio-group name="locationTypeChoice"
+						label="Delivery Location Type"
+						options={locationTypeOptions}
+						value={locationTypeChoice}
+						type="button"
+						onchange={handleOnLocationTypeChange}
+						class="validate"></lightning-radio-group>
+
+					<div lwc:if={showDeliveryCenter}>
+						<lightning-input-field
+							field-name="DeliveryCenter__c"
+							variant="label-stacked"
+							onchange={handleOnDetailsFieldChange}
+							></lightning-input-field>
+
+						<div lwc:if={deliveryCenterAddress}
+							class="slds-form-element
+								slds-form-element_edit
+								slds-form-element_readonly
+								slds-form-element_stacked
+								slds-hint-parent
+								slds-var-m-top_large">
+							<span class="slds-form-element__label">
+								Delivery Center Address
+							</span>
+							<div class="slds-form-element__control">
+								<div class="slds-form-element__static">
+									{deliveryCenterAddress.street}<br/>
+									{deliveryCenterAddress.city}
+									{deliveryCenterAddress.state},
+									{deliveryCenterAddress.postalCode}<br/>
+									{deliveryCenterAddress.country}
+								</div>
+							</div>
+						</div>
+
+						<lightning-input-field
+							field-name="DeliveryCenterAttentionContact__c"
+							variant="label-stacked"
+							onchange={handleOnDetailsFieldChange}
+							></lightning-input-field>
+					</div>
+					<div lwc:if={showDeliveryAddress}>
+						<lightning-layout multiple-rows="true"
+							class="slds-gutters">
+							<lightning-layout-item size="12"
+								class="slds-col">
+								<lightning-input-field
+									variant="label-stacked"
+									field-name="DeliveryAddress__Street__s"
+									label="Street"
+									onchange={handleOnDetailsFieldChange}
+									class="validate"></lightning-input-field>
+							</lightning-layout-item>
+							<lightning-layout-item size="6"
+								class="slds-col">
+								<lightning-input-field
+									variant="label-stacked"
+									field-name="DeliveryAddress__City__s"
+									label="City"
+									onchange={handleOnDetailsFieldChange}
+									class="validate"></lightning-input-field>
+							</lightning-layout-item>
+							<lightning-layout-item size="6"
+								class="slds-col">
+								<lightning-input-field
+									variant="label-stacked"
+									field-name="DeliveryAddress__StateCode__s"
+									label="State"
+									onchange={handleOnDetailsFieldChange}
+									class="validate"></lightning-input-field>
+							</lightning-layout-item>
+							<lightning-layout-item size="6"
+								class="slds-col">
+								<lightning-input-field
+									variant="label-stacked"
+									field-name="DeliveryAddress__PostalCode__s"
+									label="Zip Code"
+									onchange={handleOnDetailsFieldChange}
+									class="validate"></lightning-input-field>
+							</lightning-layout-item>
+							<lightning-layout-item size="6"
+								class="slds-col">
+								<lightning-input-field
+									variant="label-stacked"
+									field-name="DeliveryAddress__CountryCode__s"
+									label="Country"
+									onchange={handleOnDetailsFieldChange}
+									class="validate"></lightning-input-field>
+							</lightning-layout-item>
+							<lightning-layout-item size="6"
+								class="slds-col">
+								<lightning-input-field
+									variant="label-stacked"
+									field-name="DeliveryAttentionContactPhone__c"
+									onchange={handleOnDetailsFieldChange}
+									class="validate"></lightning-input-field>
+							</lightning-layout-item>
+							<lightning-layout-item size="6"
+								class="slds-col">
+								<lightning-input-field
+									variant="label-stacked"
+									field-name="DeliveryAttentionContactName__c"
+									onchange={handleOnDetailsFieldChange}
+									class="validate"></lightning-input-field>
+							</lightning-layout-item>
+						</lightning-layout>
+					</div>
+				</div>
+			</div>
+		</div>
+		<lightning-button lwc:ref="hiddenDetailsButton"
+			variant="brand"
+			type="submit"
+			label="Hidden Save"
+			hidden></lightning-button>
+	</lightning-record-edit-form>
+	<lightning-spinner lwc:if={isLoading}
+		variant="brand"></lightning-spinner>
+</lightning-modal-body>
+<lightning-modal-footer lwc:if={_isView}>
+	<lightning-button label="Edit"
+		variant="neutral"
+		disabled={isCancelButtonDisabled}
+		onclick={handleOnSwitchToEditClick}
+		class="slds-var-m-horizontal_x-small"></lightning-button>
+	<lightning-button label="Done"
+		variant="neutral"
+		type="cancel"
+		disabled={isCancelButtonDisabled}
+		onclick={handleOnCancelDetailsClick}
+		class="slds-var-m-horizontal_x-small"></lightning-button>
+</lightning-modal-footer>
+<lightning-modal-footer lwc:if={_isEdit}>
+	<lightning-button label="Cancel"
+		variant="neutral"
+		type="cancel"
+		disabled={isCancelButtonDisabled}
+		onclick={handleOnCancelDetailsClick}
+		class="slds-var-m-horizontal_x-small"></lightning-button>
+
+	<lightning-button label="Save"
+		variant="brand"
+		disabled={isSaveButtonDisabled}
+		onclick={handleOnSaveClick}
+		class="slds-var-m-horizontal_x-small"></lightning-button>
+</lightning-modal-footer>
+</template>

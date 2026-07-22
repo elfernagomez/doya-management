@@ -40,69 +40,79 @@
 			</lightning-layout>
 		</lightning-layout-item>
 	</lightning-layout>
-	<div for:each={groups}
-		for:item="group"
-		for:index="index"
-		key={group.uniqueId}
-		class="slds-var-m-top_small">
-		<template lwc:if={group.isPlaceHolder}>
-			<c-delivery-group-card lwc:if={group.products.length}
-				delivery-group={group}
-				product-count={group.products.length}
-				mode={mode}
-				allow-delete-on-view={isDraft}>
-				<c-product-manager products={group.products}
+	<template lwc:if={showGroupList}>
+		<div for:each={groups}
+			for:item="group"
+			for:index="index"
+			key={group.uniqueId}
+			class="slds-var-m-top_small">
+			<div data-group-id={group.uniqueId}
+				class="slds-is-relative">
+				<c-delivery-group-card
+					record-id={group.uniqueId}
+					product-count={group.products.length}
 					mode={mode}
-					hide-add-products={hideAddProducts}
-					allow-add-products-on-view={isDraft}
 					allow-delete-on-view={isDraft}
-					onproductcreate={handleOnProductCreated}
-					onproductchange={handleOnProductChange}
-					onproductdelete={handleOnProductDelete}
-					onproductdragstart={handleOnProductDragStart}
-					onproductdragend={handleOnProductDragEnd}
-					oncreateworkorder={handleOnCreateWorkOrder}
-					onshowpartstoggle={handleOnShowPartsToggle}
-					onproductdeleterequest={handleOnProductDeleteRequest}
-					></c-product-manager>
-			</c-delivery-group-card>
-		</template>
-		<div lwc:else
-			data-group-id={group.uniqueId}
-			class="slds-is-relative">
-			<c-delivery-group-card
-				record-id={group.uniqueId}
-				product-count={group.products.length}
-				mode={mode}
-				allow-delete-on-view={isDraft}
-				ongroupedit={handleOnGroupEdit}
-				ongroupclone={handleOnGroupClone}
-				ongroupdelete={handleOnGroupDelete}>
-				<c-product-manager products={group.products}
-					mode={mode}
-					hide-add-products={hideAddProducts}
-					allow-add-products-on-view={allowAddProductsOnView}
-					allow-delete-on-view={allowDeleteOnView}
+					ongroupedit={handleOnGroupEdit}
+					ongroupclone={handleOnGroupClone}
+					ongroupdelete={handleOnGroupDelete}>
+					<c-product-manager products={group.products}
+						mode={mode}
+						hide-add-products={hideAddProducts}
+						allow-add-products-on-view={allowAddProductsOnView}
+						allow-delete-on-view={allowDeleteOnView}
+						data-group-id={group.uniqueId}
+						onproductcreate={handleOnProductCreated}
+						onproductchange={handleOnProductChange}
+						onproductdelete={handleOnProductDelete}
+						onproductdragstart={handleOnProductDragStart}
+						onproductdragend={handleOnProductDragEnd}
+						oncreateworkorder={handleOnCreateWorkOrder}
+						onshowpartstoggle={handleOnShowPartsToggle}
+						onproductdeleterequest={handleOnProductDeleteRequest}
+						></c-product-manager>
+				</c-delivery-group-card>
+				<div lwc:if={group.isDropEnabled}
 					data-group-id={group.uniqueId}
-					onproductcreate={handleOnProductCreated}
-					onproductchange={handleOnProductChange}
-					onproductdelete={handleOnProductDelete}
-					onproductdragstart={handleOnProductDragStart}
-					onproductdragend={handleOnProductDragEnd}
-					oncreateworkorder={handleOnCreateWorkOrder}
-					onshowpartstoggle={handleOnShowPartsToggle}
-					onproductdeleterequest={handleOnProductDeleteRequest}
-					></c-product-manager>
-			</c-delivery-group-card>
-			<div lwc:if={group.isDropEnabled}
-				data-group-id={group.uniqueId}
-				data-dragging={group.isDragging}
-				ondragover={handleOnDragOver}
-				ondragleave={handleOnDragLeave}
-				ondrop={handleOnDrop}
-				class="dropzone anchor-all">
-				&nbsp;
+					data-dragging={group.isDragging}
+					ondragover={handleOnDragOver}
+					ondragleave={handleOnDragLeave}
+					ondrop={handleOnDrop}
+					class="dropzone anchor-all">
+					&nbsp;
+				</div>
 			</div>
+		</div>
+	</template>
+	<div lwc:else
+		class="slds-box
+			slds-box_small
+			slds-is-relative
+			slds-theme_shade
+			slds-var-m-top_small">
+		<div class="slds-media">
+			<div class="slds-media__figure">
+				<lightning-icon icon-name="standard:address"
+					size="small"></lightning-icon>
+			</div>
+			<div class="slds-media__body">
+				<div class="slds-page-header__name">
+					<div class="slds-page-header__name-title">
+						<h2>
+							<span title="Discounts"
+								class="slds-page-header__title
+									slds-text-heading_small
+									slds-truncate">No Delivery Groups added yet</span>
+						</h2>`
+					</div>
+				</div>
+			</div>
+		</div>
+		<div lwc:if={showAddGroupButton}>
+			<lightning-button
+				icon-name="utility:add"
+				label="New Group"
+				onclick={handleOnAddGroupClick}></lightning-button>
 		</div>
 	</div>
 	<div class="slds-var-m-top_small">

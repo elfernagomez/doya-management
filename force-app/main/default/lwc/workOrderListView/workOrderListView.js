@@ -122,6 +122,10 @@ export default class WorkOrderListView
 		];
 	}
 
+	get hasRecords() {
+		return this.data != null && this.data.length > 0;
+	}
+
 	render() {
 		return this.isSizeMedium ? mediumView : largeView;
 	}

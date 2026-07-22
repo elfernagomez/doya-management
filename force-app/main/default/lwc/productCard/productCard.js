@@ -120,6 +120,9 @@ export default class ProductCard extends NavigationMixin(InputBase) {
 	variant = "row"; // row, list-item, tile
 
 	@api
+	hideOrder = false;
+
+	@api
 	hideQty = false;
 
 	@api
@@ -154,6 +157,10 @@ export default class ProductCard extends NavigationMixin(InputBase) {
 		label: "Each",
 		value: "Each"
 	}];
+
+	get showOrder() {
+		return !this.hideOrder && this._product.orderId;
+	}
 
 	get showQty() {
 		return !this.hideQty;
