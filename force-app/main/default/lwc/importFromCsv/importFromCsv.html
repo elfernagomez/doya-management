@@ -1,0 +1,11 @@
+<template>
+<lightning-quick-action-panel header="Import From CSV">
+	<c-order-import-tool account-id={recordId}></c-order-import-tool>
+	<div slot="footer">
+		<lightning-button
+			label="Close"
+			onclick={handleClose}>
+		</lightning-button>
+	</div>
+</lightning-quick-action-panel>
+</template>
