@@ -10,9 +10,9 @@ const ERROR_COLUMNS = [
 ];
 
 const DEFAULT_TEMPLATE_HEADERS = [
-	'Order Reference Number',
 	'Due Date',
-	'Location Name',
+	'Order Name',
+	'Delivery Group Name',
 	'Product Name',
 	'Quantity',
 	'Unit Type',
@@ -24,12 +24,12 @@ const DEFAULT_TEMPLATE_HEADERS = [
 ];
 
 const DEFAULT_TEMPLATE_SAMPLE = [
-	'PO-100105',
 	'2030-12-31',
-	'Carnival Valor',
-	'Single sided 100Lb Cover',
+	'Miami Dade Public Fair',
+	'Convention Center, Gate B2',
+	'Stopper Small 120x60',
 	'80',
-	'Each/SqFt',
+	'SqFt',
 	'2659007_NIMKY_BF_CCL Breeze_8.5x11in_Qty10_SC.pdf',
 	'10',
 	'20',
