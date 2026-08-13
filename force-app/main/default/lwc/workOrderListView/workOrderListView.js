@@ -284,9 +284,7 @@ export default class WorkOrderListView
 				}
 			});
 
-			console.log(
-				"WorkOrderListView :: Order Products fetched",
-				JSON.stringify(this.data));
+			console.log("WorkOrderListView :: Order Products fetched");
 		})
 		.catch(error => {
 			this.addError([

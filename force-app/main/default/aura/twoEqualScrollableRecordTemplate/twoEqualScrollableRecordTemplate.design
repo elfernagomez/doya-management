@@ -1,0 +1,10 @@
+<design:component label="Two Equal Scrollable Regions (Record)">
+    <flexipage:template>
+        <flexipage:region name="leftRegion" label="Left Region" defaultWidth="MEDIUM" />
+        <flexipage:region name="rightRegion" label="Right Region" defaultWidth="MEDIUM" />
+    </flexipage:template>
+    <design:supportedFormFactors>
+        <design:supportedFormFactor type="Large" />
+        <design:supportedFormFactor type="Small" />
+    </design:supportedFormFactors>
+</design:component>

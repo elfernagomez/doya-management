@@ -14,11 +14,10 @@ https://www.lightningdesignsystem.com/components/scoped-notifications
 			<lightning-icon icon-name={icon}
 				alternative-text="information"
 				variant={iconVariant}
-				size="small"></lightning-icon>
+				size="x-small"></lightning-icon>
 		</div>
 		<div class="slds-media__body">
-			<div lwc:if={message}
-				class="slds-text-heading_medium">{message}</div>
+			<p lwc:if={message}>{message}</p>
 			<!-- custom html used inside another component -->
 			<slot></slot>
 		</div>

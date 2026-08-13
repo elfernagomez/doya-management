@@ -24,6 +24,8 @@ import {
 
 import NewWorkOrdersModal from 'c/newWorkOrdersModal';
 import OrderProductPartsSelectionModal from 'c/orderProductPartsSelectionModal';
+import ORDER_PRODUCT_MANAGER_READ_ONLY_COMPLETED_MESSAGE
+	from '@salesforce/label/c.OrderProductManager_readOnlyCompletedMessage';
 
 import getDeliveryGroups
 	from "@salesforce/apex/OrderProductManagerCtrl.getDeliveryGroups";
@@ -119,6 +121,13 @@ import WO_QUANTITY_FIELD from "@salesforce/schema/WorkOrder.Quantity__c";
 import WO_TITLE_FIELD from "@salesforce/schema/WorkOrder.Title__c";
 
 const ORDER_GROUP_RECORD_TYPE = "Order";
+const ORDER_STATUS_DRAFT = "Draft";
+const ORDER_STATUS_IN_PROGRESS = "In Progress";
+const ORDER_STATUS_COMPLETED = "Completed";
+const EDITABLE_ORDER_STATUSES = new Set([
+	ORDER_STATUS_DRAFT,
+	ORDER_STATUS_IN_PROGRESS
+]);
 
 export function getFieldApiNames() {
 	return [
@@ -259,6 +268,10 @@ export function calculateAggregations(items) {
  * @versino 1.0
  */
 export default class OrderProductManager extends NavigationMixin(InputBase) {
+	labels = {
+		readOnlyCompletedMessage: ORDER_PRODUCT_MANAGER_READ_ONLY_COMPLETED_MESSAGE
+	};
+
 	@api
 	recordId;
 
@@ -303,6 +316,23 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 		return this.orderItemCrud.canCreate || this.orderItemCrud.canUpdate;
 	}
 
+	get orderStatus() {
+		return getFieldValue(this.order.data, STATUS_FIELD);
+	}
+
+	get isCompletedOrBeyond() {
+		const status = this.orderStatus;
+		return !!status && !EDITABLE_ORDER_STATUSES.has(status);
+	}
+
+	get canMutateOrderProducts() {
+		return this.canEditOrderItems && !this.isCompletedOrBeyond;
+	}
+
+	get effectiveMode() {
+		return this.isCompletedOrBeyond ? "view" : this.mode;
+	}
+
 	get orderDeliveryGroupRecordTypeId() {
 		return this.getDeliveryGroupRecordTypeId(ORDER_GROUP_RECORD_TYPE);
 	}
@@ -335,19 +365,19 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 	}
 
 	get showAddGroupButton() {
-		return this.canEditOrderItems && (this.isDraft || this.isEdit);
+		return this.canMutateOrderProducts && (this.isDraft || this.isEdit);
 	}
 
 	get showModeButtons() {
-		return this.canEditOrderItems;
+		return this.canMutateOrderProducts;
 	}
 
 	get allowAddProductsOnView() {
-		return this.canEditOrderItems && this.isDraft;
+		return this.canMutateOrderProducts && this.isDraft;
 	}
 
 	get allowDeleteOnView() {
-		return this.canEditOrderItems && this.isDraft;
+		return this.canMutateOrderProducts && this.isDraft;
 	}
 
 	get title() {
@@ -355,7 +385,7 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 	}
 
 	get isDraft() {
-		return getFieldValue(this.order.data, STATUS_FIELD) == "Draft";
+		return this.orderStatus == ORDER_STATUS_DRAFT;
 	}
 
 	get subtitle() {
@@ -392,12 +422,44 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 		this.getDiscounts();
 	}
 
+	handleOnModeClick(event) {
+		const nextMode = event.target.dataset.value;
+		if (nextMode == "edit" && this.preventMutationIfLocked()) {
+			return;
+		}
+
+		super.handleOnModeClick(event);
+	}
+
+	preventMutationIfLocked() {
+		if (!this.canMutateOrderProducts) {
+			this.mode = "view";
+			this.toast(
+				"Read Only",
+				`Order products are read only when Order status is ${ORDER_STATUS_COMPLETED} or later.`,
+				"warning",
+				"dismissible"
+			);
+			return true;
+		}
+
+		return false;
+	}
+
 	handleOnAddGroupClick() {
+		if (this.preventMutationIfLocked()) {
+			return;
+		}
+
 		this.handleOnEditClick();
 		this.addNewGroup();
 	}
 
 	handleOnProductCreated(event) {
+		if (this.preventMutationIfLocked()) {
+			return;
+		}
+
 		this.handleOnEditClick();
 		const groupId = event.target.dataset.groupId;
 		const product = { ...event.detail };
@@ -451,14 +513,26 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 	}
 
 	handleOnProductChange(event) {
+		if (this.preventMutationIfLocked()) {
+			return;
+		}
+
 		this.updateProduct(event.detail);
 	}
 
 	handleOnProductDeleteRequest() {
+		if (this.preventMutationIfLocked()) {
+			return;
+		}
+
 		this.handleOnEditClick();
 	}
 
 	handleOnProductDelete(event) {
+		if (this.preventMutationIfLocked()) {
+			return;
+		}
+
 		this.deleteProduct(event.detail);
 	}
 
@@ -507,6 +581,10 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 	}
 
 	handleOnDrop(event) {
+		if (this.preventMutationIfLocked()) {
+			return;
+		}
+
 		let product = JSON.parse(event.dataTransfer.getData("text/json"));
 		let sourceGroupId = product.groupId;
 		let targetGroupId = event.currentTarget.dataset.groupId;
@@ -522,6 +600,10 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 	}
 
 	handleOnGroupDelete(event) {
+		if (this.preventMutationIfLocked()) {
+			return;
+		}
+
 		this.deleteGroup(event.detail.recordId);
 	}
 

@@ -1,0 +1,22 @@
+<aura:component access="global"
+	implements="lightning:recordHomeTemplate"
+	description="Two Equal Scrollable Regions Record Template">
+	<aura:attribute name="leftRegion" type="Aura.Component[]" />
+	<aura:attribute name="rightRegion" type="Aura.Component[]" />
+
+	<div class="slds-is-absolute container">
+		<div class="slds-grid grid">
+			<div class="slds-col
+					slds-size_5-of-12
+					slds-scrollable_y
+					slds-var-p-right_medium">
+				{! v.leftRegion }
+			</div>
+			<div class="slds-col
+					slds-size_7-of-12
+					slds-scrollable_y">
+				{! v.rightRegion }
+			</div>
+		</div>
+	</div>
+</aura:component>

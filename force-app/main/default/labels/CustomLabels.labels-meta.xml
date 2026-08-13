@@ -168,4 +168,11 @@
 		<shortDescription>OrderPackingSlipManager_deletePackingSlipMessage</shortDescription>
 		<value>Are you sure you want to delete this Packing Slip?</value>
 	</labels>
+	<labels>
+		<fullName>OrderProductManager_readOnlyCompletedMessage</fullName>
+		<language>en_US</language>
+		<protected>false</protected>
+		<shortDescription>OrderProductManager_readOnlyCompletedMessage</shortDescription>
+		<value>Order Products are read only once the Order reaches Completed or later status.</value>
+	</labels>
 </CustomLabels>

@@ -81,7 +81,6 @@ export default class PackingSlipCreateModal extends LightningModal {
 
 								const fields = fieldApiNames.map((fieldApiName, fieldIndex) => {
 									const isReadOnly = this.isFieldReadOnly(fieldApiName, item);
-									console.log(fieldApiName, isReadOnly);
 									return {
 										key: `section-${sectionIndex}-row-${rowIndex}-item-${itemIndex}-field-${fieldIndex}`,
 										apiName: fieldApiName,
