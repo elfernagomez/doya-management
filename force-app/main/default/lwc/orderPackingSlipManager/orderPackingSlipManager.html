@@ -28,6 +28,13 @@
 	</div>
 </template>
 
+<div lwc:if={isDeliveredOrBeyond}
+	class="slds-var-m-bottom_small">
+	<c-scoped-notification
+		message={labels.readOnlyCompletedMessage}
+		variant="warning"></c-scoped-notification>
+</div>
+
 <lightning-layout>
 	<lightning-layout-item flexibility="grow">
 		<lightning-input type="search"
@@ -36,7 +43,25 @@
 			placeholder="Search Packing Slips..."
 			onchange={handleOnSearchSlipsChange}></lightning-input>
 	</lightning-layout-item>
-	<lightning-layout-item
+	<lightning-layout-item>
+		<lightning-layout>
+			<lightning-button-group>
+				<template lwc:if={showModeButtons}>
+					<template for:each={modeOptions}
+						for:item="modeOption"
+						for:index="index">
+						<lightning-button lwc:if={modeOption.isNotChecked}
+							icon-name={modeOption.iconName}
+							key={modeOption.value}
+							data-value={modeOption.value}
+							label={modeOption.label}
+							onclick={handleOnModeClick}></lightning-button>
+					</template>
+				</template>
+			</lightning-button-group>
+		</lightning-layout>
+	</lightning-layout-item>
+	<lightning-layout-item lwc:if={showModeButtons}
 		class="slds-var-m-left_small">
 		<template for:each={modeOptions}
 			for:item="modeOption"

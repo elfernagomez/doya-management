@@ -380,6 +380,10 @@ export default class OrderProductManager extends NavigationMixin(InputBase) {
 		return this.canMutateOrderProducts && this.isDraft;
 	}
 
+	get allowCreateWorkOrderOnView() {
+		return this.canMutateOrderProducts && this.isDraft;
+	}
+
 	get title() {
 		return "Products";
 	}

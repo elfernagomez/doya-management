@@ -1,0 +1,17 @@
+.files-wrap {
+	max-width: 100%;
+}
+
+.file-title {
+	border: 0;
+	padding: 0;
+	background: transparent;
+	cursor: pointer;
+	font-weight: 600;
+	color: var(--slds-g-color-brand-base-50, #0176d3);
+	text-decoration: none;
+}
+
+.file-title:hover {
+	text-decoration: underline;
+}

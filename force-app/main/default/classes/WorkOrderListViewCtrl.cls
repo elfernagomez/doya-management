@@ -207,6 +207,77 @@ public with sharing class WorkOrderListViewCtrl {
 		}
 	}
 
+	/**
+	 * Gets files attached to one WorkOrder.
+	 * @param workOrderId WorkOrder record Id
+	 * @return List<WorkOrderFileWrapper>
+	 * @throws AuraHandledException
+	 */
+	@AuraEnabled(cacheable=true)
+	public static List<WorkOrderFileWrapper> getWorkOrderFiles(Id workOrderId) {
+		List<WorkOrderFileWrapper> files = new List<WorkOrderFileWrapper>();
+
+		try {
+			if (workOrderId == null) {
+				return files;
+			}
+
+			for (ContentDocumentLink link : [
+				SELECT ContentDocumentId,
+					ContentDocument.Title,
+					ContentDocument.FileType,
+					ContentDocument.ContentSize,
+					ContentDocument.CreatedDate
+				FROM ContentDocumentLink
+				WHERE LinkedEntityId = :workOrderId
+				ORDER BY ContentDocument.CreatedDate DESC
+			]) {
+				files.add(new WorkOrderFileWrapper(link));
+			}
+
+			return files;
+		} catch (Exception ex) {
+			System.debug(ex.getMessage() + '\n' + ex.getStackTraceString());
+			throw new AuraHandledException(ex.getMessage());
+		}
+	}
+
+	/**
+	 * Gets file counts for WorkOrders.
+	 * @param workOrderIds List of WorkOrder Ids
+	 * @return Map<Id, Integer>
+	 * @throws AuraHandledException
+	 */
+	@AuraEnabled(cacheable=true)
+	public static Map<Id, Integer> getFileCountsByWorkOrders(
+		List<Id> workOrderIds
+	) {
+		Map<Id, Integer> countsByWorkOrderId = new Map<Id, Integer>();
+
+		try {
+			if (workOrderIds == null || workOrderIds.isEmpty()) {
+				return countsByWorkOrderId;
+			}
+
+			for (AggregateResult ar : [
+				SELECT LinkedEntityId workOrderId,
+					COUNT(Id) fileCount
+				FROM ContentDocumentLink
+				WHERE LinkedEntityId IN :workOrderIds
+				GROUP BY LinkedEntityId
+			]) {
+				Id workOrderId = (Id) ar.get('workOrderId');
+				Integer fileCount = Integer.valueOf(String.valueOf(ar.get('fileCount')));
+				countsByWorkOrderId.put(workOrderId, fileCount);
+			}
+
+			return countsByWorkOrderId;
+		} catch (Exception ex) {
+			System.debug(ex.getMessage() + '\n' + ex.getStackTraceString());
+			throw new AuraHandledException(ex.getMessage());
+		}
+	}
+
 	/* private static List<WorkOrderWrapper> wrap(List<WorkOrder> workOrders) {
 		List<WorkOrderWrapper> wrappers = new List<WorkOrderWrapper>();
 		for (WorkOrder wo : workOrders)
@@ -251,5 +322,38 @@ public with sharing class WorkOrderListViewCtrl {
 
 		@AuraEnabled
 		public Object value { get; set; }
+	}
+
+	public class WorkOrderFileWrapper {
+		@AuraEnabled
+		public Id contentDocumentId;
+
+		@AuraEnabled
+		public String title;
+
+		@AuraEnabled
+		public String fileType;
+
+		@AuraEnabled
+		public Integer contentSize;
+
+		@AuraEnabled
+		public Datetime createdDate;
+
+		public WorkOrderFileWrapper(ContentDocumentLink link) {
+			contentDocumentId = link.ContentDocumentId;
+			title = link.ContentDocument != null ?
+				link.ContentDocument.Title :
+				null;
+			fileType = link.ContentDocument != null ?
+				link.ContentDocument.FileType :
+				null;
+			contentSize = link.ContentDocument != null ?
+				link.ContentDocument.ContentSize :
+				null;
+			createdDate = link.ContentDocument != null ?
+				link.ContentDocument.CreatedDate :
+				null;
+		}
 	}
 }

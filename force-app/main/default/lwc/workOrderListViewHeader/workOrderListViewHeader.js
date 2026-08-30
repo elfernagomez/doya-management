@@ -72,6 +72,15 @@ export default class WorkOrderListViewHeader extends WorkOrderListViewEventBus {
 		return `padding-right:${20}px;`;
 	}
 
+	get headerColumns() {
+		return this.columns.map(column => ({
+			...column,
+			sortIconClass: column.isSorting ?
+				"slds-is-sortable__icon slds-is-sorted__icon" :
+				"slds-is-sortable__icon"
+		}));
+	}
+
 	connectedCallback() {
 		this.subscribeToEvents();
 	}
@@ -135,7 +144,7 @@ export default class WorkOrderListViewHeader extends WorkOrderListViewEventBus {
 	}
 
 	handleOnColumnsUpdated(columns) {
-		this.columns = columns;
+		this.columns = [...columns];
 	}
 
 	handleOnWorkOrderPageFetched(data) {

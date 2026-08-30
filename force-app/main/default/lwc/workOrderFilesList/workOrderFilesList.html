@@ -1,0 +1,53 @@
+<template>
+<div class="files-wrap">
+	<!-- <lightning-file-upload
+		label="Upload File"
+		record-id={recordId}
+		onuploadfinished={handleUploadFinished}
+		multiple></lightning-file-upload> -->
+
+	<p lwc:if={hasError}
+		class="slds-text-color_error slds-var-m-bottom_small">
+		{errorMessage}
+	</p>
+
+	<template lwc:if={hasFiles}>
+		<ul class="slds-has-dividers_bottom-space slds-var-m-bottom_small">
+			<li for:each={files}
+				for:item="file"
+				key={file.id}
+				class="slds-item slds-media slds-media_center">
+				<div class="slds-media__figure">
+					<lightning-icon
+						icon-name={file.iconName}
+						size="small"
+						alternative-text="File"></lightning-icon>
+				</div>
+				<div class="slds-media__body">
+					<button type="button"
+						data-file-id={file.id}
+						onclick={handleOpenFileRecordClick}
+						class="file-title">
+						{file.title}
+					</button>
+					<div class="slds-text-color_weak slds-text-body_small">
+						{file.fileType} | {file.sizeLabel} | {file.createdLabel}
+					</div>
+				</div>
+				<div class="slds-media__figure slds-media__figure_reverse">
+					<lightning-button
+						label="View"
+						variant="neutral"
+						data-file-id={file.id}
+						onclick={handlePreviewClick}
+						class="slds-var-m-right_x-small"></lightning-button>
+				</div>
+			</li>
+		</ul>
+	</template>
+	<p lwc:else
+		class="slds-text-color_weak slds-var-m-top_small">
+		No files attached to this work order yet.
+	</p>
+</div>
+</template>

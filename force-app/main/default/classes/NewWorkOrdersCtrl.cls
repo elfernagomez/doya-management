@@ -214,17 +214,30 @@ public with sharing class NewWorkOrdersCtrl {
 			if (productIds == null || productIds.isEmpty()) {
 				return result;
 			}
-			// Lookup goes from SOP__c -> Product__c, so query SOP__c records
-			for (SOP__c s : [
-				SELECT Id, Name, Product__c, IsDefault__c, CreatedDate
-				FROM SOP__c
+
+			for (SopProduct__c sp : [
+				SELECT Id,
+					Product__c,
+					SOP__c,
+					SOP__r.Name,
+					IsDefault__c,
+					IsSopActive__c,
+					CreatedDate
+				FROM SopProduct__c
 				WHERE Product__c IN :productIds
 				AND IsDefault__c = true
-				ORDER BY CreatedDate DESC
+				AND IsSopActive__c = true
+				AND SOP__c != null
+				ORDER BY CreatedDate ASC
 			]) {
-				// keep the first SOP found per product (most recently created due to ordering)
-				if (!result.containsKey(s.Product__c)) {
-					result.put(s.Product__c, s);
+				if (!result.containsKey(sp.Product__c)) {
+					result.put(
+						sp.Product__c,
+						new SOP__c(
+							Id = sp.SOP__c,
+							Name = sp.SOP__r?.Name
+						)
+					);
 				}
 			}
 			return result;

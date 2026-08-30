@@ -47,6 +47,12 @@ export default class ProductManagerBase extends InputBase {
 	@api
 	allowDeleteOnView = false;
 
+	@api
+	allowCreateWorkOrderOnView = false;
+
+	@api
+	hideCreateWorkOrderButton = false;
+
 	@track
 	_products = [];
 

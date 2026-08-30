@@ -144,6 +144,12 @@ export default class ProductCard extends NavigationMixin(InputBase) {
 	hidePartsToggle = false;
 
 	@api
+	hideCreateWorkOrderButton = false;
+
+	@api
+	allowCreateWorkOrderOnView = false;
+
+	@api
 	allowDeleteOnView = false;
 
 	@track
@@ -188,6 +194,11 @@ export default class ProductCard extends NavigationMixin(InputBase) {
 
 	get showDeliveryGroup() {
 		return !this.hideDeliveryGroup && this._product.groupId;
+	}
+
+	get showCreateWorkOrderButton() {
+		return !this.hideCreateWorkOrderButton &&
+			(this.isEdit || this.allowCreateWorkOrderOnView);
 	}
 
 	get mainViewClass() {

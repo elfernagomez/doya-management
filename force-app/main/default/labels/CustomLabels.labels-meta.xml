@@ -124,7 +124,7 @@
 		<language>en_US</language>
 		<protected>false</protected>
 		<shortDescription>WorkOrderListView_orderProductsButtonLabel</shortDescription>
-		<value>{0} Order Product(s)</value>
+		<value>Order Products ({0})</value>
 	</labels>
 	<labels>
 		<fullName>OrderProductPartsSelectionModal_partsAvailableTitle</fullName>
@@ -174,5 +174,19 @@
 		<protected>false</protected>
 		<shortDescription>OrderProductManager_readOnlyCompletedMessage</shortDescription>
 		<value>Order Products are read only once the Order reaches Completed or later status.</value>
+	</labels>
+	<labels>
+		<fullName>OrderPackingSlipManager_readOnlyCompletedMessage</fullName>
+		<language>en_US</language>
+		<protected>false</protected>
+		<shortDescription>OrderPackingSlipManager_readOnlyCompletedMessage</shortDescription>
+		<value>Packing Slips are read only once the Order reaches Delivered or later status.</value>
+	</labels>
+	<labels>
+		<fullName>OpportunityProductManager_readOnlyClosedMessage</fullName>
+		<language>en_US</language>
+		<protected>false</protected>
+		<shortDescription>OpportunityProductManager_readOnlyClosedMessage</shortDescription>
+		<value>Opportunity products are read only when Opportunity is closed.</value>
 	</labels>
 </CustomLabels>

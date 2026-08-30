@@ -5,3 +5,101 @@
 .full-height {
 	min-height: 100%;
 }
+
+.custom-tabset {
+    display: grid;
+    grid-template-columns: 12rem 1fr;
+    border-top: 1px solid var(--slds-g-color-border-base-1, #d8dde6);
+    background-color: var(--slds-g-color-surface-1, #ffffff);
+}
+
+.custom-tabset-horizontal {
+    display: block;
+    border-top: 0;
+    width: 100%;
+}
+
+.custom-tabset-horizontal .custom-tablist {
+    display: flex;
+    align-items: stretch;
+    border-right: 0;
+    border-bottom: 1px solid var(--slds-g-color-border-base-1, #d8dde6);
+    overflow-x: auto;
+}
+
+.custom-tabset-horizontal .custom-tab {
+    width: auto;
+    text-align: center;
+    border-bottom: 0;
+    border-right: 1px solid var(--slds-g-color-border-base-1, #d8dde6);
+    white-space: nowrap;
+}
+
+.custom-tabset-horizontal .custom-tab-active {
+    box-shadow: inset 0 -3px 0 var(--slds-g-color-brand-base-50, #0176d3);
+    border-right: 1px solid var(--slds-g-color-border-base-1, #d8dde6);
+}
+
+.custom-tabset-horizontal .custom-tab-active:after {
+    display: none;
+}
+
+.custom-tabset-horizontal .custom-tabpanel {
+    padding-top: 0.75rem;
+}
+
+.custom-tablist {
+    background-color: var(--slds-g-color-surface-1, #ffffff);
+    border-right: 1px solid var(--slds-g-color-border-base-1, #d8dde6);
+}
+
+.custom-tab {
+    width: 100%;
+    display: block;
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    border: 0;
+    border-bottom: 1px solid var(--slds-g-color-border-base-1, #d8dde6);
+    background-color: var(--slds-g-color-surface-1, #ffffff);
+    color: var(--slds-g-color-neutral-base-30, #2e2e2e);
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.2;
+    cursor: pointer;
+}
+
+.custom-tab:hover {
+    background-color: var(--slds-g-color-surface-2, #f3f3f3);
+}
+
+.custom-tab:focus {
+    outline: 2px solid var(--slds-g-color-brand-base-50, #0176d3);
+    outline-offset: -2px;
+}
+
+.custom-tab-active {
+    box-shadow: inset 3px 0 0 var(--slds-g-color-brand-base-50, #0176d3);
+    border-right: 0;
+    position: relative;
+}
+
+.custom-tab-active:after {
+    content: ' ';
+    position: absolute;
+    background-color: var(--slds-g-color-surface-1, #ffffff);
+    top: 0;
+    left: 100%;
+    bottom: 0;
+    width: 1px;
+}
+
+.custom-tab-muted {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.custom-tabpanel {
+    min-height: 4rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}

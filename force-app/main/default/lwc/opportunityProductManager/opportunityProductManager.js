@@ -24,6 +24,8 @@ import {
 
 import NewWorkOrdersModal from 'c/newWorkOrdersModal';
 import OrderProductPartsSelectionModal from 'c/orderProductPartsSelectionModal';
+import OPPORTUNITY_PRODUCT_MANAGER_READ_ONLY_CLOSED_MESSAGE
+	from '@salesforce/label/c.OpportunityProductManager_readOnlyClosedMessage';
 
 import getDeliveryGroups
 	from "@salesforce/apex/OrderProductManagerCtrl.getOpportunityDeliveryGroups";
@@ -96,8 +98,6 @@ import ITEM_TOTAL_PRICE_FIELD
 	from "@salesforce/schema/OpportunityLineItem.TotalPrice";
 import ITEM_CREATED_DATE_FIELD
 	from "@salesforce/schema/OpportunityLineItem.CreatedDate";
-import ITEM_WORK_ORDER_STATUS_FIELD
-	from "@salesforce/schema/OpportunityLineItem.WorkOrderStatus__c";
 import ITEM_PARENT_ITEM_FIELD
 	from "@salesforce/schema/OpportunityLineItem.ParentOrderProduct__c";
 import ITEM_PARENT_PRODUCT_FIELD
@@ -133,7 +133,6 @@ export function getFieldApiNames() {
 		`${ITEM_OBJECT.objectApiName}.${ITEM_PRODUCT_MATERIAL_NAME_FIELD.fieldApiName}`,
 		`${ITEM_OBJECT.objectApiName}.${ITEM_PRODUCT_RECORD_TYPE_ID_FIELD.fieldApiName}`,
 		`${ITEM_OBJECT.objectApiName}.${ITEM_PRODUCT_RECORD_TYPE_NAME_FIELD.fieldApiName}`,
-		`${ITEM_OBJECT.objectApiName}.${ITEM_WORK_ORDER_STATUS_FIELD.fieldApiName}`,
 		`${ITEM_OBJECT.objectApiName}.${ITEM_UNIT_TYPE_FIELD.fieldApiName}`,
 		`${ITEM_OBJECT.objectApiName}.${ITEM_QTY_FIELD.fieldApiName}`,
 		`${ITEM_OBJECT.objectApiName}.${ITEM_DEPTH_FIELD.fieldApiName}`,
@@ -169,7 +168,7 @@ export function convertFromRecord(r) {
 		materialName: getFieldValue(r, ITEM_PRODUCT_MATERIAL_NAME_FIELD),
 		productTypeId: getFieldValue(r, ITEM_PRODUCT_RECORD_TYPE_ID_FIELD),
 		productTypeName: getFieldValue(r, ITEM_PRODUCT_RECORD_TYPE_NAME_FIELD),
-		workOrderStatus: getFieldValue(r, ITEM_WORK_ORDER_STATUS_FIELD),
+		workOrderStatus: null,
 		unitType: getFieldValue(r, ITEM_UNIT_TYPE_FIELD),
 		qty: getFieldValue(r, ITEM_QTY_FIELD),
 		depth: getFieldValue(r, ITEM_DEPTH_FIELD),
@@ -212,7 +211,7 @@ export function convertFromApexRecord(r) {
 		materialName: r.Product2.Material__r?.Name,
 		productTypeId: r.Product2.RecordTypeId,
 		productTypeName: r.Product2.RecordType?.DeveloperName,
-		workOrderStatus: r.WorkOrderStatus__c,
+		workOrderStatus: null,
 		unitType: r.UnitType__c,
 		qty: r.Quantity,
 		depth: r.Depth__c,
@@ -251,6 +250,10 @@ export function calculateAggregations(items) {
  * @versino 1.0
  */
 export default class OpportunityProductManager extends NavigationMixin(InputBase) {
+	labels = {
+		readOnlyClosedMessage: OPPORTUNITY_PRODUCT_MANAGER_READ_ONLY_CLOSED_MESSAGE
+	};
+
 	@api
 	recordId;
 
@@ -277,6 +280,10 @@ export default class OpportunityProductManager extends NavigationMixin(InputBase
 	@wire(getObjectInfo, { objectApiName: GROUP_OBJECT })
 	deliveryGroupObjectInfo;
 
+	get showGroupList() {
+		return this.groups && this.groups.length > 0;
+	}
+
 	get opportunityItemCrud() {
 		const d = this.opportunityItemInfo.data;
 		return {
@@ -289,6 +296,18 @@ export default class OpportunityProductManager extends NavigationMixin(InputBase
 
 	get canEditOpportunityItems() {
 		return this.opportunityItemCrud.canCreate || this.opportunityItemCrud.canUpdate;
+	}
+
+	get isClosed() {
+		return !!getFieldValue(this.opportunity.data, STATUS_FIELD);
+	}
+
+	get canMutateOpportunityProducts() {
+		return this.canEditOpportunityItems && !this.isClosed;
+	}
+
+	get effectiveMode() {
+		return this.isClosed ? "view" : this.mode;
 	}
 
 	get opportunityDeliveryGroupRecordTypeId() {
@@ -323,19 +342,19 @@ export default class OpportunityProductManager extends NavigationMixin(InputBase
 	}
 
 	get showAddGroupButton() {
-		return this.canEditOpportunityItems && (this.isDraft || this.isEdit);
+		return this.canMutateOpportunityProducts && (this.isDraft || this.isEdit);
 	}
 
 	get showModeButtons() {
-		return this.canEditOpportunityItems;
+		return this.canMutateOpportunityProducts;
 	}
 
 	get allowAddProductsOnView() {
-		return this.canEditOpportunityItems && this.isDraft;
+		return this.canMutateOpportunityProducts && this.isDraft;
 	}
 
 	get allowDeleteOnView() {
-		return this.canEditOpportunityItems && this.isDraft;
+		return this.canMutateOpportunityProducts && this.isDraft;
 	}
 
 	get title() {
@@ -380,12 +399,44 @@ export default class OpportunityProductManager extends NavigationMixin(InputBase
 		this.getDiscounts();
 	}
 
+	handleOnModeClick(event) {
+		const nextMode = event.target.dataset.value;
+		if (nextMode == "edit" && this.preventMutationIfLocked()) {
+			return;
+		}
+
+		super.handleOnModeClick(event);
+	}
+
+	preventMutationIfLocked() {
+		if (!this.canMutateOpportunityProducts) {
+			this.mode = "view";
+			this.toast(
+				"Read Only",
+				this.labels.readOnlyClosedMessage,
+				"warning",
+				"dismissible"
+			);
+			return true;
+		}
+
+		return false;
+	}
+
 	handleOnAddGroupClick() {
+		if (this.preventMutationIfLocked()) {
+			return;
+		}
+
 		this.handleOnEditClick();
 		this.addNewGroup();
 	}
 
 	handleOnProductCreated(event) {
+		if (this.preventMutationIfLocked()) {
+			return;
+		}
+
 		this.handleOnEditClick();
 		const groupId = event.target.dataset.groupId;
 		const product = { ...event.detail };
@@ -439,14 +490,26 @@ export default class OpportunityProductManager extends NavigationMixin(InputBase
 	}
 
 	handleOnProductChange(event) {
+		if (this.preventMutationIfLocked()) {
+			return;
+		}
+
 		this.updateProduct(event.detail);
 	}
 
 	handleOnProductDeleteRequest() {
+		if (this.preventMutationIfLocked()) {
+			return;
+		}
+
 		this.handleOnEditClick();
 	}
 
 	handleOnProductDelete(event) {
+		if (this.preventMutationIfLocked()) {
+			return;
+		}
+
 		this.deleteProduct(event.detail);
 	}
 
@@ -495,6 +558,10 @@ export default class OpportunityProductManager extends NavigationMixin(InputBase
 	}
 
 	handleOnDrop(event) {
+		if (this.preventMutationIfLocked()) {
+			return;
+		}
+
 		let product = JSON.parse(event.dataTransfer.getData("text/json"));
 		let sourceGroupId = product.groupId;
 		let targetGroupId = event.currentTarget.dataset.groupId;
@@ -510,6 +577,10 @@ export default class OpportunityProductManager extends NavigationMixin(InputBase
 	}
 
 	handleOnGroupDelete(event) {
+		if (this.preventMutationIfLocked()) {
+			return;
+		}
+
 		this.deleteGroup(event.detail.recordId);
 	}
 

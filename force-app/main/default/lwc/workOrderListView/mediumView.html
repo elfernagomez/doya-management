@@ -95,7 +95,7 @@
 			class="slds-box
 				slds-box_x-small
 				slds-theme_default">
-			<lightning-layout-item size="5">
+			<lightning-layout-item size="12">
 				<lightning-layout multiple-rows="true">
 					<lightning-layout-item
 						for:each={row.mediumBottomColumns}
@@ -126,12 +126,9 @@
 					</lightning-layout-item>
 				</lightning-layout>
 			</lightning-layout-item>
-			<lightning-layout-item size="7"
-				class="slds-border_left">
-				<div class="slds-media
-						slds-media_center
-						slds-var-p-around_medium
-						full-height">
+			<lightning-layout-item size="12"
+				class="slds-border_top slds-var-m-top_small">
+				<div class="slds-media slds-media_center slds-var-p-top_small">
 					<div class="slds-media__body">
 						<c-work-order-line-item-manager
 							variant="compact"
@@ -162,35 +159,64 @@
 					</div>
 				</div>
 			</lightning-layout-item>
-			<lightning-layout-item lwc:if={row.isOpen}
-				size="12"
-				class="slds-border_top">
-				<div lwc:if={row.selectedItemId}
-					class="slds-var-m-top_large">
-					<c-work-order-single-line-item-manager
-						variant="fields"
-						data-index={i}
-						record-id={row.selectedItemId}
-						></c-work-order-single-line-item-manager>
-				</div>
-				<lightning-layout lwc:else
-					horizontal-align="center">
-					<lightning-layout-item padding="around-medium">
-						<div class="slds-media slds-media_center">
-							<div class="slds-media__figure">
-								<lightning-icon icon-name="utility:button_choice"
-									size="x-small"></lightning-icon>
-							</div>
-							<p class="slds-text-color_weak">
-								No selection. Select an item
-								to view its details here.
-							</p>
+			<lightning-layout-item size="12"
+				lwc:if={row.isOpen}
+				class="slds-border_top slds-var-m-top_small slds-var-p-top_small">
+				<div class="custom-tabset custom-tabset-horizontal">
+					<div class="custom-tablist"
+						role="tablist"
+						aria-orientation="vertical">
+						<button type="button"
+							role="tab"
+							class={row.orderProductsTabClass}
+							data-index={i}
+							onclick={handleOnOrderProductsTabActive}>
+							{row.orderProductsButtonLabel}
+						</button>
+						<button type="button"
+							role="tab"
+							class={row.stepDetailsTabClass}
+							data-index={i}
+							onclick={handleOnStepDetailsTabActive}>
+							Step Details
+						</button>
+						<button lwc:if={row.hasFiles}
+							type="button"
+							role="tab"
+							class={row.filesTabClass}
+							data-index={i}
+							onclick={handleOnFilesTabActive}>
+							{row.filesTabLabel}
+						</button>
+					</div>
+					<div class="custom-tabpanel"
+						role="tabpanel">
+						<div lwc:if={row.isOrderProductsTabActive}
+							class="slds-var-p-horizontal_small">
+							<c-product-manager lwc:if={row.hasOrderProducts}
+								products={row.orderProducts}
+								mode="view"
+								variant="list-item"
+								hide-add-products=true></c-product-manager>
 						</div>
-					</lightning-layout-item>
-				</lightning-layout>
+						<div lwc:if={row.isStepDetailsTabActive}
+							class="slds-var-p-horizontal_small">
+							<c-work-order-single-line-item-manager
+								variant="fields"
+								data-index={i}
+								record-id={row.selectedItemId}
+								></c-work-order-single-line-item-manager>
+						</div>
+						<div lwc:if={row.isFilesTabActive}
+							class="slds-var-p-horizontal_small">
+							<c-work-order-files-list
+								record-id={row.uniqueId}></c-work-order-files-list>
+						</div>
+					</div>
+				</div>
 			</lightning-layout-item>
 		</lightning-layout>
-		<lightning-layout lwc:if={row.hasOrderProducts}
+		<!-- <lightning-layout lwc:if={row.hasOrderProducts}
 			vertical-align="stretch"
 			multiple-rows="true"
 			class="slds-box
@@ -225,7 +251,7 @@
 					variant="list-item"
 					hide-add-products=true></c-product-manager>
 			</lightning-layout-item>
-		</lightning-layout>
+		</lightning-layout> -->
 	</div>
 </div>
 </template>

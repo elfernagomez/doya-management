@@ -50,7 +50,7 @@ export default class PageHeader extends LwcBase {
 		return this.numberOfVisibleActions >= this.actions.length ?
 			this.actions :
 			this.actions.slice(0, this.numberOfVisibleActions);
-	};
+	}
 
 	get invisibleActions() {
 		return this.numberOfVisibleActions >= this.actions.length ?

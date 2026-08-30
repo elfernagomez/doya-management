@@ -4,6 +4,18 @@ private class NewWorkOrdersCtrlTest {
 	static void testCreateWorkOrdersFromOrderItems() {
 		Id stdPbId = Test.getStandardPricebookId();
 
+		Pricebook2 stdPb = new Pricebook2(
+			Id = stdPbId,
+			IsActive = true
+		);
+		update stdPb;
+
+		Pricebook2 testPb = new Pricebook2(
+			Name = 'Test Price Book',
+			IsActive = true
+		);
+		insert testPb;
+
 		// Create test data
 		Account acc = new Account(
 			Name = 'Test Account'
@@ -21,9 +33,17 @@ private class NewWorkOrdersCtrlTest {
 		);
 		insert prod;
 
-		PricebookEntry pbe = new PricebookEntry(
+		PricebookEntry stdPbe = new PricebookEntry(
 			Product2Id = prod.Id,
 			Pricebook2Id = stdPbId,
+			UnitPrice = 100,
+			IsActive = true
+		);
+		insert stdPbe;
+
+		PricebookEntry pbe = new PricebookEntry(
+			Product2Id = prod.Id,
+			Pricebook2Id = testPb.Id,
 			UnitPrice = 100,
 			IsActive = true
 		);
@@ -31,18 +51,28 @@ private class NewWorkOrdersCtrlTest {
 
 		Order ord = new Order(
 			AccountId = acc.Id,
-			Pricebook2Id = stdPbId,
+			Pricebook2Id = testPb.Id,
 			EffectiveDate = Date.today(),
 			Status = 'Draft'
 		);
 		insert ord;
+
+		ord = [
+			SELECT Id, Pricebook2Id
+			FROM Order
+			WHERE Id = :ord.Id
+			LIMIT 1
+		];
+
+		Id orderPricebookEntryId =
+			(ord.Pricebook2Id == testPb.Id) ? pbe.Id : stdPbe.Id;
 
 		OrderItem oi = new OrderItem(
 			OrderId = ord.Id,
 			Product2Id = prod.Id,
 			Quantity = 1,
 			UnitPrice = 100,
-			PricebookEntryId = pbe.Id
+			PricebookEntryId = orderPricebookEntryId
 		);
 		insert oi;
 
@@ -66,18 +96,72 @@ private class NewWorkOrdersCtrlTest {
 		parentItem.qty = 1;
 		parentItem.isPart = false;
 		parentItem.hasParts = false;
+		parentItem.workOrderAction = 'new';
 		parentItem.items = new List<NewWorkOrdersCtrl.OrderProductDTO>{ childItem };
 
 		List<NewWorkOrdersCtrl.OrderProductDTO> orderItems =
 			new List<NewWorkOrdersCtrl.OrderProductDTO>{ parentItem };
 
 		Test.startTest();
-		List<WorkOrder> workOrders =
+		List<NewWorkOrdersCtrl.OrderProductDTO> result =
 			NewWorkOrdersCtrl.createWorkOrdersFromOrderItems(orderItems);
 		Test.stopTest();
 
-		System.assertNotEquals(null, workOrders, 'WorkOrders should not be null');
-		System.assertEquals(1, workOrders.size(), 'Should create one WorkOrder');
-		System.assertEquals(ord.Id, workOrders[0].Order__c, 'Order__c should match the test Order Id');
+		System.assertNotEquals(null, result, 'Result should not be null');
+		System.assertEquals(1, result.size(), 'Should return one DTO result');
+		System.assertNotEquals(null, result[0].workOrderId,
+			'Created workOrderId should be returned on the DTO.');
+
+		WorkOrder createdWorkOrder = [
+			SELECT Id, Order__c
+			FROM WorkOrder
+			WHERE Id = :result[0].workOrderId
+			LIMIT 1
+		];
+		System.assertEquals(ord.Id, createdWorkOrder.Order__c,
+			'Order__c should match the test Order Id');
+	}
+
+	@isTest
+	static void testGetDefaultSopPerProductFromJunction() {
+		Product2 prod = new Product2(
+			Name = 'Default SOP Product',
+			IsActive = true,
+			Category__c = 'Other',
+			RecordTypeId =
+				Schema.SObjectType.Product2
+					.getRecordTypeInfosByDeveloperName()
+					.get('Product').getRecordTypeId()
+		);
+		insert prod;
+
+		SOP__c sopA = new SOP__c(Name = 'SOP A');
+		SOP__c sopB = new SOP__c(Name = 'SOP B');
+		insert new List<SOP__c>{ sopA, sopB };
+
+		insert new SopProduct__c(
+			Product__c = prod.Id,
+			SOP__c = sopA.Id,
+			IsDefault__c = true
+		);
+		insert new SopProduct__c(
+			Product__c = prod.Id,
+			SOP__c = sopB.Id,
+			IsDefault__c = true
+		);
+
+		Test.startTest();
+		Map<Id, SOP__c> defaultsByProduct =
+			NewWorkOrdersCtrl.getDefaultSopPerProduct(
+				new List<Id>{ prod.Id }
+			);
+		Test.stopTest();
+
+		System.assert(defaultsByProduct.containsKey(prod.Id),
+			'Default SOP map should contain the product key.');
+		System.assertNotEquals(null, defaultsByProduct.get(prod.Id),
+			'Default SOP should be returned for the product.');
+		System.assertNotEquals(null, defaultsByProduct.get(prod.Id).Id,
+			'Returned default SOP must include an SOP Id.');
 	}
 }

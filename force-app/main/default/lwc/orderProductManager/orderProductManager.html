@@ -11,14 +11,6 @@
 		<c-scoped-notification
 			message={labels.readOnlyCompletedMessage}
 			variant="warning"></c-scoped-notification>
-		<!-- <c-badge variant="warning"
-			icon-position="left">
-			<lightning-icon slot="iconLeft"
-				icon-name="utility:info"
-				size="xx-small"
-				alternative-text="Info"></lightning-icon>
-			<span slot="body">{labels.readOnlyCompletedMessage}</span>
-		</c-badge> -->
 	</div>
 	<lightning-layout multiple-rows="true">
 		<lightning-layout-item flexibility="grow"
@@ -75,6 +67,7 @@
 						hide-add-products={hideAddProducts}
 						allow-add-products-on-view={allowAddProductsOnView}
 						allow-delete-on-view={allowDeleteOnView}
+						allow-create-work-order-on-view={allowCreateWorkOrderOnView}
 						data-group-id={group.uniqueId}
 						onproductcreate={handleOnProductCreated}
 						onproductchange={handleOnProductChange}
@@ -117,12 +110,13 @@
 								class="slds-page-header__title
 									slds-text-heading_small
 									slds-truncate">No Delivery Groups added yet</span>
-						</h2>`
+						</h2>
 					</div>
 				</div>
 			</div>
 		</div>
-		<div lwc:if={showAddGroupButton}>
+		<div lwc:if={showAddGroupButton}
+			class="slds-var-m-top_small">
 			<lightning-button
 				icon-name="utility:add"
 				label="New Group"

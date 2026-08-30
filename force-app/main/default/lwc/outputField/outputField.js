@@ -58,7 +58,7 @@ export default class OutputField extends LwcBase {
 	get displayValue() {
 		let value;
 		switch (this.type) {
-			case "record":
+			case "record": {
 				if (this.isLookup && this.relatedTo) {
 					const o = this.record[this.relationshipName];
 					if (o && o.displayValue && o.value) {
@@ -69,8 +69,18 @@ export default class OutputField extends LwcBase {
 					}
 				}
 
-				value = this.record[this.fieldName]?.displayValue ||
-					this.record[this.fieldName]?.value;
+				const fieldData = this.record[this.fieldName];
+				const hasDisplayValue =
+					fieldData?.displayValue != null &&
+					fieldData?.displayValue !== "";
+
+				value = hasDisplayValue ?
+					fieldData.displayValue :
+					fieldData?.value;
+
+				if (!hasDisplayValue && this.shouldFormatNumericValue(value)) {
+					value = this.formatNumericValue(value);
+				}
 				
 				if (this.isNameField && value && this.record.Id) {
 					return `<a href="/lightning/r/${
@@ -79,12 +89,70 @@ export default class OutputField extends LwcBase {
 						value}</a>`;
 				}
 
-				return value || "&nbsp;";
+				return value == null || value === "" ? "&nbsp;" : value;
+			}
 			case "object":
 			default:
 				value = this.record[this.fieldName];
 				return value;
 		}
+	}
+
+	shouldFormatNumericValue(value) {
+		if (!(this.isDecimal || this.isCurrency || this.isPercent)) {
+			return false;
+		}
+
+		if (typeof value === "number") {
+			return !Number.isNaN(value);
+		}
+
+		if (typeof value === "string" && value.trim() !== "") {
+			const parsed = Number(value);
+			return !Number.isNaN(parsed);
+		}
+
+		return false;
+	}
+
+	formatNumericValue(value) {
+		const numericValue = typeof value === "number" ? value : Number(value);
+		if (Number.isNaN(numericValue)) {
+			return value;
+		}
+
+		const locale = typeof navigator !== "undefined" && navigator.language ?
+			navigator.language :
+			"en-US";
+
+		const numberFormatOptions = {};
+		const maxFrac = Number(this.maximumFractionDigits);
+		const minFrac = Number(this.minimumFractionDigits);
+		const minInt = Number(this.minimumIntegerDigits);
+
+		if (!Number.isNaN(maxFrac)) {
+			numberFormatOptions.maximumFractionDigits = maxFrac;
+		}
+
+		if (!Number.isNaN(minFrac)) {
+			numberFormatOptions.minimumFractionDigits = minFrac;
+		}
+
+		if (!Number.isNaN(minInt)) {
+			numberFormatOptions.minimumIntegerDigits = minInt;
+		}
+
+		if (this.isCurrency) {
+			numberFormatOptions.style = "currency";
+			numberFormatOptions.currency = "USD";
+		} else if (this.isPercent) {
+			numberFormatOptions.style = "percent";
+		} else {
+			numberFormatOptions.style = "decimal";
+		}
+
+		return new Intl.NumberFormat(locale, numberFormatOptions)
+			.format(numericValue);
 	}
 
 	get isCheck() {

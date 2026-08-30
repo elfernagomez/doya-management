@@ -18,6 +18,8 @@ import getDeliveryGroupsByOrder
 	from '@salesforce/apex/DeliveryGroupManager.getDeliveryGroupsByOrder';
 
 import { createGroupFromApexRecord } from "c/deliveryGroupCard";
+import PACKING_SLIP_MANAGER_READ_ONLY_COMPLETED_MESSAGE
+	from '@salesforce/label/c.OrderPackingSlipManager_readOnlyCompletedMessage';
 
 const PACKING_SLIP_CDC_CHANNEL = '/data/PackingSlip__ChangeEvent';
 
@@ -60,6 +62,10 @@ function createPackingSlipItemWrapper(record) {
 export default class OrderPackingSlipManager extends InputBase {
 	@api recordId; // Order Id
 	labelDeletePackingSlipMessage = labelDeletePackingSlipMessage;
+	
+	labels = {
+		readOnlyCompletedMessage: PACKING_SLIP_MANAGER_READ_ONLY_COMPLETED_MESSAGE
+	};
 
 	@track groups = [];
 	@track isLoading = true;
@@ -94,6 +100,14 @@ export default class OrderPackingSlipManager extends InputBase {
 		return status !== 'Delivered' &&
 			status !== 'Invoiced' &&
 			status !== 'Cancelled';
+	}
+
+	get showModeButtons() {
+		return this.isOrderActionable;
+	}
+
+	get isDeliveredOrBeyond() {
+		return !this.isOrderActionable;
 	}
 
 	connectedCallback() {

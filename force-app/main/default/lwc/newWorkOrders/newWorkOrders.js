@@ -377,6 +377,10 @@ export default class NewWorkOrders extends NavigationMixin(LwcBase) {
 		product.showWorkOrderRecordPicker = product.workOrderAction == "add";
 		product.showSopRecordPicker = product.workOrderAction == "new";
 
+		if (product.showSopRecordPicker) {
+			this.preselectFirstDefaultSop(product, true);
+		}
+
 		if (product.showWorkOrderRecordPicker &&
 				!product.workOrderOptions) {
 			this.getWorkOrderOptions(product);
@@ -410,9 +414,12 @@ export default class NewWorkOrders extends NavigationMixin(LwcBase) {
 	handleOnDefaultSopSelectClick(event) {
 		const product = this.productGroups.find(p =>
 			p.uniqueId == event.target.dataset.uniqueId);
-		if (product.defaultSopId) {
-			product.sopId = product.defaultSopId;
-			product.sopRecord = product.defaultSopRecord;
+		if (product.defaultSopRecords?.length) {
+			const firstDefaultSop = product.defaultSopRecords[0];
+			product.sopId = firstDefaultSop.Id;
+			product.sopRecord = firstDefaultSop;
+			product.defaultSopId = firstDefaultSop.Id;
+			product.defaultSopRecord = firstDefaultSop;
 			product.isDefaultSopSelected = true;
 			this.setSelectionStatus(product, true);
 		}
@@ -518,6 +525,7 @@ export default class NewWorkOrders extends NavigationMixin(LwcBase) {
 					allowJoin: false,
 					sopId: null,
 					sopRecord: null,
+					defaultSopRecords: [],
 					defaultSopId: null,
 					defaultSopRecord: null,
 					isDefaultSopSelected: null,
@@ -601,6 +609,11 @@ export default class NewWorkOrders extends NavigationMixin(LwcBase) {
 			product.isSopDisabled ? null : this.sopCustomButtonIcon;
 		product.workOrderCustomButtonIcon =
 			product.isWorkOrderActionDisabled ? null : this.workOrderCustomButtonIcon;
+
+		if (product.showSopRecordPicker) {
+			this.preselectFirstDefaultSop(product);
+		}
+
 		this.selectAll = this.productGroups.every(p => p.isSelected);
 	}
 
@@ -615,16 +628,40 @@ export default class NewWorkOrders extends NavigationMixin(LwcBase) {
 				this.productGroups.forEach(p => {
 					const sop = defaultSops[p.productId];
 					if (sop) {
-						p.sopId = sop.Id;
-						p.sopRecord = sop;
+						p.defaultSopRecords = [sop];
 						p.defaultSopId = sop.Id;
 						p.defaultSopRecord = sop;
-						p.isDefaultSopSelected = true;
+						if (p.showSopRecordPicker) {
+							this.preselectFirstDefaultSop(p);
+						}
+
+						p.items.forEach(item => {
+							item.defaultSopId = sop.Id;
+							item.defaultSopRecord = sop;
+							item.defaultSopRecords = [sop];
+						});
 					}
 				});
 			})
 			.catch(error => {
 				this.addError("Error fetching default SOPs", error);
 			});
+	}
+
+	preselectFirstDefaultSop(product, forceSelection = false) {
+		const firstDefaultSop = product.defaultSopRecords?.[0] ||
+			product.defaultSopRecord;
+
+		if (!firstDefaultSop || (!forceSelection && product.sopId)) {
+			return;
+		}
+
+		product.sopId = firstDefaultSop.Id;
+		product.sopRecord = firstDefaultSop;
+		product.defaultSopId = firstDefaultSop.Id;
+		product.defaultSopRecord = firstDefaultSop;
+		product.isDefaultSopSelected = true;
+		product.sopCustomButtonIcon =
+			product.isSopDisabled ? null : this.sopCustomButtonIcon;
 	}
 }

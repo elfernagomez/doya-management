@@ -16,6 +16,8 @@ import getFieldDetailsFromFieldSet
 	from "@salesforce/apex/FieldSetManager.getFieldDetailsFromFieldSet";
 import getOrderItemsByWorkOrders
 	from "@salesforce/apex/WorkOrderListViewCtrl.getOrderItemsByWorkOrders";
+import getFileCountsByWorkOrders
+	from "@salesforce/apex/WorkOrderListViewCtrl.getFileCountsByWorkOrders";
 
 import WORK_ORDER_OBJECT from '@salesforce/schema/WorkOrder';
 import WORK_ORDER_STATUS_FIELD from '@salesforce/schema/WorkOrder.Status';
@@ -49,7 +51,7 @@ export default class WorkOrderListView
 	getRecordsConfig;
 	searchText;
 	sortBy;
-	isSortDesc;
+	isSortDesc = false;
 	pageNumber;
 	pageSize;
 	fixFiltersList;
@@ -61,6 +63,10 @@ export default class WorkOrderListView
 	checkboxColumnWidth = "32px";
 	numericColumnWidth = "6rem";
 	numericMediumBottomColumnWidth = "4.5rem";
+	orderProductsTabValue = "orderProducts";
+	stepDetailsTabValue = "stepDetails";
+	filesTabValue = "files";
+	tabsetKeyCounter = 0;
 
 	labels = {
 		...workOrderListViewLabels
@@ -91,6 +97,33 @@ export default class WorkOrderListView
 
 	get rowCheckboxColumnStyle() {
 		return `width:${this.checkboxColumnWidth};`;
+	}
+
+	getTabUiState(activeTabValue, selectedItemId) {
+		const isOrderProductsTabActive =
+			activeTabValue === this.orderProductsTabValue;
+		const isStepDetailsTabActive =
+			activeTabValue === this.stepDetailsTabValue;
+		const isFilesTabActive =
+			activeTabValue === this.filesTabValue;
+		const hasSelectedItem = !!selectedItemId;
+
+		return {
+			isOrderProductsTabActive,
+			isStepDetailsTabActive,
+			isFilesTabActive,
+			orderProductsTabClass: isOrderProductsTabActive ?
+				"custom-tab custom-tab-active" :
+				"custom-tab",
+			stepDetailsTabClass: [
+				"custom-tab",
+				isStepDetailsTabActive ? "custom-tab-active" : "",
+				hasSelectedItem ? "" : "custom-tab-muted"
+			].filter(Boolean).join(" "),
+			filesTabClass: isFilesTabActive ?
+				"custom-tab custom-tab-active" :
+				"custom-tab"
+		};
 	}
 
 	get workOrderFields() {
@@ -217,6 +250,15 @@ export default class WorkOrderListView
 				rowNumber: ++order,
 				isOpen: false,
 				uniqueId: r.result.id,
+				activeTabValue: this.orderProductsTabValue,
+				...this.getTabUiState(this.orderProductsTabValue, null),
+				hasFiles: false,
+				filesCount: 0,
+				filesTabLabel: "Files (0)",
+				tabsetKey: this.createTabsetKey(
+					r.result.id,
+					this.orderProductsTabValue
+				),
 				selectedItemId: null,
 				data: r.result.fields,
 				orderProducts: [],
@@ -252,10 +294,45 @@ export default class WorkOrderListView
 				})));
 
 			this.fetchPageOrderItems(data.results.map(r => r.result.id));
+			this.fetchPageFileCounts(data.results.map(r => r.result.id));
 		} else if (error) {
 			this.error = error;
 			this.records = [];
 		}
+	}
+
+	fetchPageFileCounts(workOrderIds) {
+		getFileCountsByWorkOrders({
+			workOrderIds
+		})
+		.then(result => {
+			this.data.forEach(row => {
+				const filesCount = result?.[row.uniqueId] || 0;
+				const hasFiles = filesCount > 0;
+				const activeTabValue =
+					!hasFiles && row.activeTabValue === this.filesTabValue ?
+						this.orderProductsTabValue :
+						row.activeTabValue;
+
+				row.filesCount = filesCount;
+				row.hasFiles = hasFiles;
+				row.filesTabLabel = `Files (${filesCount})`;
+				row.activeTabValue = activeTabValue;
+				this.mergeObjects(
+					row,
+					this.getTabUiState(activeTabValue, row.selectedItemId)
+				);
+			});
+
+			this.updateDataRefence();
+		})
+		.catch(error => {
+			this.addError([
+					"We encountered an issue while retrieving the file counts",
+					...this.getDmlErrors(error)
+				].join(". "),
+				error);
+		});
 	}
 
 	fetchPageOrderItems(workOrderIds) {
@@ -331,11 +408,20 @@ export default class WorkOrderListView
 	handleOnOpenRowClick(event) {
 		const index = parseInt(event.currentTarget.dataset.index, 10);
 		const selectedItemId = this.autoSelect(index);
+		const activeTabValue = selectedItemId ?
+			this.stepDetailsTabValue :
+			this.orderProductsTabValue;
 		this.editDataRow(
 			index,
 			{
 				isOpen: true,
-				selectedItemId
+				selectedItemId,
+				activeTabValue,
+					...this.getTabUiState(activeTabValue, selectedItemId),
+				tabsetKey: this.createTabsetKey(
+					this.data[index].uniqueId,
+					activeTabValue
+				)
 			});
 	}
 
@@ -353,17 +439,71 @@ export default class WorkOrderListView
 		this.getAllComponents("c-work-order-line-item-manager")
 			.forEach((c, i) => {
 				const s = c.selectedItem;
-				const row = this.data[i];
+				const changes = {};
 				if (s) {
 					selectedItems.push(s);
-					row.selectedItemId = s.uniqueId;
+					changes.selectedItemId = s.uniqueId;
+					changes.activeTabValue = this.stepDetailsTabValue;
 				} else {
-					row.selectedItemId = null;
+					changes.selectedItemId = null;
+					changes.activeTabValue = this.orderProductsTabValue;
 				}
+				this.editDataRow(i, {
+					...changes,
+						...this.getTabUiState(
+							changes.activeTabValue,
+							changes.selectedItemId
+						),
+					tabsetKey: this.createTabsetKey(
+						this.data[i].uniqueId,
+						changes.activeTabValue
+					)
+				});
 			});
 		this.publishEvent(
 			"itemSelectionChanged",
 			selectedItems);
+	}
+
+	handleOnOrderProductsTabActive(event) {
+		const index = parseInt(event.currentTarget.dataset.index, 10);
+		this.editDataRow(index, {
+				activeTabValue: this.orderProductsTabValue,
+				...this.getTabUiState(
+					this.orderProductsTabValue,
+					this.data[index].selectedItemId
+				)
+		});
+	}
+
+	handleOnStepDetailsTabActive(event) {
+		const index = parseInt(event.currentTarget.dataset.index, 10);
+		this.editDataRow(index, {
+				activeTabValue: this.stepDetailsTabValue,
+				...this.getTabUiState(
+					this.stepDetailsTabValue,
+					this.data[index].selectedItemId
+				)
+		});
+	}
+
+	handleOnFilesTabActive(event) {
+		const index = parseInt(event.currentTarget.dataset.index, 10);
+		if (!this.data[index].hasFiles) {
+			return;
+		}
+
+		this.editDataRow(index, {
+			activeTabValue: this.filesTabValue,
+			...this.getTabUiState(
+				this.filesTabValue,
+				this.data[index].selectedItemId
+			)
+		});
+	}
+
+	createTabsetKey(rowId, activeTabValue) {
+		return `${rowId}_${activeTabValue}_${++this.tabsetKeyCounter}`;
 	}
 
 	handleOnDeselectAllItemsRequested() {
@@ -530,6 +670,8 @@ export default class WorkOrderListView
 	}
 
 	sortByColumn(column) {
+		console.log("Sorting by column:", JSON.stringify(column));
+
 		// click has effect of sort if not sorting
 		// or switch asc/desc if sorting
 		if (column.isSorting) {
@@ -539,7 +681,6 @@ export default class WorkOrderListView
 			this.isSortDesc = false;
 		}
 
-		// remove sorting for the rest of the columsn
 		this.columns
 			.filter(c => c.fieldName != column.fieldName)
 			.forEach(c => {
@@ -547,12 +688,14 @@ export default class WorkOrderListView
 				c.isSortDesc = false;
 			});
 		
-		column.isSorting = true;
-		column.isSortDesc = this.isSortDesc;
-		this.updateColumnsRefence();
+		const col = this.columns.find(c => c.fieldName == column.fieldName)
+		col.isSorting = true;
+		col.isSortDesc = this.isSortDesc;
 		
+		this.updateColumnsRefence();
 		this.isLoading = true;
 		this.firstPage();
+		
 	}
 
 	reset() {

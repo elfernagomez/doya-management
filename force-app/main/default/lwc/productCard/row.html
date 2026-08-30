@@ -236,7 +236,8 @@
 				disabled={_product.isDisabled}
 				onclick={handleOnDeleteProductClick}></lightning-button-icon>
 
-			<!-- <lightning-button-menu alternative-text="Show menu"
+			<lightning-button-menu lwc:if={showCreateWorkOrderButton}
+				alternative-text="Show menu"
 				onselect={handleOnMenuSelect}
 				menu-alignment="right">
 				<template lwc:if={_product.isNew}></template>
@@ -244,7 +245,7 @@
 					value="createWorkOrder"
 					label="Create Work Order"
 					prefix-icon-name="utility:new"></lightning-menu-item>
-			</lightning-button-menu> -->
+			</lightning-button-menu>
 		</lightning-button-group>
 	</div>
 </div>
@@ -498,7 +499,8 @@
 				disabled={_product.isDisabled}
 				onclick={handleOnDeleteProductClick}></lightning-button-icon>
 
-			<lightning-button-menu alternative-text="Show menu"
+			<lightning-button-menu lwc:if={showCreateWorkOrderButton}
+				alternative-text="Show menu"
 				onselect={handleOnMenuSelect}
 				menu-alignment="right">
 				<template lwc:if={_product.isNew}></template>

@@ -98,7 +98,7 @@
 				</div>
 			</lightning-layout-item>
 			<lightning-layout-item scope="col"
-				for:each={columns}
+				for:each={headerColumns}
 				for:item="col"
 				for:index="i"
 				key={col.fieldName}
@@ -111,21 +111,17 @@
 					onclick={handleOnColmunClick}
 					class="slds-th__action
 						slds-text-link_reset">
-					<span class="slds-assistive-text">Sort by: </span>
-					<div class="slds-grid
-							slds-grid_vertical-align-center
-							slds-has-flexi-truncate">
-						<b class="slds-truncate"
-							title={col.label}>{col.label}</b>
-						<lightning-icon lwc:if={col.isSortDesc}
-							icon-name="utility:arrowdown"
-							size="xx-small"
-							class="slds-is-sortable__icon"></lightning-icon>
-						<lightning-icon lwc:else
-							icon-name="utility:arrowup"
-							size="xx-small"
-							class="slds-is-sortable__icon"></lightning-icon>
-					</div>
+					<span class="slds-assistive-text">Sort by</span>
+					<b class="slds-truncate"
+						title={col.label}>{col.label}</b>
+					<lightning-icon lwc:if={col.isSortDesc}
+						icon-name="utility:arrowdown"
+						size="xx-small"
+						class={col.sortIconClass}></lightning-icon>
+					<lightning-icon lwc:else
+						icon-name="utility:arrowup"
+						size="xx-small"
+						class={col.sortIconClass}></lightning-icon>
 				</a>
 			</lightning-layout-item>
 		</lightning-layout>

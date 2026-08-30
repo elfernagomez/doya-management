@@ -7,3 +7,7 @@
     --slds-c-button-line-height: 1.7;
     --slds-c-button-font-size: 0.85rem;
 }
+
+.slds-is-sorted__icon {
+	opacity: 1;
+}
