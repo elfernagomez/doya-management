@@ -248,12 +248,81 @@ export default class NewWorkOrders extends NavigationMixin(LwcBase) {
 	}
 
 	handleOnJoinClick(event) {
-		/* event.preventDefault();
-		const index = this.productGroups.findIndex(p =>
-			p.uniqueId == event.target.dataset.uniqueId);
-		const product = this.productGroups[index]; */
+		event.preventDefault();
+		const selectedUniqueId = event.target.dataset.uniqueId;
+		const selectedProduct = this.productGroups.find(p =>
+			p.uniqueId == selectedUniqueId);
 
-		// 
+		if (!selectedProduct) {
+			return;
+		}
+
+		const sameGroupKey = (product) => [
+			product.productId,
+			product.unitType,
+			product.width,
+			product.height,
+			product.depth
+		].join(":");
+
+		const selectedKey = sameGroupKey(selectedProduct);
+		const splitRows = this.productGroups
+			.map((product, index) => ({ product, index }))
+			.filter(({ product }) =>
+				product.allowJoin && sameGroupKey(product) == selectedKey);
+
+		if (splitRows.length <= 1) {
+			return;
+		}
+
+		const firstIndex = Math.min(...splitRows.map(r => r.index));
+		const mergedItems = splitRows.flatMap(r =>
+			(r.product.items?.length ? r.product.items : [r.product]));
+		const mergedWorkOrders = splitRows.flatMap(r => r.product.workOrders || []);
+		const mergedQty = splitRows.reduce((sum, r) =>
+			sum + (Number(r.product.qty) || 0), 0);
+
+		const sopSelectionSource =
+			splitRows.find(r => r.product.uniqueId == selectedUniqueId)?.product ||
+			splitRows.find(r => r.product.sopId)?.product ||
+			splitRows[0].product;
+
+		const defaultSopSource =
+			splitRows.find(r => r.product.defaultSopRecords?.length)?.product ||
+			splitRows.find(r => r.product.defaultSopRecord)?.product ||
+			splitRows[0].product;
+
+		const mergedProduct = {
+			...splitRows[0].product,
+			qty: mergedQty,
+			items: mergedItems,
+			workOrders: mergedWorkOrders,
+			allowSplit: mergedItems.length > 1,
+			allowJoin: false,
+			isSelected: mergedWorkOrders.length == 0,
+			isSopDisabled: mergedWorkOrders.length != 0,
+			isWorkOrderActionDisabled: mergedWorkOrders.length != 0,
+			isWorkOrderRecordPickerDisabled: mergedWorkOrders.length != 0,
+			sopId: sopSelectionSource.sopId || null,
+			sopRecord: sopSelectionSource.sopRecord || null,
+			defaultSopRecords: defaultSopSource.defaultSopRecords ||
+				(defaultSopSource.defaultSopRecord ? [defaultSopSource.defaultSopRecord] : []),
+			defaultSopId: defaultSopSource.defaultSopId ||
+				defaultSopSource.defaultSopRecord?.Id || null,
+			defaultSopRecord: defaultSopSource.defaultSopRecord || null,
+			isDefaultSopSelected: !!(sopSelectionSource.sopId &&
+				(sopSelectionSource.sopId == defaultSopSource.defaultSopId ||
+				sopSelectionSource.sopId == defaultSopSource.defaultSopRecord?.Id))
+		};
+
+		const rowsToRemove = [...splitRows]
+			.sort((a, b) => b.index - a.index)
+			.map(r => r.index);
+		rowsToRemove.forEach(index => this.productGroups.splice(index, 1));
+		this.productGroups.splice(firstIndex, 0, mergedProduct);
+
+		this.setSelectionStatus(mergedProduct, mergedProduct.isSelected);
+		this.productGroups = [...this.productGroups];
 	}
 
 	handleOnSopSelectClick(event) {
